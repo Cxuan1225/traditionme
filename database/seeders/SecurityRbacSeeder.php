@@ -12,29 +12,47 @@ use Spatie\Permission\PermissionRegistrar;
 class SecurityRbacSeeder extends Seeder
 {
     /**
-     * @var list<string>
+     * @var array<string, list<string>>
      */
-    private const PERMISSIONS = [
-        'roles.view',
-        'roles.create',
-        'roles.manage_permissions',
-        'permissions.view',
-        'permissions.create',
-        'users.assign_roles',
-        'security.audit.view',
-        'security.sessions.revoke',
-        'security.mfa.manage',
+    private const ROLE_PERMISSION_MATRIX = [
+        'admin' => [
+            'roles.view',
+            'roles.create',
+            'roles.manage_permissions',
+            'permissions.view',
+            'permissions.create',
+            'users.assign_roles',
+            'security.audit.view',
+            'security.sessions.revoke',
+            'security.mfa.manage',
+        ],
+        'seller' => [
+            'security.mfa.manage',
+        ],
+        'user' => [
+            'security.mfa.manage',
+        ],
     ];
 
     public function run(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        foreach (self::PERMISSIONS as $permission) {
+        $permissions = collect(self::ROLE_PERMISSION_MATRIX)
+            ->flatten()
+            ->unique()
+            ->values()
+            ->all();
+
+        foreach ($permissions as $permission) {
             Permission::findOrCreate($permission, 'web');
         }
 
-        $superAdmin = Role::findOrCreate('super-admin', 'web');
-        $superAdmin->syncPermissions(self::PERMISSIONS);
+        foreach (self::ROLE_PERMISSION_MATRIX as $roleName => $rolePermissions) {
+            $role = Role::findOrCreate($roleName, 'web');
+            $role->syncPermissions($rolePermissions);
+        }
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

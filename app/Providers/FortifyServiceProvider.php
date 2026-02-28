@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
@@ -54,7 +56,7 @@ class FortifyServiceProvider extends ServiceProvider
         ]));
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/ResetPassword', [
-            'email' => $request->email,
+            'email' => $request->string('email')->toString(),
             'token' => $request->route('token'),
         ]));
 
@@ -79,11 +81,16 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureRateLimiting(): void
     {
         RateLimiter::for('two-factor', function (Request $request) {
-            return Limit::perMinute(5)->by($request->session()->get('login.id'));
+            $loginId = $request->session()->get('login.id');
+
+            return Limit::perMinute(5)->by(is_string($loginId) || is_int($loginId) ? $loginId : '');
         });
 
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $usernameInput = $request->input(Fortify::username());
+            $username = is_string($usernameInput) ? $usernameInput : '';
+            $ipAddress = $request->ip() ?? '';
+            $throttleKey = Str::transliterate(Str::lower($username).'|'.$ipAddress);
 
             return Limit::perMinute(5)->by($throttleKey);
         });

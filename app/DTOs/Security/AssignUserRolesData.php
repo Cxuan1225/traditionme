@@ -17,8 +17,18 @@ readonly class AssignUserRolesData
 
     public static function fromRequest(AssignUserRolesRequest $request): self
     {
-        /** @var list<string> $roles */
-        $roles = array_values($request->validated('roles'));
+        $rawRoles = $request->validated('roles');
+
+        if (! is_array($rawRoles)) {
+            $rawRoles = [];
+        }
+
+        $roles = [];
+        foreach ($rawRoles as $role) {
+            if (is_string($role)) {
+                $roles[] = $role;
+            }
+        }
 
         return new self(roles: $roles);
     }

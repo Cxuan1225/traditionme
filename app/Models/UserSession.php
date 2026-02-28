@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property string $session_id
+ * @property int $user_id
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Carbon\CarbonImmutable|\Illuminate\Support\Carbon|string|null $last_activity_at
+ * @property \Carbon\CarbonImmutable|\Illuminate\Support\Carbon|string|null $revoked_at
+ */
 class UserSession extends Model
 {
-    use HasFactory;
-
     /**
      * @var list<string>
      */
@@ -32,6 +38,9 @@ class UserSession extends Model
         'revoked_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

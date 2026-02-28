@@ -15,14 +15,17 @@ class SessionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var \App\Models\UserSession $session */
+        $session = $this->resource;
+
         return [
-            'id' => $this->id,
-            'session_id' => $this->session_id,
-            'user_id' => $this->user_id,
-            'ip_address' => $this->ip_address,
-            'user_agent' => $this->user_agent,
-            'last_activity_at' => $this->last_activity_at,
-            'revoked_at' => $this->revoked_at,
+            'id' => $session->id,
+            'session_id' => $session->session_id,
+            'user_id' => $session->user_id,
+            'ip_address' => $session->ip_address,
+            'user_agent' => $session->user_agent,
+            'last_activity_at' => $session->last_activity_at,
+            'revoked_at' => $session->revoked_at,
         ];
     }
 }

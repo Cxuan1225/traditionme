@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->prefix('settings/security')->group(function (): void {
     Route::get('roles', [RoleController::class, 'index'])
-        ->middleware('role_or_permission:super-admin|roles.view')
+        ->middleware('role_or_permission:admin|roles.view')
         ->name('security.roles.index');
 
     Route::post('roles', [RoleController::class, 'store'])
@@ -26,6 +26,6 @@ Route::middleware(['auth'])->prefix('settings/security')->group(function (): voi
         ->name('security.users.roles.update');
 
     Route::get('audit-logs', [AuditLogController::class, 'index'])
-        ->middleware('role:super-admin')
+        ->middleware('role:admin')
         ->name('security.audit-logs.index');
 });

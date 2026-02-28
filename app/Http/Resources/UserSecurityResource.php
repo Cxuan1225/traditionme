@@ -15,11 +15,14 @@ class UserSecurityResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var \App\Models\User $user */
+        $user = $this->resource;
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'roles' => RoleResource::collection($this->whenLoaded('roles')),
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => RoleResource::collection($user->relationLoaded('roles') ? $user->roles : collect()),
         ];
     }
 }

@@ -17,8 +17,18 @@ readonly class SyncRolePermissionsData
 
     public static function fromRequest(SyncRolePermissionsRequest $request): self
     {
-        /** @var list<string> $permissions */
-        $permissions = array_values($request->validated('permissions'));
+        $rawPermissions = $request->validated('permissions');
+
+        if (! is_array($rawPermissions)) {
+            $rawPermissions = [];
+        }
+
+        $permissions = [];
+        foreach ($rawPermissions as $permission) {
+            if (is_string($permission)) {
+                $permissions[] = $permission;
+            }
+        }
 
         return new self(permissions: $permissions);
     }

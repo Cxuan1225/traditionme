@@ -1,0 +1,82 @@
+# .codex/config.toml
+# Central configuration for the multi-agent system.
+
+[project]
+name = "tradition-me"
+stack = "Laravel + Vue 3 + Inertia"
+agents_enabled = true                    # Toggle multi-agent system on/off
+agents_dir = ".codex/agents"             # Where agent .md files live
+
+# Codex native multi-agent execution (official support):
+# https://developers.openai.com/codex/multi-agent/
+[features]
+multi_agent = true
+
+# ─── Agents ──────────────────────────────────────────────────────────────────
+
+[agents]
+max_threads = 6
+max_depth = 2
+
+[agents.orchestrator]
+description = "Lead coordinator for planning, delegation, and pipeline progression."
+config_file = "agents/orchestrator.toml"
+
+[agents.backend]
+description = "Laravel backend specialist for app/routes/database/tests server-side changes."
+config_file = "agents/backend.toml"
+
+[agents.frontend]
+description = "Vue/Inertia frontend specialist for resources/js and related UI layers."
+config_file = "agents/frontend.toml"
+
+[agents.qa]
+description = "Verification specialist for tests, lint, type checks, and acceptance validation."
+config_file = "agents/qa.toml"
+
+[agents.docs]
+description = "Documentation specialist for .codex/docs/README synchronization."
+config_file = "agents/docs.toml"
+
+[agents.monitor]
+description = "Polling/watchdog role for asynchronous waits and status checks."
+config_file = "agents/monitor.toml"
+
+# ─── Workflow Pipeline ───────────────────────────────────────────────────────
+
+[pipeline]
+stages = ["plan", "design", "implement", "verify", "document", "archive"]
+tasks_dir = ".codex/tasks"
+archive_dir = ".codex/archive"
+archive_index = ".codex/archive/index.md"    # Entry point for archived tasks
+
+[pipeline.archive]
+group_by = "completion_date"                 # YYYY-MM-DD folder structure
+sort_order = "desc"                          # Newest first
+update_index = true                          # Auto-update archive/index.md on archival
+
+# ─── Documentation ───────────────────────────────────────────────────────────
+
+[docs]
+engine = "vitepress"
+version = "2.x"
+source_dir = "docs/"                          # Future VitePress source directory
+output_dir = "docs/.vitepress/dist"
+
+[docs.plugins]
+mermaid = true                                # vitepress-plugin-mermaid — diagrams
+search = true                                 # Built-in VitePress search (MiniSearch)
+tabs = true                                   # vitepress-plugin-tabs — tabbed content blocks
+group_icons = true                            # vitepress-plugin-group-icons — tech icon grouping
+
+# ─── Quality Gates ───────────────────────────────────────────────────────────
+
+[quality]
+strict_types = true                              # declare(strict_types=1) required in all PHP files
+phpstan_level = 10                                # PHPStan / Larastan max level
+phpstan = "vendor/bin/phpstan analyse --memory-limit=512M"  # Static analysis (level 10, Larastan)
+lint_backend = "vendor/bin/pint --test"           # Laravel Pint code style
+lint_frontend = "npm run lint:check"              # ESLint
+typecheck_frontend = "npm run types:check"        # vue-tsc --noEmit
+format = "npm run format:check"                   # Prettier
+test = "php artisan test"                          # Pest

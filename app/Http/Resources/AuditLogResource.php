@@ -15,16 +15,19 @@ class AuditLogResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var \App\Models\AuditLog $auditLog */
+        $auditLog = $this->resource;
+
         return [
-            'id' => $this->id,
-            'actor_id' => $this->actor_id,
-            'event' => $this->event,
-            'subject_type' => $this->subject_type,
-            'subject_id' => $this->subject_id,
-            'ip_address' => $this->ip_address,
-            'user_agent' => $this->user_agent,
-            'metadata' => $this->metadata,
-            'occurred_at' => $this->occurred_at,
+            'id' => $auditLog->id,
+            'actor_id' => $auditLog->actor_id,
+            'event' => $auditLog->event,
+            'subject_type' => $auditLog->subject_type,
+            'subject_id' => $auditLog->subject_id,
+            'ip_address' => $auditLog->ip_address,
+            'user_agent' => $auditLog->user_agent,
+            'metadata' => $auditLog->metadata,
+            'occurred_at' => $auditLog->occurred_at,
         ];
     }
 }

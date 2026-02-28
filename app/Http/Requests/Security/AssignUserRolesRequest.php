@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Security;
 
-use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,16 +15,16 @@ class AssignUserRolesRequest extends FormRequest
         return true;
     }
 
-    /**
-     * @return array<string, ValidationRule|array<int, ValidationRule|string>|string>
-     */
+    /** @return array<string, mixed> */
     public function rules(): array
     {
         return [
             'roles' => ['required', 'array'],
             'roles.*' => [
                 'string',
-                Rule::exists('roles', 'name')->where(fn ($query) => $query->where('guard_name', 'web')),
+                Rule::exists('roles', 'name')->where(
+                    static fn (QueryBuilder $query): QueryBuilder => $query->where('guard_name', 'web')
+                ),
                 'distinct',
             ],
         ];
