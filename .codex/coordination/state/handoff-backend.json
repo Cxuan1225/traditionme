@@ -1,8 +1,0 @@
-{
-  "status": "in_progress",
-  "lock": "none",
-  "resume_from": "orchestrator-unblock-2026-03-01T05:18:07",
-  "last_updated": "2026-02-28",
-  "task": "RBAC role matrix for `admin`, `user`, `seller` (DB/seeder contract)",
-  "file": "C:\\Users\\haoji_hq4bjqi\\Herd\\tradition-me\\.codex\\tasks\\handoffs\\backend.md"
-}
