@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import DeleteUser from '@/components/DeleteUser.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getInitials } from '@/composables/useInitials';
 import AdminLayout from '@/layouts/admin/Layout.vue';
 import SettingsLayout from '@/layouts/settings/AdminSettingsLayout.vue';
 import { edit } from '@/routes/profile';
@@ -30,6 +32,39 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
+const avatarPreview = ref<string | null>(null);
+const removeAvatar = ref<boolean>(false);
+
+const displayedAvatar = computed<string | null>(() => {
+    if (removeAvatar.value) {
+        return avatarPreview.value;
+    }
+
+    return avatarPreview.value ?? user.value.avatar ?? null;
+});
+
+const handleAvatarChange = (event: Event): void => {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    if (avatarPreview.value !== null) {
+        URL.revokeObjectURL(avatarPreview.value);
+        avatarPreview.value = null;
+    }
+
+    if (file === null) {
+        return;
+    }
+
+    avatarPreview.value = URL.createObjectURL(file);
+    removeAvatar.value = false;
+};
+
+onBeforeUnmount(() => {
+    if (avatarPreview.value !== null) {
+        URL.revokeObjectURL(avatarPreview.value);
+    }
+});
 </script>
 
 <template>
@@ -51,6 +86,46 @@ const user = computed(() => page.props.auth.user);
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
+                    <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
+                        <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Profile photo</p>
+                        <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
+                            <Avatar class="h-24 w-20 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                                <AvatarImage
+                                    v-if="displayedAvatar"
+                                    :src="displayedAvatar"
+                                    :alt="user.name"
+                                    class="object-cover object-center"
+                                />
+                                <AvatarFallback class="bg-zinc-900 text-sm font-bold text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900">
+                                    {{ getInitials(user.name) }}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div class="flex-1 space-y-2">
+                                <Input
+                                    id="avatar"
+                                    name="avatar"
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp"
+                                    class="cursor-pointer"
+                                    @change="handleAvatarChange"
+                                />
+                                <Label
+                                    v-if="user.avatar"
+                                    class="inline-flex items-center gap-2 text-sm font-normal text-zinc-700 dark:text-zinc-300"
+                                >
+                                    <input
+                                        v-model="removeAvatar"
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-zinc-300"
+                                    />
+                                    Remove current photo
+                                </Label>
+                                <input v-if="removeAvatar" type="hidden" name="remove_avatar" value="1" />
+                                <InputError :message="errors.avatar || errors.remove_avatar" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid gap-2">
                         <Label for="name">Name</Label>
                         <Input

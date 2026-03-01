@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -15,6 +17,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property string|null $avatar_path
+ * @property string|null $avatar
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
  */
@@ -31,6 +35,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'avatar_path',
         'password',
     ];
 
@@ -41,9 +46,17 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'avatar_path',
         'two_factor_secret',
         'two_factor_recovery_codes',
         'remember_token',
+    ];
+
+    /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'avatar',
     ];
 
     /**
@@ -58,5 +71,16 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    protected function avatar(): Attribute
+    {
+        return Attribute::get(function (): ?string {
+            if ($this->avatar_path === null || $this->avatar_path === '') {
+                return null;
+            }
+
+            return Storage::disk('public')->url($this->avatar_path);
+        });
     }
 }

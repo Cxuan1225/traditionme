@@ -12,7 +12,9 @@ use App\Support\AdminViewMode;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -46,7 +48,20 @@ class ProfileController extends Controller
 
         /** @var array<string, mixed> $validated */
         $validated = $request->validated();
-        $user->fill($validated);
+        $user->fill(Arr::except($validated, ['avatar', 'remove_avatar']));
+
+        if ($request->boolean('remove_avatar') && $user->avatar_path !== null) {
+            Storage::disk('public')->delete($user->avatar_path);
+            $user->avatar_path = null;
+        }
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar_path !== null) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+
+            $user->avatar_path = $request->file('avatar')?->store('avatars', 'public');
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;

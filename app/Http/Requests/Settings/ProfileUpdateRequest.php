@@ -23,6 +23,10 @@ class ProfileUpdateRequest extends FormRequest
         $user = $this->user();
         $userId = $user instanceof User ? $user->id : null;
 
-        return $this->profileRules($userId);
+        return [
+            ...$this->profileRules($userId),
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_avatar' => ['nullable', 'boolean'],
+        ];
     }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { KeyRound, ShieldCheck, TriangleAlert } from 'lucide-vue-next';
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -18,7 +19,11 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
 
         <SettingsLayout>
             <div class="rounded-[1.75rem] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-                <div class="mb-6 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-cyan-100 p-4 dark:border-zinc-700 dark:from-zinc-800 dark:to-zinc-800">
+                <div class="mb-6 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-cyan-50 to-teal-100 p-5 dark:border-zinc-700 dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-800">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-white/80 px-3 py-1 text-xs font-bold tracking-[0.14em] text-emerald-700 uppercase dark:border-zinc-600 dark:bg-zinc-900 dark:text-emerald-300">
+                        <KeyRound class="size-3.5" />
+                        Credentials
+                    </div>
                     <Heading
                         variant="small"
                         title="Update password"
@@ -26,7 +31,7 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                     />
                 </div>
 
-                <div class="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+                <div class="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
                     <Form
                         v-bind="PasswordController.update.form()"
                         :options="{
@@ -38,7 +43,7 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                             'password_confirmation',
                             'current_password',
                         ]"
-                        class="space-y-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800"
+                        class="space-y-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-700 dark:bg-zinc-800"
                         v-slot="{ errors, processing, recentlySuccessful }"
                     >
                         <div class="grid gap-2">
@@ -87,7 +92,7 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                                 :disabled="processing"
                                 class="h-11 rounded-full bg-zinc-900 px-6 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                                 data-test="update-password-button"
-                                >Save password</Button
+                                >Save new password</Button
                             >
 
                             <Transition
@@ -107,12 +112,21 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                     </Form>
 
                     <aside class="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/90">
-                        <p class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Password rules</p>
-                        <ul class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
-                            <li class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">At least 12 characters.</li>
-                            <li class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">Mix uppercase, lowercase, number, and symbol.</li>
-                            <li class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">Avoid reuse from other apps.</li>
-                        </ul>
+                        <p class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Security checklist</p>
+                        <div class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+                            <p class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">
+                                <span class="inline-flex items-center gap-2"><ShieldCheck class="size-3.5" />At least 12 characters</span>
+                            </p>
+                            <p class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">
+                                <span class="inline-flex items-center gap-2"><ShieldCheck class="size-3.5" />Mixed character types</span>
+                            </p>
+                            <p class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">
+                                <span class="inline-flex items-center gap-2"><TriangleAlert class="size-3.5" />Avoid reused passwords</span>
+                            </p>
+                        </div>
+                        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
+                            Tip: update your password before major sale periods to keep checkout account safe.
+                        </div>
                     </aside>
                 </div>
             </div>
