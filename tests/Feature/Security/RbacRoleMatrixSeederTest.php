@@ -20,6 +20,10 @@ test('rbac seeder defines canonical admin user seller matrix', function (): void
     expect($adminPermissions)->toBe([
         'permissions.create',
         'permissions.view',
+        'products.create',
+        'products.delete',
+        'products.update',
+        'products.view',
         'roles.create',
         'roles.manage_permissions',
         'roles.view',
@@ -37,8 +41,8 @@ test('rbac seeder is idempotent when rerun', function (): void {
     $this->seed(SecurityRbacSeeder::class);
 
     expect(Role::query()->whereIn('name', ['admin', 'seller', 'user'])->count())->toBe(3);
-    expect(Permission::query()->count())->toBe(9);
-    expect(Role::findByName('admin', 'web')->permissions()->count())->toBe(9);
+    expect(Permission::query()->count())->toBe(13);
+    expect(Role::findByName('admin', 'web')->permissions()->count())->toBe(13);
     expect(Role::findByName('seller', 'web')->permissions()->count())->toBe(1);
     expect(Role::findByName('user', 'web')->permissions()->count())->toBe(1);
 });

@@ -25,6 +25,10 @@ class SecurityRbacSeeder extends Seeder
             'security.audit.view',
             'security.sessions.revoke',
             'security.mfa.manage',
+            'products.view',
+            'products.create',
+            'products.update',
+            'products.delete',
         ],
         'seller' => [
             'security.mfa.manage',

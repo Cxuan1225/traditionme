@@ -1,8 +1,8 @@
 import { createInertiaApp } from '@inertiajs/vue3';
+import AOS from 'aos';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
-import AOS from 'aos';
 import 'aos/dist/aos.css';
 import '../css/app.css';
 import { initializeTheme } from '@/composables/useAppearance';
