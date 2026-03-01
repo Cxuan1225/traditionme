@@ -488,6 +488,7 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
             </div>
+            </div>
         </SettingsLayout>
     </AdminLayout>
 </template>

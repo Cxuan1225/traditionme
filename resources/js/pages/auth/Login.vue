@@ -56,7 +56,7 @@ const showPassword = ref<boolean>(false);
                             :tabindex="1"
                             autocomplete="email"
                             placeholder="email@example.com"
-                            class="h-11 border-zinc-300 focus-visible:ring-amber-400"
+                            class="h-11 border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
                         />
                         <InputError :message="errors.email" />
                     </div>
@@ -82,7 +82,7 @@ const showPassword = ref<boolean>(false);
                                 :tabindex="2"
                                 autocomplete="current-password"
                                 placeholder="Password"
-                                class="h-11 border-zinc-300 pr-16 focus-visible:ring-amber-400"
+                                class="h-11 border-zinc-300 bg-white pr-16 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
                             />
                             <button
                                 type="button"

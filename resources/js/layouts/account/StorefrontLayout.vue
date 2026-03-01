@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { dashboard, home } from '@/routes';
+import { dashboard, home, logout } from '@/routes';
 import viewMode from '@/routes/admin/view-mode';
 import cart from '@/routes/cart';
 import { edit as editProfile } from '@/routes/profile';
@@ -82,6 +82,15 @@ const switchMode = (mode: 'admin' | 'storefront'): void => {
                         class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
                     >
                         Shop
+                    </Link>
+                    <Link
+                        v-if="auth?.user"
+                        :href="logout()"
+                        method="post"
+                        as="button"
+                        class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
+                    >
+                        Log out
                     </Link>
                 </nav>
             </div>

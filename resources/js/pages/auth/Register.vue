@@ -42,7 +42,7 @@ const showPasswordConfirmation = ref<boolean>(false);
                             autocomplete="name"
                             name="name"
                             placeholder="Full name"
-                            class="h-11 border-zinc-300 focus-visible:ring-amber-400"
+                            class="h-11 border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
                         />
                         <InputError :message="errors.name" />
                     </div>
@@ -57,7 +57,7 @@ const showPasswordConfirmation = ref<boolean>(false);
                             autocomplete="email"
                             name="email"
                             placeholder="email@example.com"
-                            class="h-11 border-zinc-300 focus-visible:ring-amber-400"
+                            class="h-11 border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
                         />
                         <InputError :message="errors.email" />
                     </div>
@@ -73,7 +73,7 @@ const showPasswordConfirmation = ref<boolean>(false);
                                 autocomplete="new-password"
                                 name="password"
                                 placeholder="Password"
-                                class="h-11 border-zinc-300 pr-16 focus-visible:ring-amber-400"
+                                class="h-11 border-zinc-300 bg-white pr-16 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
                             />
                             <button
                                 type="button"
@@ -98,7 +98,7 @@ const showPasswordConfirmation = ref<boolean>(false);
                                 autocomplete="new-password"
                                 name="password_confirmation"
                                 placeholder="Confirm password"
-                                class="h-11 border-zinc-300 pr-16 focus-visible:ring-amber-400"
+                                class="h-11 border-zinc-300 bg-white pr-16 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
                             />
                             <button
                                 type="button"
