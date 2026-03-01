@@ -2,6 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Boxes, ClipboardCheck, Shield, Sparkles, Users } from 'lucide-vue-next';
 import { computed } from 'vue';
+import { Badge } from '@/components/ui/badge';
 import {
     Card,
     CardAction,
@@ -11,7 +12,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import AdminLayout from '@/layouts/admin/Layout.vue';
 import { dashboard } from '@/routes';
 import { index as productsIndex } from '@/routes/products';

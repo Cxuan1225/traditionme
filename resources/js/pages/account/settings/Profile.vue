@@ -2,15 +2,15 @@
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import { BadgeCheck, MailCheck, UserRound } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, ref } from 'vue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/DeleteUser.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
-import { getInitials } from '@/composables/useInitials';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getInitials } from '@/composables/useInitials';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
 import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
 import { send } from '@/routes/verification';

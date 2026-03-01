@@ -13,9 +13,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import AuthLayout from '@/layouts/AuthLayout.vue';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
 import AdminLayout from '@/layouts/admin/Layout.vue';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/password/confirm';
 import type { Auth } from '@/types';
 
