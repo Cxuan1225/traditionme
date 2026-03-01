@@ -2,6 +2,8 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import '../css/app.css';
 import { initializeTheme } from '@/composables/useAppearance';
 
@@ -18,6 +20,17 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .mount(el);
+
+        AOS.init({
+            duration: 600,
+            once: true,
+            offset: 24,
+            easing: 'ease-out-cubic',
+        });
+
+        document.addEventListener('inertia:navigated', () => {
+            AOS.refreshHard();
+        });
     },
     progress: {
         color: '#4B5563',

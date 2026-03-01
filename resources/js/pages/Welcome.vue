@@ -113,7 +113,10 @@ withDefaults(
 
         <main class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
             <section class="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-                <article class="overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-orange-50 via-amber-50 to-rose-100 p-6 shadow-sm lg:p-10">
+                <article
+                    class="overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-orange-50 via-amber-50 to-rose-100 p-6 shadow-sm lg:p-10"
+                    data-aos="fade-up"
+                >
                     <p class="text-xs font-bold tracking-[0.25em] text-red-700 uppercase">Mega Raya Sale 2026</p>
                     <h1 class="mt-3 max-w-2xl text-4xl leading-tight font-black text-zinc-900 sm:text-5xl">
                         E-commerce for Malaysian
@@ -143,7 +146,7 @@ withDefaults(
                     </div>
                 </article>
 
-                <article class="rounded-3xl border border-zinc-200 bg-zinc-900 p-6 text-zinc-100 shadow-sm lg:p-8">
+                <article class="rounded-3xl border border-zinc-200 bg-zinc-900 p-6 text-zinc-100 shadow-sm lg:p-8" data-aos="fade-up" data-aos-delay="120">
                     <p class="text-xs font-bold tracking-[0.2em] text-amber-300 uppercase">Flash Deals</p>
                     <div class="mt-4 space-y-3">
                         <div class="rounded-2xl border border-white/20 bg-white/5 p-4">
@@ -160,7 +163,7 @@ withDefaults(
                 </article>
             </section>
 
-            <section class="mt-8">
+            <section class="mt-8" data-aos="fade-up" data-aos-delay="80">
                 <div class="mb-4 flex items-end justify-between">
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Featured Products</h2>
                     <span class="text-sm font-semibold text-zinc-600">Showing 4 of 120 items</span>
@@ -193,7 +196,7 @@ withDefaults(
                 </div>
             </section>
 
-            <section class="mt-8 grid gap-4 md:grid-cols-3">
+            <section class="mt-8 grid gap-4 md:grid-cols-3" data-aos="fade-up" data-aos-delay="120">
                 <article class="rounded-2xl border border-zinc-200 bg-white p-5">
                     <p class="text-sm font-bold text-zinc-900">Trusted by 10,000+ shoppers</p>
                     <p class="mt-1 text-sm text-zinc-600">Verified reviews from families across Malaysia.</p>
@@ -208,7 +211,7 @@ withDefaults(
                 </article>
             </section>
 
-            <section class="mt-8">
+            <section class="mt-8" data-aos="fade-up" data-aos-delay="160">
                 <div class="mb-4 flex items-end justify-between">
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Shop by Occasion</h2>
                     <span class="text-sm font-semibold text-zinc-600">Tailored collections for real events</span>
@@ -234,7 +237,7 @@ withDefaults(
                 </div>
             </section>
 
-            <section class="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+            <section class="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]" data-aos="fade-up" data-aos-delay="200">
                 <article class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:p-8">
                     <h2 class="text-2xl font-black text-zinc-900">Customer Reviews</h2>
                     <div class="mt-4 space-y-3">
@@ -270,7 +273,7 @@ withDefaults(
                 </article>
             </section>
 
-            <section class="mt-8 grid gap-4 lg:grid-cols-[1fr_1fr]">
+            <section class="mt-8 grid gap-4 lg:grid-cols-[1fr_1fr]" data-aos="fade-up" data-aos-delay="240">
                 <article class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
                     <h2 class="text-2xl font-black text-zinc-900">Frequently Asked Questions</h2>
                     <div class="mt-4 space-y-3">
