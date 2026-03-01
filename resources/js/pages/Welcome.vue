@@ -1,12 +1,24 @@
 <script setup lang="ts">
 import { Form, Head, Link, router, usePage } from '@inertiajs/vue3';
+import { ChevronDown, LayoutGrid, LogOut, Settings, ShoppingBag } from 'lucide-vue-next';
 import { computed } from 'vue';
-import { dashboard, login, register } from '@/routes';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { getInitials } from '@/composables/useInitials';
+import { dashboard, home, login, logout, register } from '@/routes';
 import cart from '@/routes/cart';
 import cartItems from '@/routes/cart/items';
 import collections from '@/routes/collections';
 import newsletterSubscriptions from '@/routes/newsletter/subscriptions';
+import { edit as editProfile } from '@/routes/profile';
 import shop from '@/routes/shop';
+import type { Auth } from '@/types';
 import type { WelcomeCategory, WelcomeOccasion, WelcomeProduct, WelcomeReview } from '@/types/welcome';
 
 withDefaults(
@@ -44,8 +56,11 @@ const addToCart = (productSlug: string): void => {
     );
 };
 
-const page = usePage<{ flash?: { status?: string } }>();
+const page = usePage<{ flash?: { status?: string }; auth?: Auth }>();
 const flashStatus = computed(() => page.props.flash?.status ?? '');
+const auth = computed(() => page.props.auth);
+const user = computed(() => auth.value?.user);
+const isAuthenticated = computed(() => Boolean(user.value));
 </script>
 
 <template>
@@ -64,65 +79,102 @@ const flashStatus = computed(() => page.props.flash?.status ?? '');
         </div>
 
         <header class="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur">
-            <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-10">
-                <div class="flex items-center gap-3">
-                    <span
-                        class="inline-flex size-10 items-center justify-center rounded-xl bg-zinc-900 text-sm font-extrabold tracking-wide text-zinc-100"
-                    >
+            <div class="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:px-10">
+                <Link :href="home()" class="flex items-center gap-3">
+                    <span class="inline-flex size-10 items-center justify-center rounded-xl bg-zinc-900 text-sm font-extrabold tracking-wide text-zinc-100">
                         TM
                     </span>
                     <div>
                         <p class="text-xs font-bold tracking-[0.2em] text-amber-700 uppercase">Malaysian Multi-Cultural Fashion</p>
                         <p class="brand-title text-2xl font-extrabold text-zinc-900">Tradition Me</p>
                     </div>
-                </div>
+                </Link>
 
-                <div class="hidden flex-1 px-6 md:block">
-                    <div class="rounded-full border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm text-zinc-500">
-                        Search kurung, kebaya, cheongsam, saree...
-                    </div>
-                </div>
+                <nav class="flex items-center gap-2 overflow-x-auto text-sm font-semibold">
+                    <Link
+                        :href="home()"
+                        class="rounded-full px-4 py-2 text-zinc-700 transition hover:bg-zinc-100"
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        :href="shop.index()"
+                        class="rounded-full px-4 py-2 text-zinc-700 transition hover:bg-zinc-100"
+                    >
+                        Shop
+                    </Link>
+                </nav>
 
-                <div class="flex items-center gap-2">
+                <nav class="flex items-center gap-2 text-sm font-semibold">
                     <Link
                         :href="cart.show()"
-                        class="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-500 sm:inline-flex"
+                        class="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-500"
                     >
-                        Cart ({{ cartCount }})
+                        <span class="inline-flex items-center gap-2">
+                            <ShoppingBag class="size-4" />
+                            Cart ({{ cartCount }})
+                        </span>
                     </Link>
-                    <nav class="flex items-center gap-2 text-sm font-semibold">
-                        <template v-if="$page.props.auth.user">
-                            <Link
-                                :href="dashboard()"
-                                class="rounded-full bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-500"
-                            >
-                                Dashboard
-                            </Link>
-                            <Link
-                                v-if="canAccessAdministration"
-                                :href="dashboard({ query: { admin: 1 } })"
-                                class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
-                            >
-                                Administration
-                            </Link>
-                        </template>
-                        <template v-else>
-                            <Link
-                                :href="login()"
-                                class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                v-if="canRegister"
-                                :href="register()"
-                                class="rounded-full bg-amber-500 px-4 py-2 text-zinc-900 transition hover:bg-amber-400"
-                            >
-                                Register
-                            </Link>
-                        </template>
-                    </nav>
-                </div>
+
+                    <template v-if="isAuthenticated">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger as-child>
+                                <button
+                                    type="button"
+                                    class="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white px-2 py-1.5 text-zinc-700 transition hover:border-zinc-500"
+                                >
+                                    <Avatar class="size-8 rounded-full border border-zinc-200">
+                                        <AvatarImage v-if="user?.avatar" :src="user.avatar" :alt="user.name" />
+                                        <AvatarFallback class="bg-zinc-900 text-xs font-bold text-zinc-100">
+                                            {{ getInitials(user?.name) }}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <ChevronDown class="size-4" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" class="w-52">
+                                <div class="px-2 py-1">
+                                    <p class="truncate text-sm font-semibold text-zinc-900">{{ user?.name }}</p>
+                                    <p class="truncate text-xs text-zinc-500">{{ user?.email }}</p>
+                                </div>
+                                <DropdownMenuItem as-child>
+                                    <Link :href="editProfile()" class="flex w-full items-center">
+                                        <Settings class="mr-2 size-4" />
+                                        Settings
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem v-if="canAccessAdministration" as-child>
+                                    <Link :href="dashboard({ query: { admin: 1 } })" class="flex w-full items-center">
+                                        <LayoutGrid class="mr-2 size-4" />
+                                        Administration
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem as-child>
+                                    <Link :href="logout()" method="post" as="button" class="flex w-full items-center text-red-700">
+                                        <LogOut class="mr-2 size-4" />
+                                        Log out
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </template>
+                    <template v-else>
+                        <Link
+                            :href="login()"
+                            class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
+                        >
+                            Log in
+                        </Link>
+                        <Link
+                            v-if="canRegister"
+                            :href="register()"
+                            class="rounded-full bg-amber-500 px-4 py-2 text-zinc-900 transition hover:bg-amber-400"
+                        >
+                            Register
+                        </Link>
+                    </template>
+                </nav>
             </div>
 
             <div class="border-t border-zinc-200 bg-white">

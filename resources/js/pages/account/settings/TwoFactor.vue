@@ -37,7 +37,14 @@ onUnmounted(() => {
         <h1 class="sr-only">Two-factor authentication settings</h1>
 
         <SettingsLayout>
-            <div class="space-y-6">
+            <div class="space-y-6 rounded-[1.75rem] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+                <div class="rounded-2xl border border-blue-200 bg-gradient-to-r from-sky-50 to-indigo-100 p-4 dark:border-zinc-700 dark:from-zinc-800 dark:to-zinc-800">
+                    <p class="text-xs font-bold tracking-[0.14em] text-indigo-700 uppercase dark:text-indigo-300">Security layer</p>
+                    <p class="mt-2 text-sm text-zinc-700 dark:text-zinc-200">
+                        Two-factor authentication adds one extra verification step when you sign in.
+                    </p>
+                </div>
+
                 <Heading
                     variant="small"
                     title="Two-factor authentication"
@@ -46,7 +53,7 @@ onUnmounted(() => {
 
                 <div
                     v-if="!twoFactorEnabled"
-                    class="flex flex-col items-start justify-start space-y-4"
+                    class="flex flex-col items-start justify-start space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800"
                 >
                     <Badge variant="destructive">Disabled</Badge>
 
@@ -60,6 +67,7 @@ onUnmounted(() => {
                     <div>
                         <Button
                             v-if="hasSetupData"
+                            class="rounded-full"
                             @click="showSetupModal = true"
                         >
                             <ShieldCheck />Continue setup
@@ -70,7 +78,7 @@ onUnmounted(() => {
                             @success="showSetupModal = true"
                             #default="{ processing }"
                         >
-                            <Button type="submit" :disabled="processing">
+                            <Button type="submit" :disabled="processing" class="rounded-full">
                                 <ShieldCheck />Enable 2FA</Button
                             ></Form
                         >
@@ -79,7 +87,7 @@ onUnmounted(() => {
 
                 <div
                     v-else
-                    class="flex flex-col items-start justify-start space-y-4"
+                    class="flex flex-col items-start justify-start space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800"
                 >
                     <Badge variant="default">Enabled</Badge>
 
@@ -98,6 +106,7 @@ onUnmounted(() => {
                                 variant="destructive"
                                 type="submit"
                                 :disabled="processing"
+                                class="rounded-full"
                             >
                                 <ShieldBan />
                                 Disable 2FA
