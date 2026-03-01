@@ -28,7 +28,7 @@ test('roles index is accessible with roles.view permission', function (): void {
     $user->givePermissionTo('roles.view');
 
     $this->actingAs($user)
-        ->get(route('security.roles.index'))
+        ->getJson(route('security.roles.index'))
         ->assertOk()
         ->assertJsonStructure(['data']);
 });

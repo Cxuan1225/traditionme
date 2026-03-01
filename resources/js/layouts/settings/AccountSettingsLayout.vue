@@ -22,7 +22,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 </script>
 
 <template>
-    <div class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+    <div class="rounded-3xl border border-zinc-300 bg-zinc-100/85 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
         <Heading title="Account settings" description="Manage your personal profile, password, and sign-in preferences" />
 
         <div class="mt-6 flex flex-col lg:flex-row lg:space-x-12">

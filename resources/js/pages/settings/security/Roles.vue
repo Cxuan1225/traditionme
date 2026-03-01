@@ -19,7 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import AppLayout from '@/layouts/AppLayout.vue';
+import AdminLayout from '@/layouts/admin/Layout.vue';
 import { index as rolesIndexRoute } from '@/routes/security/roles';
 import type { BreadcrumbItem } from '@/types';
 
@@ -381,7 +381,7 @@ onMounted(async () => {
 <template>
     <Head title="Security roles" />
 
-    <AppLayout :breadcrumbs="breadcrumbItems">
+    <AdminLayout :breadcrumbs="breadcrumbItems">
         <div class="flex flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
             <Alert v-if="pageError" variant="destructive">
                 <AlertTitle>Request failed</AlertTitle>
@@ -394,7 +394,7 @@ onMounted(async () => {
             </Alert>
 
             <div class="grid gap-4 lg:grid-cols-2">
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/80">
                     <CardHeader>
                         <CardTitle>Role catalog</CardTitle>
                         <CardDescription>
@@ -426,8 +426,8 @@ onMounted(async () => {
                                 v-for="role in roles"
                                 :key="role.id"
                                 type="button"
-                                class="w-full rounded-lg border p-3 text-left transition hover:bg-muted/50"
-                                :class="{ 'border-primary bg-muted/70': selectedRoleId === role.id }"
+                                class="w-full rounded-lg border border-border bg-background/70 p-3 text-left transition hover:bg-muted/50"
+                                :class="{ 'border-primary bg-muted/60': selectedRoleId === role.id }"
                                 @click="selectedRoleId = role.id"
                             >
                                 <div class="flex flex-wrap items-center justify-between gap-2">
@@ -453,7 +453,7 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/80">
                     <CardHeader>
                         <CardTitle>Create role</CardTitle>
                         <CardDescription>
@@ -473,9 +473,7 @@ onMounted(async () => {
 
                         <div class="space-y-2">
                             <Label>Initial permissions</Label>
-                            <div
-                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border p-3"
-                            >
+                            <div class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3">
                                 <p
                                     v-if="permissions.length === 0"
                                     class="text-sm text-muted-foreground"
@@ -531,7 +529,7 @@ onMounted(async () => {
             </div>
 
             <div class="grid gap-4 lg:grid-cols-2">
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/80">
                     <CardHeader>
                         <CardTitle>Sync role permissions</CardTitle>
                         <CardDescription>
@@ -550,9 +548,7 @@ onMounted(async () => {
 
                         <div class="space-y-2">
                             <Label>Permissions</Label>
-                            <div
-                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border p-3"
-                            >
+                            <div class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3">
                                 <p
                                     v-if="permissions.length === 0"
                                     class="text-sm text-muted-foreground"
@@ -603,7 +599,7 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/80">
                     <CardHeader>
                         <CardTitle>Assign roles to user</CardTitle>
                         <CardDescription>
@@ -627,9 +623,7 @@ onMounted(async () => {
 
                         <div class="space-y-2">
                             <Label>Roles</Label>
-                            <div
-                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border p-3"
-                            >
+                            <div class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3">
                                 <p
                                     v-if="availableRoleNames.length === 0"
                                     class="text-sm text-muted-foreground"
@@ -664,10 +658,7 @@ onMounted(async () => {
                             </div>
                         </div>
 
-                        <div
-                            v-if="assignedUser"
-                            class="rounded-md border p-3 text-sm text-muted-foreground"
-                        >
+                        <div v-if="assignedUser" class="rounded-md border border-border bg-background/70 p-3 text-sm text-muted-foreground">
                             Updated user:
                             <span class="font-medium text-foreground">
                                 {{ assignedUser.name }}
@@ -695,5 +686,5 @@ onMounted(async () => {
                 </Card>
             </div>
         </div>
-    </AppLayout>
+    </AdminLayout>
 </template>

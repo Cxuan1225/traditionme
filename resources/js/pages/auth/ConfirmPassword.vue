@@ -1,48 +1,48 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
+import AdminLayout from '@/layouts/admin/Layout.vue';
 import { store } from '@/routes/password/confirm';
+import type { Auth } from '@/types';
+
+const page = usePage<{ auth?: Auth }>();
+const isAdminMode = computed(
+    () => page.props.auth?.isAdmin === true && page.props.auth?.adminViewMode === 'admin',
+);
 </script>
 
 <template>
+    <Head title="Confirm password" />
+
     <AuthLayout
+        v-if="!$page.props.auth?.user"
         title="Confirm your password"
         description="This is a secure area of the application. Please confirm your password before continuing."
     >
-        <Head title="Confirm password" />
-
-        <Form
-            v-bind="store.form()"
-            reset-on-success
-            v-slot="{ errors, processing }"
-        >
+        <Form v-bind="store.form()" reset-on-success v-slot="{ errors, processing }">
             <div class="space-y-6">
                 <div class="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        class="mt-1 block w-full"
-                        required
-                        autocomplete="current-password"
-                        autofocus
-                    />
-
+                    <Label for="password">Password</Label>
+                    <Input id="password" type="password" name="password" class="mt-1 block w-full" required autocomplete="current-password" autofocus />
                     <InputError :message="errors.password" />
                 </div>
 
                 <div class="flex items-center">
-                    <Button
-                        class="w-full"
-                        :disabled="processing"
-                        data-test="confirm-password-button"
-                    >
+                    <Button class="w-full" :disabled="processing" data-test="confirm-password-button">
                         <Spinner v-if="processing" />
                         Confirm password
                     </Button>
@@ -50,4 +50,72 @@ import { store } from '@/routes/password/confirm';
             </div>
         </Form>
     </AuthLayout>
+
+    <AdminLayout v-else-if="isAdminMode">
+        <div class="mx-auto max-w-xl py-8">
+            <Card class="border-border bg-card/80">
+                <CardHeader>
+                    <CardTitle>Confirm your password</CardTitle>
+                    <CardDescription>
+                        Secure action detected. Confirm your password to continue with two-factor settings.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form v-bind="store.form()" reset-on-success v-slot="{ errors, processing }" class="space-y-6">
+                        <div class="grid gap-2">
+                            <Label for="admin-password">Password</Label>
+                            <Input
+                                id="admin-password"
+                                type="password"
+                                name="password"
+                                class="mt-1 block w-full"
+                                required
+                                autocomplete="current-password"
+                                autofocus
+                            />
+                            <InputError :message="errors.password" />
+                        </div>
+                        <Button class="w-full bg-amber-500 text-zinc-900 hover:bg-amber-400" :disabled="processing" data-test="confirm-password-button">
+                            <Spinner v-if="processing" />
+                            Confirm password
+                        </Button>
+                    </Form>
+                </CardContent>
+            </Card>
+        </div>
+    </AdminLayout>
+
+    <StorefrontLayout v-else>
+        <div class="mx-auto max-w-xl py-8">
+            <Card class="border-zinc-300 bg-zinc-100/90 dark:border-zinc-800 dark:bg-zinc-900/70">
+                <CardHeader>
+                    <CardTitle>Confirm your password</CardTitle>
+                    <CardDescription>
+                        Secure action detected. Confirm your password to continue with two-factor settings.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form v-bind="store.form()" reset-on-success v-slot="{ errors, processing }" class="space-y-6">
+                        <div class="grid gap-2">
+                            <Label for="account-password">Password</Label>
+                            <Input
+                                id="account-password"
+                                type="password"
+                                name="password"
+                                class="mt-1 block w-full"
+                                required
+                                autocomplete="current-password"
+                                autofocus
+                            />
+                            <InputError :message="errors.password" />
+                        </div>
+                        <Button class="w-full" :disabled="processing" data-test="confirm-password-button">
+                            <Spinner v-if="processing" />
+                            Confirm password
+                        </Button>
+                    </Form>
+                </CardContent>
+            </Card>
+        </div>
+    </StorefrontLayout>
 </template>

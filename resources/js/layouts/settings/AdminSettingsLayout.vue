@@ -6,7 +6,6 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
-import { index as productsIndex } from '@/routes/products';
 import { edit as editProfile } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
@@ -17,7 +16,6 @@ const sidebarNavItems: NavItem[] = [
     { title: 'Password', href: editPassword() },
     { title: 'Two-factor auth', href: show() },
     { title: 'Appearance', href: editAppearance() },
-    { title: 'Products', href: productsIndex() },
 ];
 
 const { isCurrentOrParentUrl } = useCurrentUrl();
@@ -35,7 +33,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                         :key="toUrl(item.href)"
                         variant="ghost"
                         :class="[
-                            'w-full justify-start',
+                            'w-full justify-start text-foreground/80 hover:text-foreground',
                             { 'bg-muted': isCurrentOrParentUrl(item.href) },
                         ]"
                         as-child

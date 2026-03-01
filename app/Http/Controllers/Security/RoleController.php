@@ -10,13 +10,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Security\CreateRoleRequest;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\RoleResource;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Inertia\Inertia;
+use Inertia\Response;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): Response|AnonymousResourceCollection
     {
         $roles = Role::query()
             ->where('guard_name', 'web')
@@ -24,14 +27,27 @@ class RoleController extends Controller
             ->orderBy('name')
             ->get();
 
+        $permissions = Permission::query()
+            ->where('guard_name', 'web')
+            ->orderBy('name')
+            ->get();
+
+        if (! $request->expectsJson()) {
+            return Inertia::render('settings/security/Roles', [
+                'initialRoles' => RoleResource::collection($roles)->resolve($request),
+                'initialPermissions' => PermissionResource::collection($permissions)->resolve($request),
+                'capabilities' => [
+                    'canViewRoles' => $request->user()?->can('roles.view') ?? false,
+                    'canCreateRoles' => $request->user()?->can('roles.create') ?? false,
+                    'canManageRolePermissions' => $request->user()?->can('roles.manage_permissions') ?? false,
+                    'canAssignUserRoles' => $request->user()?->can('users.assign_roles') ?? false,
+                ],
+            ]);
+        }
+
         return RoleResource::collection($roles)
             ->additional([
-                'permissions' => PermissionResource::collection(
-                    Permission::query()
-                        ->where('guard_name', 'web')
-                        ->orderBy('name')
-                        ->get(),
-                ),
+                'permissions' => PermissionResource::collection($permissions),
             ]);
     }
 
