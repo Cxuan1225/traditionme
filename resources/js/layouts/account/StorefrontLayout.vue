@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { ChevronDown, LogOut, Settings, ShoppingBag, UserRound } from 'lucide-vue-next';
+import { ChevronDown, LogOut, Settings, ShoppingBag } from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {

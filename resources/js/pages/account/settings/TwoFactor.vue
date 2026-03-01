@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
 import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
-import { disable, enable, show } from '@/routes/two-factor';
+import { disable, enable } from '@/routes/two-factor';
 
 type Props = {
     requiresConfirmation?: boolean;
