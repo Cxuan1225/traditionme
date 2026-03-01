@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Home\GetWelcomeDataAction;
 use App\Http\Resources\WelcomePageResource;
+use App\Support\AdminViewMode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -23,7 +24,7 @@ class HomeController extends Controller
 
         return Inertia::render('Welcome', [
             'canRegister' => Features::enabled(Features::registration()),
-            'canAccessAdministration' => $user !== null && ($user->hasRole('admin') || $user->can('roles.view')),
+            'canAccessAdministration' => $user !== null && AdminViewMode::isAdmin($user),
             'cartCount' => $cartCount,
             ...$welcomeData,
         ]);

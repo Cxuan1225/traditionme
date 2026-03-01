@@ -7,6 +7,8 @@ use App\Http\Controllers\Commerce\CartController;
 use App\Http\Controllers\Commerce\CartItemController;
 use App\Http\Controllers\Commerce\CollectionController;
 use App\Http\Controllers\Commerce\ShopController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\ViewModeController;
 use App\Http\Controllers\Marketing\NewsletterSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,7 +20,10 @@ Route::post('/cart/items', [CartItemController::class, 'store'])->name('cart.ite
 Route::post('/newsletter/subscriptions', [NewsletterSubscriptionController::class, 'store'])->name('newsletter.subscriptions.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::post('admin/view-mode', [ViewModeController::class, 'update'])
+        ->middleware('role:admin')
+        ->name('admin.view-mode.update');
 });
 
 require __DIR__.'/settings.php';

@@ -28,7 +28,7 @@ class ProductController extends Controller
             return ProductResource::collection($products);
         }
 
-        return Inertia::render('settings/Products', [
+        return Inertia::render('admin/settings/Products', [
             'initialProducts' => ProductResource::collection($products)->resolve($request),
             'capabilities' => [
                 'canViewProducts' => $request->user()?->can('products.view') ?? false,

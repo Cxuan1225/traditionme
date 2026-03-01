@@ -16,6 +16,8 @@ class SecurityRbacSeeder extends Seeder
      */
     private const ROLE_PERMISSION_MATRIX = [
         'admin' => [
+            'admin.view',
+            'admin.view.switch',
             'roles.view',
             'roles.create',
             'roles.manage_permissions',

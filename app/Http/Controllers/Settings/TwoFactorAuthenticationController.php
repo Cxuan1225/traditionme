@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Settings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
 use App\Models\User;
+use App\Support\AdminViewMode;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
@@ -37,7 +38,11 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
             abort(403);
         }
 
-        return Inertia::render('settings/TwoFactor', [
+        $page = AdminViewMode::isAdminMode($request)
+            ? 'admin/settings/TwoFactor'
+            : 'account/settings/TwoFactor';
+
+        return Inertia::render($page, [
             'twoFactorEnabled' => $user->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);

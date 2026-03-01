@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Support\AdminViewMode;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -37,12 +38,18 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $isAdmin = AdminViewMode::isAdmin($user);
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
                 'permissions' => fn (): array => $request->user()?->getPermissionNames()->values()->all() ?? [],
+                'roles' => fn (): array => $request->user()?->getRoleNames()->values()->all() ?? [],
+                'isAdmin' => $isAdmin,
+                'adminViewMode' => $isAdmin ? AdminViewMode::current($request) : AdminViewMode::STOREFRONT,
             ],
             'flash' => [
                 'status' => fn (): ?string => $request->session()->get('status'),

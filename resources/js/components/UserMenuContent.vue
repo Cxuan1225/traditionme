@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from 'lucide-vue-next';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { LogOut, Repeat, Settings } from 'lucide-vue-next';
+import { computed } from 'vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -9,15 +10,32 @@ import {
 } from '@/components/ui/dropdown-menu';
 import UserInfo from '@/components/UserInfo.vue';
 import { logout } from '@/routes';
+import viewMode from '@/routes/admin/view-mode';
 import { edit } from '@/routes/profile';
-import type { User } from '@/types';
+import type { Auth, User } from '@/types';
 
 type Props = {
     user: User;
 };
 
+const page = usePage<{ auth?: Auth }>();
+const canSwitchView = computed(() => page.props.auth?.isAdmin === true);
+const isAdminMode = computed(() => page.props.auth?.adminViewMode === 'admin');
+
 const handleLogout = () => {
     router.flushAll();
+};
+
+const switchMode = (): void => {
+    router.post(
+        viewMode.update().url,
+        {
+            mode: isAdminMode.value ? 'storefront' : 'admin',
+        },
+        {
+            preserveScroll: true,
+        },
+    );
 };
 
 defineProps<Props>();
@@ -36,6 +54,14 @@ defineProps<Props>();
                 <Settings class="mr-2 h-4 w-4" />
                 Settings
             </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+            v-if="canSwitchView"
+            class="cursor-pointer"
+            @click="switchMode"
+        >
+            <Repeat class="mr-2 h-4 w-4" />
+            {{ isAdminMode ? 'Switch to Storefront' : 'Switch to Admin' }}
         </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
