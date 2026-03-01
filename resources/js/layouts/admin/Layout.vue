@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import viewMode from '@/routes/admin/view-mode';
-import { dashboard, home } from '@/routes';
+import { dashboard, home, logout } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
 import { index as productsIndex } from '@/routes/products';
 import { edit as editProfile } from '@/routes/profile';
@@ -151,6 +151,14 @@ const switchToStorefront = (): void => {
                     </Button>
                     <Link :href="home()" class="inline-flex w-full items-center justify-center rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-accent hover:text-foreground">
                         Back to Home
+                    </Link>
+                    <Link
+                        :href="logout()"
+                        method="post"
+                        as="button"
+                        class="inline-flex w-full items-center justify-center rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-accent hover:text-foreground"
+                    >
+                        Log out
                     </Link>
                 </div>
             </aside>

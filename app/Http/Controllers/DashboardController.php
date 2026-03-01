@@ -23,10 +23,11 @@ class DashboardController extends Controller
             AdminViewMode::set($request, AdminViewMode::ADMIN);
         }
 
-        if (AdminViewMode::isAdminMode($request)) {
-            return Inertia::render('admin/Dashboard');
-        }
+        $page = match (AdminViewMode::isAdminMode($request)) {
+            true => 'admin/Dashboard',
+            default => 'account/Dashboard',
+        };
 
-        return Inertia::render('account/Dashboard');
+        return Inertia::render($page);
     }
 }
