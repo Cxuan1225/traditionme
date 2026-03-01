@@ -6,7 +6,6 @@ import cart from '@/routes/cart';
 import cartItems from '@/routes/cart/items';
 import collections from '@/routes/collections';
 import newsletterSubscriptions from '@/routes/newsletter/subscriptions';
-import securityRoles from '@/routes/security/roles';
 import shop from '@/routes/shop';
 import type { WelcomeCategory, WelcomeOccasion, WelcomeProduct, WelcomeReview } from '@/types/welcome';
 
@@ -101,7 +100,7 @@ const flashStatus = computed(() => page.props.flash?.status ?? '');
                             </Link>
                             <Link
                                 v-if="canAccessAdministration"
-                                :href="securityRoles.index()"
+                                :href="dashboard({ query: { admin: 1 } })"
                                 class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
                             >
                                 Administration
