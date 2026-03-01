@@ -17,5 +17,6 @@ readonly class WelcomePageData
         public array $products,
         public array $occasions,
         public array $reviews,
+        public int $totalProducts,
     ) {}
 }

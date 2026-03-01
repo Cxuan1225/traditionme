@@ -1,13 +1,21 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Form, Head, Link, router, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { dashboard, login, register } from '@/routes';
+import cart from '@/routes/cart';
+import cartItems from '@/routes/cart/items';
+import collections from '@/routes/collections';
+import newsletterSubscriptions from '@/routes/newsletter/subscriptions';
 import securityRoles from '@/routes/security/roles';
+import shop from '@/routes/shop';
 import type { WelcomeCategory, WelcomeOccasion, WelcomeProduct, WelcomeReview } from '@/types/welcome';
 
 withDefaults(
     defineProps<{
         canRegister: boolean;
         canAccessAdministration: boolean;
+        cartCount: number;
+        totalProducts: number;
         categories: WelcomeCategory[];
         products: WelcomeProduct[];
         occasions: WelcomeOccasion[];
@@ -16,12 +24,29 @@ withDefaults(
     {
         canRegister: true,
         canAccessAdministration: false,
+        cartCount: 0,
+        totalProducts: 0,
         categories: () => [],
         products: () => [],
         occasions: () => [],
         reviews: () => [],
     },
 );
+
+const addToCart = (productSlug: string): void => {
+    const target = cartItems.store();
+
+    router.post(
+        target.url,
+        { product_slug: productSlug },
+        {
+            preserveScroll: true,
+        },
+    );
+};
+
+const page = usePage<{ flash?: { status?: string } }>();
+const flashStatus = computed(() => page.props.flash?.status ?? '');
 </script>
 
 <template>
@@ -60,9 +85,12 @@ withDefaults(
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <span class="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 sm:inline-flex">
-                        Cart (2)
-                    </span>
+                    <Link
+                        :href="cart.show()"
+                        class="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-500 sm:inline-flex"
+                    >
+                        Cart ({{ cartCount }})
+                    </Link>
                     <nav class="flex items-center gap-2 text-sm font-semibold">
                         <template v-if="$page.props.auth.user">
                             <Link
@@ -126,18 +154,18 @@ withDefaults(
                         Shop curated traditional and modern pieces inspired by Malay, Chinese, Indian, Orang Asli, Sabah, and Sarawak communities.
                     </p>
                     <div class="mt-6 flex flex-wrap gap-3">
-                        <button
-                            type="button"
+                        <Link
+                            :href="shop.index()"
                             class="rounded-full bg-zinc-900 px-6 py-3 text-sm font-bold tracking-wide text-white uppercase transition hover:bg-zinc-700"
                         >
                             Shop Now
-                        </button>
-                        <button
-                            type="button"
+                        </Link>
+                        <Link
+                            :href="shop.index({ query: { category: 'new-arrivals' } })"
                             class="rounded-full border border-zinc-400 px-6 py-3 text-sm font-bold tracking-wide text-zinc-900 uppercase transition hover:border-zinc-700"
                         >
                             View New Arrivals
-                        </button>
+                        </Link>
                     </div>
                     <div class="mt-6 flex flex-wrap gap-4 text-sm font-semibold text-zinc-700">
                         <span>Secure checkout</span>
@@ -166,7 +194,7 @@ withDefaults(
             <section class="mt-8" data-aos="fade-up" data-aos-delay="80">
                 <div class="mb-4 flex items-end justify-between">
                     <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">Featured Products</h2>
-                    <span class="text-sm font-semibold text-zinc-600">Showing 4 of 120 items</span>
+                    <span class="text-sm font-semibold text-zinc-600">Showing {{ products.length }} of {{ totalProducts }} items</span>
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <article
@@ -188,6 +216,7 @@ withDefaults(
                         </div>
                         <button
                             type="button"
+                            @click="addToCart(product.slug)"
                             class="mt-4 w-full rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-bold tracking-wide text-white uppercase transition hover:bg-zinc-700"
                         >
                             Add to Cart
@@ -227,12 +256,12 @@ withDefaults(
                         </span>
                         <h3 class="mt-4 text-xl font-extrabold text-zinc-900">{{ occasion.name }}</h3>
                         <p class="mt-2 text-sm text-zinc-600">{{ occasion.description }}</p>
-                        <button
-                            type="button"
+                        <Link
+                            :href="collections.show({ slug: occasion.slug })"
                             class="mt-4 rounded-full border border-zinc-900 px-4 py-2 text-xs font-bold tracking-wide text-zinc-900 uppercase transition hover:bg-zinc-900 hover:text-white"
                         >
                             View Collection
-                        </button>
+                        </Link>
                     </article>
                 </div>
             </section>
@@ -298,15 +327,28 @@ withDefaults(
                     <p class="mt-2 text-sm text-zinc-700">
                         Join our member list for launch alerts, special discounts, and styling updates for every festive season.
                     </p>
-                    <div class="mt-4 rounded-full border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-500">
-                        Enter your email address
-                    </div>
-                    <button
-                        type="button"
-                        class="mt-4 rounded-full bg-zinc-900 px-6 py-3 text-sm font-bold tracking-wide text-white uppercase transition hover:bg-zinc-700"
-                    >
-                        Subscribe Now
-                    </button>
+                    <Form :action="newsletterSubscriptions.store().url" method="post" v-slot="{ errors, processing }" class="mt-4">
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            autocomplete="email"
+                            placeholder="Enter your email address"
+                            class="w-full rounded-full border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-700 outline-none transition focus:border-zinc-500"
+                        />
+                        <input type="hidden" name="source" value="welcome-page" />
+                        <p v-if="errors.email" class="mt-2 text-sm font-medium text-red-600">{{ errors.email }}</p>
+                        <button
+                            type="submit"
+                            class="mt-4 rounded-full bg-zinc-900 px-6 py-3 text-sm font-bold tracking-wide text-white uppercase transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            :disabled="processing"
+                        >
+                            {{ processing ? 'Subscribing...' : 'Subscribe Now' }}
+                        </button>
+                    </Form>
+                    <p v-if="flashStatus" class="mt-3 text-sm font-semibold text-emerald-700">
+                        {{ flashStatus }}
+                    </p>
                 </article>
             </section>
         </main>

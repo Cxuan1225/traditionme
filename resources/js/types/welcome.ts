@@ -15,6 +15,7 @@ export interface WelcomeProduct {
 
 export interface WelcomeOccasion {
     name: string;
+    slug: string;
     description: string;
     badge: string;
 }

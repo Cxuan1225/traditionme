@@ -23,8 +23,9 @@ class WelcomePageResource extends JsonResource
      *         badge: string,
      *         gradient: string
      *     }>,
-     *     occasions: array<int, array{name: string, description: string, badge: string}>,
-     *     reviews: array<int, array{name: string, location: string, comment: string}>
+     *     occasions: array<int, array{name: string, slug: string, description: string, badge: string}>,
+     *     reviews: array<int, array{name: string, location: string, comment: string}>,
+     *     totalProducts: int
      * }
      */
     public function toArray(Request $request): array
@@ -37,6 +38,7 @@ class WelcomePageResource extends JsonResource
             'products' => WelcomeProductResource::collection($welcome->products)->resolve($request),
             'occasions' => WelcomeOccasionResource::collection($welcome->occasions)->resolve($request),
             'reviews' => WelcomeReviewResource::collection($welcome->reviews)->resolve($request),
+            'totalProducts' => $welcome->totalProducts,
         ];
     }
 }

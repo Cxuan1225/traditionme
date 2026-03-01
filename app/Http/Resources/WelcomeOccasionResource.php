@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class WelcomeOccasionResource extends JsonResource
 {
     /**
-     * @return array{name: string, description: string, badge: string}
+     * @return array{name: string, slug: string, description: string, badge: string}
      */
     public function toArray(Request $request): array
     {
@@ -21,6 +21,7 @@ class WelcomeOccasionResource extends JsonResource
 
         return [
             'name' => $occasion->name,
+            'slug' => $occasion->slug,
             'description' => $occasion->description,
             'badge' => $occasion->badge,
         ];

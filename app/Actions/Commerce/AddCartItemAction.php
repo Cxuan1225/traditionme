@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Actions\Commerce;
+
+use App\DTOs\Commerce\AddCartItemData;
+use App\Support\WelcomeCatalog;
+use Illuminate\Contracts\Session\Session;
+
+class AddCartItemAction
+{
+    public function __invoke(Session $session, AddCartItemData $data): bool
+    {
+        if (! in_array($data->productSlug, WelcomeCatalog::productSlugs(), true)) {
+            return false;
+        }
+
+        /** @var array<string, int> $cart */
+        $cart = $session->get('cart.items', []);
+        $currentQuantity = $cart[$data->productSlug] ?? 0;
+        $cart[$data->productSlug] = $currentQuantity + 1;
+
+        $session->put('cart.items', $cart);
+
+        return true;
+    }
+}
