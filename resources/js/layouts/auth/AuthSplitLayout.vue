@@ -36,7 +36,7 @@ defineProps<{
                     <h1 class="text-xl font-medium tracking-tight" v-if="title">
                         {{ title }}
                     </h1>
-                    <p class="text-sm text-muted-foreground" v-if="description">
+                    <p class="text-sm text-zinc-700 dark:text-muted-foreground" v-if="description">
                         {{ description }}
                     </p>
                 </div>

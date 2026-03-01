@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import { Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff, Lock, Mail, UserRound } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -14,12 +14,14 @@ import { store } from '@/routes/register';
 
 const showPassword = ref<boolean>(false);
 const showPasswordConfirmation = ref<boolean>(false);
+const fieldClass =
+    'h-11 border-zinc-400 bg-white pr-16 pl-10 font-medium text-zinc-900 placeholder:text-zinc-600 focus-visible:ring-amber-500 dark:border-zinc-400 dark:bg-white dark:text-zinc-900 dark:placeholder:text-zinc-600';
 </script>
 
 <template>
     <AuthBase
-        title="Create your account"
-        description="Join Tradition Me for faster checkout and curated drops."
+        title="Create Member Account"
+        description="Set up your Tradition Me profile for faster checkout and order tracking."
     >
         <Head title="Register" />
 
@@ -27,44 +29,56 @@ const showPasswordConfirmation = ref<boolean>(false);
             v-bind="store.form()"
             :reset-on-success="['password', 'password_confirmation']"
             v-slot="{ errors, processing }"
-            class="flex flex-col gap-5"
+            class="space-y-5"
         >
-            <div class="rounded-2xl border border-zinc-200 bg-white px-5 py-5 shadow-sm" data-aos="fade-up" data-aos-delay="80">
-                <div class="grid gap-5">
-                    <div class="grid gap-2">
-                        <Label for="name" class="font-semibold text-zinc-800">Name</Label>
-                        <Input
-                            id="name"
-                            type="text"
-                            required
-                            autofocus
-                            :tabindex="1"
-                            autocomplete="name"
-                            name="name"
-                            placeholder="Full name"
-                            class="h-11 border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
-                        />
+            <section class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-200 dark:bg-white">
+                <div class="mb-5">
+                    <h2 class="text-lg font-black text-zinc-900 dark:text-zinc-900">Account Details</h2>
+                    <p class="text-xs font-medium text-zinc-700 dark:text-zinc-700">Use real details so delivery and account recovery stay accurate.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <Label for="name" class="font-semibold text-zinc-800 dark:text-zinc-800">Name</Label>
+                        <div class="relative">
+                            <UserRound class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
+                            <Input
+                                id="name"
+                                type="text"
+                                required
+                                autofocus
+                                :tabindex="1"
+                                autocomplete="name"
+                                name="name"
+                                placeholder="Full name"
+                                :class="fieldClass"
+                            />
+                        </div>
                         <InputError :message="errors.name" />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="email" class="font-semibold text-zinc-800">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            required
-                            :tabindex="2"
-                            autocomplete="email"
-                            name="email"
-                            placeholder="email@example.com"
-                            class="h-11 border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
-                        />
+                    <div class="space-y-2">
+                        <Label for="email" class="font-semibold text-zinc-800 dark:text-zinc-800">Email address</Label>
+                        <div class="relative">
+                            <Mail class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
+                            <Input
+                                id="email"
+                                type="email"
+                                required
+                                :tabindex="2"
+                                autocomplete="email"
+                                name="email"
+                                placeholder="email@example.com"
+                                :class="fieldClass"
+                            />
+                        </div>
                         <InputError :message="errors.email" />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="password" class="font-semibold text-zinc-800">Password</Label>
+                    <div class="space-y-2">
+                        <Label for="password" class="font-semibold text-zinc-800 dark:text-zinc-800">Password</Label>
                         <div class="relative">
+                            <Lock class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
                             <Input
                                 id="password"
                                 :type="showPassword ? 'text' : 'password'"
@@ -72,24 +86,25 @@ const showPasswordConfirmation = ref<boolean>(false);
                                 :tabindex="3"
                                 autocomplete="new-password"
                                 name="password"
-                                placeholder="Password"
-                                class="h-11 border-zinc-300 bg-white pr-16 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
+                                placeholder="Create password"
+                                :class="fieldClass"
                             />
                             <button
                                 type="button"
-                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-600 hover:text-zinc-900"
+                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-700 hover:text-zinc-900 dark:text-zinc-700 dark:hover:text-zinc-900"
                                 @click="showPassword = !showPassword"
                             >
-                                <EyeOff v-if="showPassword" class="h-4 w-4" />
-                                <Eye v-else class="h-4 w-4" />
+                                <EyeOff v-if="showPassword" class="size-4" />
+                                <Eye v-else class="size-4" />
                             </button>
                         </div>
                         <InputError :message="errors.password" />
                     </div>
 
-                    <div class="grid gap-2">
-                        <Label for="password_confirmation" class="font-semibold text-zinc-800">Confirm password</Label>
+                    <div class="space-y-2">
+                        <Label for="password_confirmation" class="font-semibold text-zinc-800 dark:text-zinc-800">Confirm password</Label>
                         <div class="relative">
+                            <Lock class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
                             <Input
                                 id="password_confirmation"
                                 :type="showPasswordConfirmation ? 'text' : 'password'"
@@ -97,46 +112,44 @@ const showPasswordConfirmation = ref<boolean>(false);
                                 :tabindex="4"
                                 autocomplete="new-password"
                                 name="password_confirmation"
-                                placeholder="Confirm password"
-                                class="h-11 border-zinc-300 bg-white pr-16 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
+                                placeholder="Repeat password"
+                                :class="fieldClass"
                             />
                             <button
                                 type="button"
-                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-600 hover:text-zinc-900"
+                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-700 hover:text-zinc-900 dark:text-zinc-700 dark:hover:text-zinc-900"
                                 @click="showPasswordConfirmation = !showPasswordConfirmation"
                             >
-                                <EyeOff v-if="showPasswordConfirmation" class="h-4 w-4" />
-                                <Eye v-else class="h-4 w-4" />
+                                <EyeOff v-if="showPasswordConfirmation" class="size-4" />
+                                <Eye v-else class="size-4" />
                             </button>
                         </div>
                         <InputError :message="errors.password_confirmation" />
                     </div>
-
-                    <Button
-                        type="submit"
-                        class="mt-2 h-11 w-full bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-                        tabindex="5"
-                        :disabled="processing"
-                        data-test="register-user-button"
-                    >
-                        <Spinner v-if="processing" />
-                        Create account
-                    </Button>
                 </div>
-            </div>
+            </section>
 
-            <div class="text-center text-sm text-zinc-600" data-aos="fade-up" data-aos-delay="140">
+            <Button
+                type="submit"
+                class="h-11 w-full rounded-xl bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                tabindex="5"
+                :disabled="processing"
+                data-test="register-user-button"
+            >
+                <Spinner v-if="processing" />
+                Create account
+            </Button>
+
+            <div class="rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-center text-sm font-medium text-zinc-900 dark:border-zinc-300 dark:bg-zinc-100 dark:text-zinc-900">
                 Already have an account?
                 <TextLink
                     :href="login()"
-                    class="font-semibold text-amber-700 hover:text-amber-600"
+                    class="!text-amber-800 font-bold hover:!text-amber-700 dark:!text-amber-800 dark:hover:!text-amber-700"
                     :tabindex="6"
-                    >Log in</TextLink>
+                >
+                    Log in
+                </TextLink>
             </div>
-
-            <p class="text-center text-xs text-zinc-500" data-aos="fade-up" data-aos-delay="180">
-                Your account helps you track orders, save preferences, and checkout faster.
-            </p>
         </Form>
     </AuthBase>
 </template>

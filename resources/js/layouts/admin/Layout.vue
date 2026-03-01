@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, router } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 import {
     Gauge,
     LockKeyhole,
@@ -9,9 +9,7 @@ import {
     UserRoundCog,
     UsersRound,
 } from 'lucide-vue-next';
-import { Button } from '@/components/ui/button';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
-import viewMode from '@/routes/admin/view-mode';
 import { dashboard, home, logout } from '@/routes';
 import { edit as editAppearance } from '@/routes/appearance';
 import { index as productsIndex } from '@/routes/products';
@@ -77,13 +75,6 @@ const settingsNav: NavEntry[] = [
     },
 ];
 
-const switchToStorefront = (): void => {
-    router.post(
-        viewMode.update().url,
-        { mode: 'storefront' },
-        { preserveScroll: true },
-    );
-};
 </script>
 
 <template>
@@ -146,17 +137,14 @@ const switchToStorefront = (): void => {
                 </div>
 
                 <div class="relative mt-8 space-y-2 border-t border-border pt-4">
-                    <Button class="w-full justify-start bg-amber-500 text-amber-950 hover:bg-amber-400" @click="switchToStorefront">
-                        Switch to Storefront
-                    </Button>
                     <Link :href="home()" class="inline-flex w-full items-center justify-center rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-accent hover:text-foreground">
-                        Back to Home
+                        Go to Storefront
                     </Link>
                     <Link
                         :href="logout()"
                         method="post"
                         as="button"
-                        class="inline-flex w-full items-center justify-center rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-accent hover:text-foreground"
+                        class="inline-flex w-full items-center justify-center rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100 dark:border-red-900/60 dark:bg-red-950/35 dark:text-red-300 dark:hover:bg-red-950/50"
                     >
                         Log out
                     </Link>

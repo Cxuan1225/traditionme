@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import { Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff, Lock, Mail, ShieldCheck } from 'lucide-vue-next';
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -21,18 +21,20 @@ defineProps<{
 }>();
 
 const showPassword = ref<boolean>(false);
+const fieldClass =
+    'h-11 border-zinc-400 bg-white pr-16 pl-10 font-medium text-zinc-900 placeholder:text-zinc-600 focus-visible:ring-amber-500 dark:border-zinc-400 dark:bg-white dark:text-zinc-900 dark:placeholder:text-zinc-600';
 </script>
 
 <template>
     <AuthBase
-        title="Welcome back"
-        description="Sign in to continue your Tradition Me experience."
+        title="Member Login"
+        description="Access your account to manage orders, checkout faster, and track new arrivals."
     >
         <Head title="Log in" />
 
         <div
             v-if="status"
-            class="mb-4 text-center text-sm font-medium text-green-600"
+            class="mb-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"
         >
             {{ status }}
         </div>
@@ -41,39 +43,53 @@ const showPassword = ref<boolean>(false);
             v-bind="store.form()"
             :reset-on-success="['password']"
             v-slot="{ errors, processing }"
-            class="flex flex-col gap-5"
+            class="space-y-5"
         >
-            <div class="rounded-2xl border border-zinc-200 bg-white px-5 py-5 shadow-sm" data-aos="fade-up" data-aos-delay="80">
-                <div class="grid gap-5">
-                    <div class="grid gap-2">
-                        <Label for="email" class="font-semibold text-zinc-800">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            required
-                            autofocus
-                            :tabindex="1"
-                            autocomplete="email"
-                            placeholder="email@example.com"
-                            class="h-11 border-zinc-300 bg-white text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
-                        />
+            <section class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-200 dark:bg-white">
+                <div class="mb-5 flex items-center gap-3">
+                    <span class="inline-flex size-10 items-center justify-center rounded-xl bg-zinc-900 text-zinc-100">
+                        <ShieldCheck class="size-5" />
+                    </span>
+                    <div>
+                        <h2 class="text-lg font-black text-zinc-900 dark:text-zinc-900">Secure Sign In</h2>
+                        <p class="text-xs font-medium text-zinc-700 dark:text-zinc-700">Protected account access for Tradition Me members.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-2">
+                        <Label for="email" class="font-semibold text-zinc-800 dark:text-zinc-800">Email address</Label>
+                        <div class="relative">
+                            <Mail class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
+                            <Input
+                                id="email"
+                                type="email"
+                                name="email"
+                                required
+                                autofocus
+                                :tabindex="1"
+                                autocomplete="email"
+                                placeholder="email@example.com"
+                                :class="fieldClass"
+                            />
+                        </div>
                         <InputError :message="errors.email" />
                     </div>
 
-                    <div class="grid gap-2">
+                    <div class="space-y-2">
                         <div class="flex items-center justify-between">
-                            <Label for="password" class="font-semibold text-zinc-800">Password</Label>
+                            <Label for="password" class="font-semibold text-zinc-800 dark:text-zinc-800">Password</Label>
                             <TextLink
                                 v-if="canResetPassword"
                                 :href="request()"
-                                class="text-sm font-semibold text-amber-700 hover:text-amber-600"
+                                class="!text-amber-800 text-sm font-bold hover:!text-amber-700 dark:!text-amber-800 dark:hover:!text-amber-700"
                                 :tabindex="5"
                             >
                                 Forgot password?
                             </TextLink>
                         </div>
                         <div class="relative">
+                            <Lock class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
                             <Input
                                 id="password"
                                 :type="showPassword ? 'text' : 'password'"
@@ -82,53 +98,42 @@ const showPassword = ref<boolean>(false);
                                 :tabindex="2"
                                 autocomplete="current-password"
                                 placeholder="Password"
-                                class="h-11 border-zinc-300 bg-white pr-16 text-zinc-900 placeholder:text-zinc-500 focus-visible:ring-amber-400"
+                                :class="fieldClass"
                             />
                             <button
                                 type="button"
-                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-600 hover:text-zinc-900"
+                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-700 hover:text-zinc-900 dark:text-zinc-700 dark:hover:text-zinc-900"
                                 @click="showPassword = !showPassword"
                             >
-                                <EyeOff v-if="showPassword" class="h-4 w-4" />
-                                <Eye v-else class="h-4 w-4" />
+                                <EyeOff v-if="showPassword" class="size-4" />
+                                <Eye v-else class="size-4" />
                             </button>
                         </div>
                         <InputError :message="errors.password" />
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <Label for="remember" class="flex items-center space-x-3 text-zinc-700">
-                            <Checkbox id="remember" name="remember" :tabindex="3" />
-                            <span>Remember me</span>
-                        </Label>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        class="mt-2 h-11 w-full bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
-                        :tabindex="4"
-                        :disabled="processing"
-                        data-test="login-button"
-                    >
-                        <Spinner v-if="processing" />
-                        Log in
-                    </Button>
+                    <Label for="remember" class="flex items-center space-x-3 text-sm font-medium text-zinc-800 dark:text-zinc-800">
+                        <Checkbox id="remember" name="remember" :tabindex="3" />
+                        <span>Remember me on this device</span>
+                    </Label>
                 </div>
-            </div>
+            </section>
 
-            <div
-                class="text-center text-sm text-zinc-600"
-                v-if="canRegister"
-                data-aos="fade-up"
-                data-aos-delay="140"
+            <Button
+                type="submit"
+                class="h-11 w-full rounded-xl bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                :tabindex="4"
+                :disabled="processing"
+                data-test="login-button"
             >
-                Don't have an account?
-                <TextLink :href="register()" :tabindex="5" class="font-semibold text-amber-700 hover:text-amber-600">Create one</TextLink>
-            </div>
+                <Spinner v-if="processing" />
+                Log in
+            </Button>
 
-            <p class="text-center text-xs text-zinc-500" data-aos="fade-up" data-aos-delay="180">
-                By continuing, you agree to secure account access for Tradition Me services.
-            </p>
+            <div v-if="canRegister" class="rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-center text-sm font-medium text-zinc-900 dark:border-zinc-300 dark:bg-zinc-100 dark:text-zinc-900">
+                New here?
+                <TextLink :href="register()" :tabindex="5" class="!text-amber-800 font-bold hover:!text-amber-700 dark:!text-amber-800 dark:hover:!text-amber-700">Create your account</TextLink>
+            </div>
         </Form>
     </AuthBase>
 </template>

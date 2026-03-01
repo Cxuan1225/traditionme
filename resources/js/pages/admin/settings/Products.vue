@@ -20,7 +20,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AdminLayout from '@/layouts/admin/Layout.vue';
-import SettingsLayout from '@/layouts/settings/AdminSettingsLayout.vue';
 import { index as productsIndexRoute } from '@/routes/products';
 import productsRoutes from '@/routes/products';
 import type { BreadcrumbItem } from '@/types';
@@ -328,8 +327,29 @@ onMounted(async () => {
     <Head title="Product management" />
 
     <AdminLayout :breadcrumbs="breadcrumbItems">
-        <SettingsLayout>
-            <div class="flex flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+        <div class="space-y-4">
+            <section class="rounded-3xl border border-border bg-gradient-to-r from-amber-100/70 via-card to-rose-100/50 p-6 dark:from-amber-950/35 dark:via-card dark:to-rose-950/20">
+                <p class="text-xs font-semibold tracking-[0.2em] text-amber-700 uppercase dark:text-amber-300">Admin Catalog</p>
+                <h2 class="mt-2 text-3xl font-black text-foreground">Product Control Center</h2>
+                <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
+                    Maintain pricing, visibility, and merchandising fields for storefront publishing.
+                </p>
+                <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div class="rounded-xl border border-border bg-background/70 px-4 py-3">
+                        <p class="text-xs text-muted-foreground">Total products</p>
+                        <p class="text-2xl font-black">{{ products.length }}</p>
+                    </div>
+                    <div class="rounded-xl border border-border bg-background/70 px-4 py-3">
+                        <p class="text-xs text-muted-foreground">Active</p>
+                        <p class="text-2xl font-black">{{ products.filter((item) => item.is_active).length }}</p>
+                    </div>
+                    <div class="rounded-xl border border-border bg-background/70 px-4 py-3">
+                        <p class="text-xs text-muted-foreground">Inactive</p>
+                        <p class="text-2xl font-black">{{ products.filter((item) => !item.is_active).length }}</p>
+                    </div>
+                </div>
+            </section>
+
             <Alert v-if="pageError" variant="destructive">
                 <AlertTitle>Request failed</AlertTitle>
                 <AlertDescription>{{ pageError }}</AlertDescription>
@@ -340,31 +360,25 @@ onMounted(async () => {
                 <AlertDescription>{{ pageSuccess }}</AlertDescription>
             </Alert>
 
-            <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                <Card class="h-full">
+            <div class="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+                <Card class="h-full border-border bg-card/80">
                     <CardHeader>
-                        <CardTitle>Products</CardTitle>
+                        <CardTitle>Catalog List</CardTitle>
                         <CardDescription>
-                            Manage catalog products shown on storefront pages.
+                            Manage products shown on storefront pages.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
-                        <div v-if="loading" class="flex items-center gap-2 text-sm">
+                        <div v-if="loading" class="flex items-center gap-2 text-sm text-muted-foreground">
                             <Spinner />
                             Loading products...
                         </div>
 
-                        <p
-                            v-else-if="!abilities.canViewProducts"
-                            class="text-sm text-muted-foreground"
-                        >
+                        <p v-else-if="!abilities.canViewProducts" class="text-sm text-muted-foreground">
                             You do not have access to view products.
                         </p>
 
-                        <p
-                            v-else-if="products.length === 0"
-                            class="text-sm text-muted-foreground"
-                        >
+                        <p v-else-if="products.length === 0" class="text-sm text-muted-foreground">
                             No products available yet.
                         </p>
 
@@ -372,11 +386,11 @@ onMounted(async () => {
                             <div
                                 v-for="product in products"
                                 :key="product.id"
-                                class="rounded-lg border p-3"
+                                class="rounded-2xl border border-border bg-background/70 p-3"
                             >
                                 <div class="flex items-center justify-between gap-3">
                                     <div>
-                                        <p class="font-medium">{{ product.name }}</p>
+                                        <p class="font-semibold text-foreground">{{ product.name }}</p>
                                         <p class="text-xs text-muted-foreground">{{ product.slug }}</p>
                                     </div>
                                     <Badge :variant="product.is_active ? 'default' : 'secondary'">
@@ -411,21 +425,17 @@ onMounted(async () => {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button
-                            variant="outline"
-                            :disabled="loading || !abilities.canViewProducts"
-                            @click="loadProducts"
-                        >
+                        <Button variant="outline" :disabled="loading || !abilities.canViewProducts" @click="loadProducts">
                             Refresh
                         </Button>
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/80">
                     <CardHeader>
-                        <CardTitle>{{ editingId ? 'Edit product' : 'Create product' }}</CardTitle>
+                        <CardTitle>{{ editingId ? 'Edit Product' : 'New Product' }}</CardTitle>
                         <CardDescription>
-                            Define storefront product fields and status.
+                            Configure catalog fields and publish state.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
@@ -488,7 +498,6 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
             </div>
-            </div>
-        </SettingsLayout>
+        </div>
     </AdminLayout>
 </template>

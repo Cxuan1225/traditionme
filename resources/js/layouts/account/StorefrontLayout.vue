@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { dashboard, home, logout } from '@/routes';
-import viewMode from '@/routes/admin/view-mode';
 import cart from '@/routes/cart';
 import { edit as editProfile } from '@/routes/profile';
 import shop from '@/routes/shop';
@@ -10,18 +9,7 @@ import type { Auth } from '@/types';
 
 const page = usePage<{ auth?: Auth }>();
 const auth = computed(() => page.props.auth);
-const isAdmin = computed(() => auth.value?.isAdmin === true);
-const isAdminMode = computed(() => auth.value?.adminViewMode === 'admin');
-
-const switchMode = (mode: 'admin' | 'storefront'): void => {
-    router.post(
-        viewMode.update().url,
-        { mode },
-        {
-            preserveScroll: true,
-        },
-    );
-};
+const userName = computed(() => auth.value?.user?.name ?? 'Member');
 </script>
 
 <template>
@@ -31,7 +19,7 @@ const switchMode = (mode: 'admin' | 'storefront'): void => {
         </div>
 
         <header class="sticky top-0 z-20 border-b border-zinc-200 bg-white/95 backdrop-blur">
-            <div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-10">
+            <div class="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:px-10">
                 <div class="flex items-center gap-3">
                     <span class="inline-flex size-10 items-center justify-center rounded-xl bg-zinc-900 text-sm font-extrabold tracking-wide text-zinc-100">
                         TM
@@ -42,16 +30,30 @@ const switchMode = (mode: 'admin' | 'storefront'): void => {
                     </div>
                 </div>
 
-                <div class="hidden flex-1 px-6 md:block">
-                    <div class="rounded-full border border-zinc-300 bg-zinc-100 px-4 py-2 text-sm text-zinc-500">
-                        Search kurung, kebaya, cheongsam, saree...
-                    </div>
-                </div>
+                <nav class="flex items-center gap-2 overflow-x-auto text-sm font-semibold">
+                    <Link
+                        :href="home()"
+                        class="rounded-full px-4 py-2 text-zinc-700 transition hover:bg-zinc-100"
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        :href="shop.index()"
+                        class="rounded-full px-4 py-2 text-zinc-700 transition hover:bg-zinc-100"
+                    >
+                        Shop
+                    </Link>
+                    <span
+                        class="hidden rounded-full border border-zinc-300 bg-zinc-100 px-4 py-2 text-xs font-bold tracking-wide text-zinc-700 sm:inline-flex"
+                    >
+                        {{ userName }}
+                    </span>
+                </nav>
 
                 <nav class="flex items-center gap-2 text-sm font-semibold">
                     <Link
                         :href="cart.show()"
-                        class="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-500 sm:inline-flex"
+                        class="rounded-full border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:border-zinc-500"
                     >
                         Cart
                     </Link>
@@ -62,14 +64,6 @@ const switchMode = (mode: 'admin' | 'storefront'): void => {
                     >
                         Settings
                     </Link>
-                    <button
-                        v-if="isAdmin"
-                        type="button"
-                        class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
-                        @click="switchMode(isAdminMode ? 'storefront' : 'admin')"
-                    >
-                        {{ isAdminMode ? 'Switch to Storefront' : 'Switch to Admin' }}
-                    </button>
                     <Link
                         v-if="auth?.user"
                         :href="dashboard()"
@@ -88,7 +82,7 @@ const switchMode = (mode: 'admin' | 'storefront'): void => {
                         :href="logout()"
                         method="post"
                         as="button"
-                        class="rounded-full border border-zinc-300 px-4 py-2 text-zinc-900 transition hover:border-zinc-500"
+                        class="rounded-full border border-red-300 bg-red-50 px-4 py-2 font-bold text-red-700 transition hover:bg-red-100"
                     >
                         Log out
                     </Link>
