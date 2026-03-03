@@ -411,31 +411,31 @@
     }
 
     .tm-table {
-        @apply w-full min-w-[640px] border-collapse text-left;
+        @apply w-full min-w-[760px] border-collapse text-left;
     }
 
     .tm-table-comfortable .tm-th {
-        @apply py-3;
+        @apply py-4;
     }
 
     .tm-table-comfortable .tm-td {
-        @apply py-3;
+        @apply py-4;
     }
 
     .tm-table-compact .tm-th {
-        @apply py-2;
+        @apply py-3;
     }
 
     .tm-table-compact .tm-td {
-        @apply py-2;
+        @apply py-3;
     }
 
     .tm-th {
-        @apply border-border bg-secondary/55 text-muted-foreground border-b px-4 py-3 text-xs font-bold uppercase tracking-[0.14em];
+        @apply border-border bg-secondary/55 text-muted-foreground border-b px-5 py-3 text-xs font-bold uppercase tracking-[0.14em];
     }
 
     .tm-td {
-        @apply border-border/70 text-foreground border-b px-4 py-3 align-middle text-sm;
+        @apply border-border/70 text-foreground border-b px-5 py-3 align-middle text-sm;
     }
 
     .tm-tr {
@@ -448,6 +448,14 @@
 
     .tm-tr:focus-within .tm-td {
         @apply bg-primary/10;
+    }
+
+    .tm-table-roomy .tm-th {
+        @apply py-4;
+    }
+
+    .tm-table-roomy .tm-td {
+        @apply py-4;
     }
 
     .tm-table-checkbox {

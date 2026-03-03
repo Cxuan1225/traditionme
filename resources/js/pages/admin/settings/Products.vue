@@ -12,6 +12,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -74,6 +82,7 @@ const pageError = ref<string | null>(null);
 const pageSuccess = ref<string | null>(null);
 const products = ref<ProductResource[]>(props.initialProducts);
 const editingId = ref<number | null>(null);
+const isEditorOpen = ref<boolean>(false);
 const previewImageError = ref<boolean>(false);
 
 const form = ref<{
@@ -325,9 +334,15 @@ const resetForm = (): void => {
     };
 };
 
+const openCreateEditor = (): void => {
+    resetForm();
+    isEditorOpen.value = true;
+};
+
 const startEdit = (product: ProductResource): void => {
     editingId.value = product.id;
     previewImageError.value = false;
+    isEditorOpen.value = true;
     form.value = {
         name: product.name,
         slug: product.slug,
@@ -346,6 +361,7 @@ const startEdit = (product: ProductResource): void => {
 const duplicateIntoDraft = (product: ProductResource): void => {
     editingId.value = null;
     previewImageError.value = false;
+    isEditorOpen.value = true;
     form.value = {
         name: `${product.name} copy`,
         slug: `${product.slug}-copy`,
@@ -420,6 +436,7 @@ const submitForm = async (): Promise<void> => {
             pageSuccess.value = 'Product created successfully.';
         }
 
+        isEditorOpen.value = false;
         resetForm();
     } catch (error) {
         pageError.value =
@@ -645,7 +662,7 @@ onMounted(async () => {
                             <Spinner v-if="loading" />
                             Refresh
                         </Button>
-                        <Button variant="outline" @click="resetForm">
+                        <Button variant="outline" @click="openCreateEditor">
                             New product
                         </Button>
                     </div>
@@ -758,7 +775,7 @@ onMounted(async () => {
                 </div>
             </section>
 
-            <div class="grid gap-4 xl:grid-cols-[1.28fr_0.72fr]">
+            <div class="grid gap-4">
                 <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>Catalog list</CardTitle>
@@ -816,7 +833,7 @@ onMounted(async () => {
                             No products match your filter combination.
                         </p>
 
-                        <div v-else class="tm-table-wrap">
+                        <div v-else class="tm-table-wrap tm-table-roomy">
                             <table :class="['tm-table', tableDensityClass]">
                                 <thead>
                                     <tr>
@@ -1064,18 +1081,22 @@ onMounted(async () => {
                         </Button>
                     </CardFooter>
                 </Card>
+            </div>
 
-                <Card class="tm-panel h-full">
-                    <CardHeader>
-                        <CardTitle>{{
+            <Dialog :open="isEditorOpen" @update:open="isEditorOpen = $event">
+                <DialogContent
+                    class="max-h-[92vh] overflow-y-auto sm:max-w-4xl"
+                >
+                    <DialogHeader>
+                        <DialogTitle>{{
                             editingId ? 'Edit product' : 'Create product'
-                        }}</CardTitle>
-                        <CardDescription>
+                        }}</DialogTitle>
+                        <DialogDescription>
                             Keep product identity, pricing, and media fields
                             aligned before publish.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent class="space-y-3">
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div class="space-y-3">
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Identity</p>
                             <p class="tm-form-hint">
@@ -1093,7 +1114,6 @@ onMounted(async () => {
                                         class="tm-input-surface"
                                     />
                                 </div>
-
                                 <div class="tm-form-field">
                                     <Label for="slug" class="tm-label"
                                         >Slug</Label
@@ -1105,7 +1125,6 @@ onMounted(async () => {
                                         placeholder="songket-luxe-kurung-set"
                                     />
                                 </div>
-
                                 <div class="tm-form-field">
                                     <Label for="category" class="tm-label"
                                         >Category</Label
@@ -1118,7 +1137,6 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </section>
-
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Commercial details</p>
                             <p class="tm-form-hint">
@@ -1152,7 +1170,6 @@ onMounted(async () => {
                                         />
                                     </div>
                                 </div>
-
                                 <div class="tm-form-field">
                                     <Label for="badge" class="tm-label"
                                         >Badge</Label
@@ -1166,7 +1183,6 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </section>
-
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Media and publish</p>
                             <p class="tm-form-hint">
@@ -1179,9 +1195,9 @@ onMounted(async () => {
                             >
                                 <div class="space-y-3">
                                     <div class="tm-form-field">
-                                        <Label for="image-url" class="tm-label">
-                                            Product photo URL
-                                        </Label>
+                                        <Label for="image-url" class="tm-label"
+                                            >Product photo URL</Label
+                                        >
                                         <Input
                                             id="image-url"
                                             v-model="form.image_url"
@@ -1189,11 +1205,10 @@ onMounted(async () => {
                                             placeholder="https://images.example.com/products/songket.jpg"
                                         />
                                     </div>
-
                                     <div class="tm-form-field">
-                                        <Label for="gradient" class="tm-label">
-                                            Fallback gradient classes
-                                        </Label>
+                                        <Label for="gradient" class="tm-label"
+                                            >Fallback gradient classes</Label
+                                        >
                                         <Input
                                             id="gradient"
                                             v-model="form.gradient"
@@ -1201,7 +1216,6 @@ onMounted(async () => {
                                             placeholder="from-rose-100 via-orange-50 to-amber-100"
                                         />
                                     </div>
-
                                     <Label
                                         class="flex items-center gap-2 text-sm"
                                     >
@@ -1213,7 +1227,6 @@ onMounted(async () => {
                                         Product is active
                                     </Label>
                                 </div>
-
                                 <div class="tm-media-preview-panel">
                                     <div
                                         class="tm-media-preview"
@@ -1273,8 +1286,8 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </section>
-                    </CardContent>
-                    <CardFooter class="tm-sticky-actions">
+                    </div>
+                    <DialogFooter class="tm-sticky-actions">
                         <Button
                             :disabled="
                                 submitting ||
@@ -1296,9 +1309,9 @@ onMounted(async () => {
                         >
                             Clear
                         </Button>
-                    </CardFooter>
-                </Card>
-            </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     </AdminLayout>
 </template>

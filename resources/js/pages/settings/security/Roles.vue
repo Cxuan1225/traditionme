@@ -157,9 +157,9 @@ const permissionGroups = computed<PermissionGroup[]>(() => {
 
 const roleDomainCount = (role: RoleResource): number =>
     new Set(
-        role.permissions.map((permission) =>
-            normalizePermissionDomain(permission.name),
-        ),
+        parsePermissionCollection(
+            (role as { permissions?: unknown }).permissions,
+        ).map((permission) => normalizePermissionDomain(permission.name)),
     ).size;
 
 const permissionPresetKeywords: Record<
@@ -187,7 +187,9 @@ const matchesPreset = (
 
 const selectedRolePermissionSet = computed<string[]>(() =>
     selectedRole.value
-        ? selectedRole.value.permissions
+        ? parsePermissionCollection(
+              (selectedRole.value as { permissions?: unknown }).permissions,
+          )
               .map((permission) => permission.name)
               .sort((left, right) => left.localeCompare(right))
         : [],
@@ -770,7 +772,7 @@ onMounted(async () => {
                             No roles match your search.
                         </p>
 
-                        <div v-else class="tm-table-wrap">
+                        <div v-else class="tm-table-wrap tm-table-roomy">
                             <table class="tm-table">
                                 <thead>
                                     <tr>

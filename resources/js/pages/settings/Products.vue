@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
@@ -29,6 +37,7 @@ type ProductResource = {
     original_price_in_sen: number | null;
     badge: string | null;
     gradient: string | null;
+    image_url: string | null;
     is_active: boolean;
 };
 
@@ -38,6 +47,9 @@ type Capabilities = {
     canUpdateProducts?: boolean;
     canDeleteProducts?: boolean;
 };
+
+type StatusFilter = 'all' | 'active' | 'inactive' | 'missing-photo';
+type DensityMode = 'comfortable' | 'compact';
 
 const props = withDefaults(
     defineProps<{
@@ -60,11 +72,18 @@ const breadcrumbItems: BreadcrumbItem[] = [
 const loading = ref<boolean>(false);
 const submitting = ref<boolean>(false);
 const deleting = ref<number | null>(null);
+const quickUpdating = ref<number | null>(null);
 const searchQuery = ref<string>('');
+const statusFilter = ref<StatusFilter>('all');
+const categoryFilter = ref<string>('all');
+const density = ref<DensityMode>('comfortable');
+const selectedProductIds = ref<number[]>([]);
 const pageError = ref<string | null>(null);
 const pageSuccess = ref<string | null>(null);
 const products = ref<ProductResource[]>(props.initialProducts);
 const editingId = ref<number | null>(null);
+const isEditorOpen = ref<boolean>(false);
+const previewImageError = ref<boolean>(false);
 
 const form = ref<{
     name: string;
@@ -74,6 +93,7 @@ const form = ref<{
     original_price_in_sen: string;
     badge: string;
     gradient: string;
+    image_url: string;
     is_active: boolean;
 }>({
     name: '',
@@ -83,6 +103,7 @@ const form = ref<{
     original_price_in_sen: '',
     badge: '',
     gradient: '',
+    image_url: '',
     is_active: true,
 });
 
@@ -93,19 +114,98 @@ const abilities = computed<Required<Capabilities>>(() => ({
     canDeleteProducts: props.capabilities.canDeleteProducts ?? true,
 }));
 
+const categoryOptions = computed<string[]>(() =>
+    Array.from(
+        new Set(
+            products.value
+                .map((product) => product.category.trim())
+                .filter((category) => category !== ''),
+        ),
+    ).sort((left, right) => left.localeCompare(right)),
+);
+
 const visibleProducts = computed<ProductResource[]>(() => {
     const query = searchQuery.value.trim().toLowerCase();
-    if (query === '') {
-        return products.value;
+
+    return products.value.filter((product) => {
+        const searchMatch =
+            query === '' ||
+            [product.name, product.slug, product.category]
+                .join(' ')
+                .toLowerCase()
+                .includes(query);
+
+        const statusMatch =
+            statusFilter.value === 'all' ||
+            (statusFilter.value === 'active' && product.is_active) ||
+            (statusFilter.value === 'inactive' && !product.is_active) ||
+            (statusFilter.value === 'missing-photo' &&
+                product.image_url === null);
+
+        const categoryMatch =
+            categoryFilter.value === 'all' ||
+            product.category === categoryFilter.value;
+
+        return searchMatch && statusMatch && categoryMatch;
+    });
+});
+
+const activeCount = computed<number>(
+    () => products.value.filter((item) => item.is_active).length,
+);
+
+const inactiveCount = computed<number>(
+    () => products.value.filter((item) => !item.is_active).length,
+);
+
+const missingPhotoCount = computed<number>(
+    () => products.value.filter((item) => item.image_url === null).length,
+);
+
+const allVisibleSelected = computed<boolean>(
+    () =>
+        visibleProducts.value.length > 0 &&
+        visibleProducts.value.every((product) =>
+            selectedProductIds.value.includes(product.id),
+        ),
+);
+
+const someVisibleSelected = computed<boolean>(
+    () =>
+        !allVisibleSelected.value &&
+        visibleProducts.value.some((product) =>
+            selectedProductIds.value.includes(product.id),
+        ),
+);
+
+const selectedProducts = computed<ProductResource[]>(() =>
+    products.value.filter((product) =>
+        selectedProductIds.value.includes(product.id),
+    ),
+);
+
+const draftImageUrl = computed<string>(() => form.value.image_url.trim());
+const draftPreviewUrl = computed<string | null>(() => {
+    if (draftImageUrl.value === '') {
+        return null;
     }
 
-    return products.value.filter((product) =>
-        [product.name, product.slug, product.category]
-            .join(' ')
-            .toLowerCase()
-            .includes(query),
-    );
+    return /^https?:\/\/\S+/i.test(draftImageUrl.value)
+        ? draftImageUrl.value
+        : null;
 });
+
+const draftMediaState = computed<'missing' | 'invalid' | 'valid'>(() => {
+    if (draftImageUrl.value === '') {
+        return 'missing';
+    }
+
+    return draftPreviewUrl.value === null ? 'invalid' : 'valid';
+});
+
+const tableDensityClass = computed<string>(() =>
+    density.value === 'compact' ? 'tm-table-compact' : 'tm-table-comfortable',
+);
 
 const readCookie = (name: string): string | null => {
     const encodedName = `${encodeURIComponent(name)}=`;
@@ -207,6 +307,9 @@ const loadProducts = async (): Promise<void> => {
             productsIndexRoute.url(),
         );
         products.value = parseCollection(payload.data ?? []);
+        selectedProductIds.value = selectedProductIds.value.filter((id) =>
+            products.value.some((product) => product.id === id),
+        );
     } catch (error) {
         pageError.value =
             error instanceof Error ? error.message : 'Unable to load products.';
@@ -217,6 +320,7 @@ const loadProducts = async (): Promise<void> => {
 
 const resetForm = (): void => {
     editingId.value = null;
+    previewImageError.value = false;
     form.value = {
         name: '',
         slug: '',
@@ -225,12 +329,20 @@ const resetForm = (): void => {
         original_price_in_sen: '',
         badge: '',
         gradient: '',
+        image_url: '',
         is_active: true,
     };
 };
 
+const openCreateEditor = (): void => {
+    resetForm();
+    isEditorOpen.value = true;
+};
+
 const startEdit = (product: ProductResource): void => {
     editingId.value = product.id;
+    previewImageError.value = false;
+    isEditorOpen.value = true;
     form.value = {
         name: product.name,
         slug: product.slug,
@@ -241,8 +353,29 @@ const startEdit = (product: ProductResource): void => {
             : '',
         badge: product.badge ?? '',
         gradient: product.gradient ?? '',
+        image_url: product.image_url ?? '',
         is_active: product.is_active,
     };
+};
+
+const duplicateIntoDraft = (product: ProductResource): void => {
+    editingId.value = null;
+    previewImageError.value = false;
+    isEditorOpen.value = true;
+    form.value = {
+        name: `${product.name} copy`,
+        slug: `${product.slug}-copy`,
+        category: product.category,
+        price_in_sen: product.price_in_sen.toString(),
+        original_price_in_sen: product.original_price_in_sen
+            ? product.original_price_in_sen.toString()
+            : '',
+        badge: product.badge ?? '',
+        gradient: product.gradient ?? '',
+        image_url: product.image_url ?? '',
+        is_active: false,
+    };
+    pageSuccess.value = 'Draft copied to editor.';
 };
 
 const submitForm = async (): Promise<void> => {
@@ -266,6 +399,10 @@ const submitForm = async (): Promise<void> => {
                 form.value.original_price_in_sen.trim() === ''
                     ? null
                     : Number.parseInt(form.value.original_price_in_sen, 10),
+            image_url:
+                form.value.image_url.trim() === ''
+                    ? null
+                    : form.value.image_url.trim(),
         };
 
         if (isEditing && editingId.value !== null) {
@@ -299,12 +436,61 @@ const submitForm = async (): Promise<void> => {
             pageSuccess.value = 'Product created successfully.';
         }
 
+        isEditorOpen.value = false;
         resetForm();
     } catch (error) {
         pageError.value =
             error instanceof Error ? error.message : 'Unable to save product.';
     } finally {
         submitting.value = false;
+    }
+};
+
+const toggleProductActive = async (product: ProductResource): Promise<void> => {
+    if (!abilities.value.canUpdateProducts) {
+        return;
+    }
+
+    quickUpdating.value = product.id;
+    pageError.value = null;
+    pageSuccess.value = null;
+
+    try {
+        const response = await requestJson(
+            productsRoutes.update.url({ product: product.id }),
+            {
+                method: 'PUT',
+                body: {
+                    name: product.name,
+                    slug: product.slug,
+                    category: product.category,
+                    price_in_sen: product.price_in_sen,
+                    original_price_in_sen: product.original_price_in_sen,
+                    badge: product.badge ?? '',
+                    gradient: product.gradient ?? '',
+                    image_url: product.image_url,
+                    is_active: !product.is_active,
+                },
+            },
+        );
+
+        const updated = parseProduct(response);
+        if (updated) {
+            products.value = products.value.map((entry) =>
+                entry.id === updated.id ? updated : entry,
+            );
+        }
+
+        pageSuccess.value = `Product marked ${
+            product.is_active ? 'inactive' : 'active'
+        }.`;
+    } catch (error) {
+        pageError.value =
+            error instanceof Error
+                ? error.message
+                : 'Unable to update product status.';
+    } finally {
+        quickUpdating.value = null;
     }
 };
 
@@ -325,6 +511,9 @@ const removeProduct = async (productId: number): Promise<void> => {
         products.value = products.value.filter(
             (product) => product.id !== productId,
         );
+        selectedProductIds.value = selectedProductIds.value.filter(
+            (id) => id !== productId,
+        );
         if (editingId.value === productId) {
             resetForm();
         }
@@ -339,6 +528,50 @@ const removeProduct = async (productId: number): Promise<void> => {
     }
 };
 
+const setDensity = (mode: DensityMode): void => {
+    density.value = mode;
+};
+
+const setStatusFilter = (status: StatusFilter): void => {
+    statusFilter.value = status;
+};
+
+const toggleRowSelection = (productId: number, checked: boolean): void => {
+    if (checked) {
+        if (!selectedProductIds.value.includes(productId)) {
+            selectedProductIds.value = [...selectedProductIds.value, productId];
+        }
+
+        return;
+    }
+
+    selectedProductIds.value = selectedProductIds.value.filter(
+        (id) => id !== productId,
+    );
+};
+
+const toggleAllVisibleSelection = (checked: boolean): void => {
+    const visibleIds = visibleProducts.value.map((product) => product.id);
+    if (checked) {
+        selectedProductIds.value = Array.from(
+            new Set([...selectedProductIds.value, ...visibleIds]),
+        );
+
+        return;
+    }
+
+    selectedProductIds.value = selectedProductIds.value.filter(
+        (id) => !visibleIds.includes(id),
+    );
+};
+
+watch(
+    () => form.value.image_url,
+    () => {
+        previewImageError.value = false;
+    },
+);
+
 onMounted(async () => {
     if (products.value.length === 0) {
         await loadProducts();
@@ -352,14 +585,42 @@ onMounted(async () => {
     <AppLayout :breadcrumbs="breadcrumbItems">
         <div class="space-y-4 p-4">
             <section class="tm-shell p-6">
-                <p class="tm-kicker text-primary">Catalog Management</p>
-                <h2 class="tm-display text-foreground mt-2 text-3xl font-black">
-                    Product control center
-                </h2>
-                <p class="text-muted-foreground mt-2 max-w-2xl text-sm">
-                    Maintain pricing, visibility, and merchandising fields for
-                    storefront publishing.
-                </p>
+                <div
+                    class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
+                >
+                    <div>
+                        <p class="tm-kicker text-primary">Catalog workspace</p>
+                        <h2 class="tm-display mt-2 text-3xl font-black">
+                            Media-first product catalog
+                        </h2>
+                        <p class="text-muted-foreground mt-2 max-w-2xl text-sm">
+                            Filter faster, review product imagery quality, and
+                            update catalog metadata without leaving this view.
+                        </p>
+                    </div>
+                    <div class="grid gap-2 sm:grid-cols-3">
+                        <div class="tm-stat">
+                            <p class="text-muted-foreground text-xs">
+                                Total products
+                            </p>
+                            <p class="text-2xl font-black">
+                                {{ products.length }}
+                            </p>
+                        </div>
+                        <div class="tm-stat">
+                            <p class="text-muted-foreground text-xs">Active</p>
+                            <p class="text-2xl font-black">{{ activeCount }}</p>
+                        </div>
+                        <div class="tm-stat tm-stat-warning">
+                            <p class="text-muted-foreground text-xs">
+                                Missing photo
+                            </p>
+                            <p class="text-2xl font-black">
+                                {{ missingPhotoCount }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <Alert v-if="pageError" variant="destructive">
@@ -372,22 +633,25 @@ onMounted(async () => {
                 <AlertDescription>{{ pageSuccess }}</AlertDescription>
             </Alert>
 
-            <section class="tm-admin-toolbar">
+            <section class="tm-admin-toolbar space-y-3">
                 <div
-                    class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                    class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between"
+                    role="region"
+                    aria-label="Catalog actions toolbar"
                 >
                     <div>
                         <p class="text-foreground text-sm font-semibold">
-                            Catalog actions
+                            Catalog workflow tools
                         </p>
                         <p class="text-muted-foreground text-xs">
-                            Search and maintain product records faster.
+                            Search by name, control density, and focus on
+                            missing media or inactive inventory.
                         </p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <Input
                             v-model="searchQuery"
-                            class="tm-input-surface w-full min-w-52 lg:w-64"
+                            class="tm-input-surface w-full min-w-52 lg:w-72"
                             placeholder="Search name, slug, category..."
                         />
                         <Button
@@ -398,25 +662,151 @@ onMounted(async () => {
                             <Spinner v-if="loading" />
                             Refresh
                         </Button>
-                        <Button variant="outline" @click="resetForm">
+                        <Button variant="outline" @click="openCreateEditor">
                             New product
                         </Button>
                     </div>
                 </div>
+
+                <div class="tm-filter-row">
+                    <div
+                        class="tm-chip-row"
+                        role="tablist"
+                        aria-label="Status filter"
+                    >
+                        <button
+                            type="button"
+                            class="tm-filter-chip"
+                            :class="{
+                                'tm-filter-chip-active': statusFilter === 'all',
+                            }"
+                            :aria-pressed="statusFilter === 'all'"
+                            @click="setStatusFilter('all')"
+                        >
+                            All <span>{{ products.length }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="tm-filter-chip"
+                            :class="{
+                                'tm-filter-chip-active':
+                                    statusFilter === 'active',
+                            }"
+                            :aria-pressed="statusFilter === 'active'"
+                            @click="setStatusFilter('active')"
+                        >
+                            Active <span>{{ activeCount }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="tm-filter-chip"
+                            :class="{
+                                'tm-filter-chip-active':
+                                    statusFilter === 'inactive',
+                            }"
+                            :aria-pressed="statusFilter === 'inactive'"
+                            @click="setStatusFilter('inactive')"
+                        >
+                            Inactive <span>{{ inactiveCount }}</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="tm-filter-chip tm-filter-chip-warning"
+                            :class="{
+                                'tm-filter-chip-active':
+                                    statusFilter === 'missing-photo',
+                            }"
+                            :aria-pressed="statusFilter === 'missing-photo'"
+                            @click="setStatusFilter('missing-photo')"
+                        >
+                            Missing photo <span>{{ missingPhotoCount }}</span>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <label class="tm-label text-xs" for="catalog-category">
+                            Category
+                        </label>
+                        <select
+                            id="catalog-category"
+                            v-model="categoryFilter"
+                            class="tm-select-surface"
+                        >
+                            <option value="all">All categories</option>
+                            <option
+                                v-for="category in categoryOptions"
+                                :key="category"
+                                :value="category"
+                            >
+                                {{ category }}
+                            </option>
+                        </select>
+                        <div
+                            class="tm-density-switch"
+                            role="group"
+                            aria-label="Table density"
+                        >
+                            <button
+                                type="button"
+                                class="tm-density-button"
+                                :class="{
+                                    'tm-density-button-active':
+                                        density === 'comfortable',
+                                }"
+                                :aria-pressed="density === 'comfortable'"
+                                @click="setDensity('comfortable')"
+                            >
+                                Comfortable
+                            </button>
+                            <button
+                                type="button"
+                                class="tm-density-button"
+                                :class="{
+                                    'tm-density-button-active':
+                                        density === 'compact',
+                                }"
+                                :aria-pressed="density === 'compact'"
+                                @click="setDensity('compact')"
+                            >
+                                Compact
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div class="grid gap-4">
                 <Card class="tm-panel h-full">
                     <CardHeader>
-                        <CardTitle>Products</CardTitle>
+                        <CardTitle>Catalog list</CardTitle>
                         <CardDescription>
-                            Manage catalog products shown on storefront pages.
+                            Image-first product rows with quick operational
+                            actions.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
                         <div
+                            v-if="selectedProducts.length > 0"
+                            class="tm-state-note tm-state-note-warning flex flex-wrap items-center justify-between gap-2"
+                        >
+                            <span class="text-sm">
+                                {{ selectedProducts.length }} selected for bulk
+                                review staging.
+                            </span>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                @click="selectedProductIds = []"
+                            >
+                                Clear selection
+                            </Button>
+                        </div>
+
+                        <div
                             v-if="loading"
-                            class="flex items-center gap-2 text-sm"
+                            class="tm-state-note tm-state-note-warning flex items-center gap-2"
+                            role="status"
+                            aria-live="polite"
                         >
                             <Spinner />
                             Loading products...
@@ -440,19 +830,56 @@ onMounted(async () => {
                             v-else-if="visibleProducts.length === 0"
                             class="tm-empty-state"
                         >
-                            No products match your search.
+                            No products match your filter combination.
                         </p>
 
-                        <div v-else class="tm-table-wrap">
-                            <table class="tm-table">
+                        <div v-else class="tm-table-wrap tm-table-roomy">
+                            <table :class="['tm-table', tableDensityClass]">
                                 <thead>
                                     <tr>
-                                        <th class="tm-th">Product</th>
-                                        <th class="tm-th">Category</th>
-                                        <th class="tm-th">Price (sen)</th>
-                                        <th class="tm-th">Status</th>
-                                        <th class="tm-th text-right">
-                                            Actions
+                                        <th scope="col" class="tm-th w-12">
+                                            <input
+                                                type="checkbox"
+                                                class="tm-table-checkbox"
+                                                :checked="allVisibleSelected"
+                                                :aria-checked="
+                                                    someVisibleSelected
+                                                        ? 'mixed'
+                                                        : allVisibleSelected
+                                                          ? 'true'
+                                                          : 'false'
+                                                "
+                                                :aria-label="
+                                                    allVisibleSelected
+                                                        ? 'Unselect visible products'
+                                                        : 'Select visible products'
+                                                "
+                                                @change="
+                                                    toggleAllVisibleSelection(
+                                                        (
+                                                            $event.target as HTMLInputElement
+                                                        ).checked,
+                                                    )
+                                                "
+                                            />
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Product
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Status
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Category
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Price (sen)
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="tm-th text-right"
+                                        >
+                                            Row actions
                                         </th>
                                     </tr>
                                 </thead>
@@ -463,20 +890,80 @@ onMounted(async () => {
                                         class="tm-tr"
                                     >
                                         <td class="tm-td">
-                                            <p class="font-medium">
-                                                {{ product.name }}
-                                            </p>
-                                            <p
-                                                class="text-muted-foreground text-xs"
+                                            <input
+                                                type="checkbox"
+                                                class="tm-table-checkbox"
+                                                :checked="
+                                                    selectedProductIds.includes(
+                                                        product.id,
+                                                    )
+                                                "
+                                                :aria-label="`Select ${product.name}`"
+                                                @change="
+                                                    toggleRowSelection(
+                                                        product.id,
+                                                        (
+                                                            $event.target as HTMLInputElement
+                                                        ).checked,
+                                                    )
+                                                "
+                                            />
+                                        </td>
+                                        <td class="tm-td">
+                                            <div
+                                                class="flex items-center gap-3"
                                             >
-                                                {{ product.slug }}
-                                            </p>
-                                        </td>
-                                        <td class="tm-td">
-                                            {{ product.category }}
-                                        </td>
-                                        <td class="tm-td">
-                                            {{ product.price_in_sen }}
+                                                <div
+                                                    class="tm-media-thumb"
+                                                    :class="
+                                                        product.image_url
+                                                            ? ''
+                                                            : (product.gradient ??
+                                                              'from-zinc-200 to-zinc-100')
+                                                    "
+                                                >
+                                                    <img
+                                                        v-if="product.image_url"
+                                                        :src="product.image_url"
+                                                        :alt="product.name"
+                                                        class="h-full w-full object-cover"
+                                                    />
+                                                    <span
+                                                        v-else
+                                                        class="tm-media-fallback"
+                                                    >
+                                                        No photo
+                                                    </span>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <p class="font-semibold">
+                                                        {{ product.name }}
+                                                    </p>
+                                                    <p
+                                                        class="text-muted-foreground text-xs"
+                                                    >
+                                                        {{ product.slug }}
+                                                    </p>
+                                                    <div
+                                                        class="flex flex-wrap items-center gap-1"
+                                                    >
+                                                        <Badge
+                                                            v-if="product.badge"
+                                                            variant="secondary"
+                                                        >
+                                                            {{ product.badge }}
+                                                        </Badge>
+                                                        <span
+                                                            v-if="
+                                                                !product.image_url
+                                                            "
+                                                            class="tm-warning-chip"
+                                                        >
+                                                            Missing photo
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="tm-td">
                                             <Badge
@@ -493,11 +980,20 @@ onMounted(async () => {
                                                 }}
                                             </Badge>
                                         </td>
+                                        <td class="tm-td">
+                                            {{ product.category }}
+                                        </td>
+                                        <td class="tm-td">
+                                            {{ product.price_in_sen }}
+                                        </td>
                                         <td class="tm-td text-right">
-                                            <div class="flex justify-end gap-2">
+                                            <div
+                                                class="flex flex-wrap justify-end gap-2"
+                                            >
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
+                                                    :aria-label="`Edit ${product.name}`"
                                                     :disabled="
                                                         !abilities.canUpdateProducts
                                                     "
@@ -506,8 +1002,50 @@ onMounted(async () => {
                                                     Edit
                                                 </Button>
                                                 <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    :aria-label="`Duplicate ${product.name}`"
+                                                    :disabled="
+                                                        !abilities.canCreateProducts
+                                                    "
+                                                    @click="
+                                                        duplicateIntoDraft(
+                                                            product,
+                                                        )
+                                                    "
+                                                >
+                                                    Duplicate
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    :disabled="
+                                                        !abilities.canUpdateProducts ||
+                                                        quickUpdating ===
+                                                            product.id
+                                                    "
+                                                    @click="
+                                                        toggleProductActive(
+                                                            product,
+                                                        )
+                                                    "
+                                                >
+                                                    <Spinner
+                                                        v-if="
+                                                            quickUpdating ===
+                                                            product.id
+                                                        "
+                                                    />
+                                                    {{
+                                                        product.is_active
+                                                            ? 'Deactivate'
+                                                            : 'Activate'
+                                                    }}
+                                                </Button>
+                                                <Button
                                                     variant="destructive"
                                                     size="sm"
+                                                    :aria-label="`Delete ${product.name}`"
                                                     :disabled="
                                                         !abilities.canDeleteProducts ||
                                                         deleting === product.id
@@ -543,17 +1081,22 @@ onMounted(async () => {
                         </Button>
                     </CardFooter>
                 </Card>
+            </div>
 
-                <Card class="tm-panel h-full">
-                    <CardHeader>
-                        <CardTitle>{{
+            <Dialog :open="isEditorOpen" @update:open="isEditorOpen = $event">
+                <DialogContent
+                    class="max-h-[92vh] overflow-y-auto sm:max-w-4xl"
+                >
+                    <DialogHeader>
+                        <DialogTitle>{{
                             editingId ? 'Edit product' : 'Create product'
-                        }}</CardTitle>
-                        <CardDescription>
-                            Define storefront product fields and status.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent class="space-y-3">
+                        }}</DialogTitle>
+                        <DialogDescription>
+                            Keep product identity, pricing, and media fields
+                            aligned before publish.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div class="space-y-3">
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Identity</p>
                             <p class="tm-form-hint">
@@ -571,7 +1114,6 @@ onMounted(async () => {
                                         class="tm-input-surface"
                                     />
                                 </div>
-
                                 <div class="tm-form-field">
                                     <Label for="slug" class="tm-label"
                                         >Slug</Label
@@ -583,7 +1125,6 @@ onMounted(async () => {
                                         placeholder="songket-luxe-kurung-set"
                                     />
                                 </div>
-
                                 <div class="tm-form-field">
                                     <Label for="category" class="tm-label"
                                         >Category</Label
@@ -596,12 +1137,11 @@ onMounted(async () => {
                                 </div>
                             </div>
                         </section>
-
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Commercial details</p>
                             <p class="tm-form-hint">
-                                Keep price values in sen and optional
-                                merchandising badge info.
+                                Keep monetary values in sen and optional badge
+                                labels for merchandising highlights.
                             </p>
                             <div class="mt-3 space-y-3">
                                 <div class="grid grid-cols-2 gap-3">
@@ -630,7 +1170,6 @@ onMounted(async () => {
                                         />
                                     </div>
                                 </div>
-
                                 <div class="tm-form-field">
                                     <Label for="badge" class="tm-label"
                                         >Badge</Label
@@ -639,43 +1178,116 @@ onMounted(async () => {
                                         id="badge"
                                         v-model="form.badge"
                                         class="tm-input-surface"
-                                        placeholder="Best Seller"
+                                        placeholder="Best seller"
                                     />
                                 </div>
                             </div>
                         </section>
-
                         <section class="tm-card p-4">
-                            <p class="tm-subtitle">Publish settings</p>
+                            <p class="tm-subtitle">Media and publish</p>
                             <p class="tm-form-hint">
-                                Use gradient classes for storefront card media
-                                styling.
+                                Supply <code>image_url</code> for photo-first
+                                cards. Gradient classes are fallback for missing
+                                media.
                             </p>
-                            <div class="mt-3 space-y-3">
-                                <div class="tm-form-field">
-                                    <Label for="gradient" class="tm-label"
-                                        >Gradient classes</Label
+                            <div
+                                class="mt-3 grid gap-3 xl:grid-cols-[1.1fr_0.9fr]"
+                            >
+                                <div class="space-y-3">
+                                    <div class="tm-form-field">
+                                        <Label for="image-url" class="tm-label"
+                                            >Product photo URL</Label
+                                        >
+                                        <Input
+                                            id="image-url"
+                                            v-model="form.image_url"
+                                            class="tm-input-surface"
+                                            placeholder="https://images.example.com/products/songket.jpg"
+                                        />
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <Label for="gradient" class="tm-label"
+                                            >Fallback gradient classes</Label
+                                        >
+                                        <Input
+                                            id="gradient"
+                                            v-model="form.gradient"
+                                            class="tm-input-surface"
+                                            placeholder="from-rose-100 via-orange-50 to-amber-100"
+                                        />
+                                    </div>
+                                    <Label
+                                        class="flex items-center gap-2 text-sm"
                                     >
-                                    <Input
-                                        id="gradient"
-                                        v-model="form.gradient"
-                                        class="tm-input-surface"
-                                        placeholder="from-rose-100 via-orange-50 to-amber-100"
-                                    />
+                                        <input
+                                            v-model="form.is_active"
+                                            type="checkbox"
+                                            class="h-4 w-4 rounded border-zinc-300"
+                                        />
+                                        Product is active
+                                    </Label>
                                 </div>
-
-                                <Label class="flex items-center gap-2 text-sm">
-                                    <input
-                                        v-model="form.is_active"
-                                        type="checkbox"
-                                        class="h-4 w-4 rounded border-zinc-300"
-                                    />
-                                    Product is active
-                                </Label>
+                                <div class="tm-media-preview-panel">
+                                    <div
+                                        class="tm-media-preview"
+                                        :class="
+                                            draftPreviewUrl
+                                                ? ''
+                                                : form.gradient.trim() ||
+                                                  'from-zinc-200 to-zinc-100'
+                                        "
+                                    >
+                                        <img
+                                            v-if="
+                                                draftPreviewUrl &&
+                                                !previewImageError
+                                            "
+                                            :src="draftPreviewUrl"
+                                            alt="Draft product media preview"
+                                            class="h-full w-full object-cover"
+                                            @error="previewImageError = true"
+                                        />
+                                        <div
+                                            v-else
+                                            class="tm-media-fallback px-3 text-center"
+                                        >
+                                            {{
+                                                draftMediaState === 'missing'
+                                                    ? 'No product photo yet'
+                                                    : 'URL could not be previewed'
+                                            }}
+                                        </div>
+                                    </div>
+                                    <p
+                                        v-if="draftMediaState === 'missing'"
+                                        class="tm-state-note tm-state-note-warning"
+                                    >
+                                        Missing photo warning: this product will
+                                        render with gradient fallback in
+                                        listings.
+                                    </p>
+                                    <p
+                                        v-else-if="
+                                            draftMediaState === 'invalid'
+                                        "
+                                        class="tm-state-note tm-state-note-danger"
+                                    >
+                                        Photo URL should start with
+                                        <code>http://</code> or
+                                        <code>https://</code>.
+                                    </p>
+                                    <p
+                                        v-else
+                                        class="tm-state-note tm-state-note-success"
+                                    >
+                                        Photo preview loaded. Product cards will
+                                        prioritize this media.
+                                    </p>
+                                </div>
                             </div>
                         </section>
-                    </CardContent>
-                    <CardFooter class="tm-sticky-actions">
+                    </div>
+                    <DialogFooter class="tm-sticky-actions">
                         <Button
                             :disabled="
                                 submitting ||
@@ -697,9 +1309,9 @@ onMounted(async () => {
                         >
                             Clear
                         </Button>
-                    </CardFooter>
-                </Card>
-            </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     </AppLayout>
 </template>
