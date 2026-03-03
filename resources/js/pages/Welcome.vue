@@ -245,7 +245,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
         <main
             class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
         >
-            <section class="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+            <section class="tm-stagger grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
                 <article
                     class="tm-shell overflow-hidden bg-[linear-gradient(140deg,hsl(37_67%_94%)_0%,hsl(30_66%_92%)_45%,hsl(5_63%_91%)_100%)] p-6 lg:p-10"
                     data-aos="fade-up"
@@ -294,7 +294,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 </article>
 
                 <article
-                    class="tm-shell rounded-3xl border-zinc-800 bg-zinc-900 p-6 text-zinc-100 shadow-sm lg:p-8"
+                    class="tm-shell rounded-3xl border-zinc-800 bg-zinc-900 p-6 text-zinc-100 shadow-sm transition hover:-translate-y-1 lg:p-8"
                     data-aos="fade-up"
                     data-aos-delay="120"
                 >
@@ -350,11 +350,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         {{ totalProducts }} items</span
                     >
                 </div>
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div
+                    class="tm-stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                >
                     <article
                         v-for="product in products"
                         :key="product.name"
-                        class="rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm"
+                        class="rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-xl"
                     >
                         <div class="mb-3 flex items-center justify-between">
                             <span
@@ -386,7 +388,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         <button
                             type="button"
                             @click="addToCart(product.slug)"
-                            class="mt-4 w-full rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-bold tracking-wide text-white uppercase transition hover:bg-zinc-700"
+                            class="mt-4 w-full rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-bold tracking-wide text-white uppercase transition hover:-translate-y-0.5 hover:bg-zinc-700"
                         >
                             Add to Cart
                         </button>
@@ -440,11 +442,11 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         >Tailored collections for real events</span
                     >
                 </div>
-                <div class="grid gap-4 md:grid-cols-3">
+                <div class="tm-stagger grid gap-4 md:grid-cols-3">
                     <article
                         v-for="occasion in occasions"
                         :key="occasion.name"
-                        class="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm"
+                        class="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                     >
                         <span
                             class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold tracking-wide text-amber-800 uppercase"
@@ -473,7 +475,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 data-aos-delay="200"
             >
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm lg:p-8"
+                    class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg lg:p-8"
                 >
                     <h2 class="text-2xl font-black text-zinc-900">
                         Customer Reviews
@@ -497,7 +499,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 </article>
 
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-zinc-900 p-6 text-zinc-100 shadow-sm lg:p-8"
+                    class="rounded-3xl border border-zinc-200 bg-zinc-900 p-6 text-zinc-100 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl lg:p-8"
                 >
                     <h2 class="text-2xl font-black">How It Works</h2>
                     <ol class="mt-4 space-y-3">
@@ -550,7 +552,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 data-aos-delay="240"
             >
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm"
+                    class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
                     <h2 class="text-2xl font-black text-zinc-900">
                         Frequently Asked Questions
@@ -587,7 +589,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 </article>
 
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-orange-100 p-6 shadow-sm"
+                    class="rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-orange-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
                     <p
                         class="text-xs font-bold tracking-[0.2em] text-red-700 uppercase"

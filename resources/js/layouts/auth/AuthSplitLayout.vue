@@ -17,7 +17,7 @@ defineProps<{
         class="relative grid h-dvh flex-col items-center justify-center bg-background px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0"
     >
         <div
-            class="relative hidden h-full flex-col bg-zinc-900 p-10 text-zinc-100 lg:flex dark:border-r"
+            class="tm-fade-in relative hidden h-full flex-col bg-zinc-900 p-10 text-zinc-100 lg:flex dark:border-r"
         >
             <div
                 class="absolute inset-0 bg-[radial-gradient(circle_at_15%_15%,rgba(245,158,11,0.28),transparent_40%),radial-gradient(circle_at_80%_65%,rgba(239,68,68,0.24),transparent_45%),#111827]"
@@ -37,7 +37,7 @@ defineProps<{
                 </p>
             </div>
         </div>
-        <div class="lg:p-8">
+        <div class="tm-fade-up lg:p-8">
             <div
                 class="tm-shell mx-auto flex w-full flex-col justify-center space-y-6 p-7 sm:w-[390px]"
             >

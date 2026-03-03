@@ -77,7 +77,9 @@ const permissionCount = computed(() => permissions.value.length);
                 </p>
             </section>
 
-            <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <section
+                class="tm-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+            >
                 <Card class="tm-shell border-border bg-card/80">
                     <CardHeader>
                         <CardDescription>Granted permissions</CardDescription>
@@ -133,7 +135,7 @@ const permissionCount = computed(() => permissions.value.length);
                 </Card>
             </section>
 
-            <section class="grid gap-4 lg:grid-cols-3">
+            <section class="tm-stagger grid gap-4 lg:grid-cols-3">
                 <Card class="tm-shell border-border bg-card/80 lg:col-span-2">
                     <CardHeader>
                         <CardTitle>Quick actions</CardTitle>

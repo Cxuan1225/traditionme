@@ -80,7 +80,7 @@ const settingsNav: NavEntry[] = [
     <div class="min-h-screen bg-background text-foreground">
         <div class="grid min-h-screen grid-cols-1 lg:grid-cols-[308px_1fr]">
             <aside
-                class="relative border-r border-border bg-[linear-gradient(180deg,hsl(39_66%_92%)_0%,hsl(38_46%_97%)_42%,hsl(38_46%_97%)_100%)] px-5 py-6 dark:bg-[linear-gradient(180deg,hsl(25_15%_13%)_0%,hsl(24_16%_10%)_100%)]"
+                class="tm-fade-in relative border-r border-border bg-[linear-gradient(180deg,hsl(39_66%_92%)_0%,hsl(38_46%_97%)_42%,hsl(38_46%_97%)_100%)] px-5 py-6 dark:bg-[linear-gradient(180deg,hsl(25_15%_13%)_0%,hsl(24_16%_10%)_100%)]"
             >
                 <div
                     class="pointer-events-none absolute -top-16 -left-16 h-48 w-48 rounded-full bg-amber-300/35 blur-3xl dark:bg-amber-500/15"
@@ -110,7 +110,7 @@ const settingsNav: NavEntry[] = [
                     </div>
                 </Link>
 
-                <div class="relative space-y-7">
+                <div class="tm-stagger relative space-y-7">
                     <div>
                         <p
                             class="mb-2 px-2 text-[11px] font-bold tracking-[0.22em] text-muted-foreground uppercase"
@@ -122,7 +122,7 @@ const settingsNav: NavEntry[] = [
                                 v-for="item in primaryNav"
                                 :key="item.title"
                                 :href="item.href"
-                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:border-primary/35 hover:bg-orange-50 hover:text-foreground dark:hover:border-primary/60 dark:hover:bg-amber-950/30"
+                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-orange-50 hover:text-foreground dark:hover:border-primary/60 dark:hover:bg-amber-950/30"
                                 :class="{
                                     'border-primary/45 bg-primary/10 text-primary shadow-sm dark:border-primary/70 dark:bg-amber-950/35 dark:text-amber-200':
                                         isCurrentOrParentUrl(item.href),
@@ -149,7 +149,7 @@ const settingsNav: NavEntry[] = [
                                 v-for="item in settingsNav"
                                 :key="item.title"
                                 :href="item.href"
-                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:border-primary/35 hover:bg-orange-50 hover:text-foreground dark:hover:border-primary/60 dark:hover:bg-amber-950/30"
+                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-orange-50 hover:text-foreground dark:hover:border-primary/60 dark:hover:bg-amber-950/30"
                                 :class="{
                                     'border-primary/45 bg-primary/10 text-primary shadow-sm dark:border-primary/70 dark:bg-amber-950/35 dark:text-amber-200':
                                         isCurrentOrParentUrl(item.href),
@@ -200,7 +200,7 @@ const settingsNav: NavEntry[] = [
                         Control Center
                     </h1>
                 </header>
-                <main class="relative px-4 py-5 lg:px-8">
+                <main class="tm-fade-up relative px-4 py-5 lg:px-8">
                     <slot />
                 </main>
             </div>

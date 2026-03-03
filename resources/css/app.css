@@ -199,6 +199,7 @@
 @layer components {
     .tm-shell {
         @apply relative overflow-hidden rounded-[2rem] border border-border/80 bg-card/92 shadow-[0_22px_60px_-42px_rgba(32,18,6,0.7)] backdrop-blur;
+        animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .tm-shell::before {
@@ -211,7 +212,12 @@
     }
 
     .tm-subtle-card {
-        @apply rounded-2xl border border-border/90 bg-background/70 shadow-sm backdrop-blur;
+        @apply rounded-2xl border border-border/90 bg-background/70 shadow-sm backdrop-blur transition duration-300;
+    }
+
+    .tm-subtle-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 18px 30px -24px rgba(26, 12, 4, 0.42);
     }
 
     .tm-dot-grid {
@@ -220,5 +226,94 @@
             transparent 0.9px
         );
         background-size: 16px 16px;
+    }
+
+    .tm-fade-up {
+        animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .tm-fade-in {
+        animation: tm-fade-in 420ms ease-out both;
+    }
+
+    .tm-stagger > * {
+        animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .tm-stagger > *:nth-child(1) {
+        animation-delay: 70ms;
+    }
+
+    .tm-stagger > *:nth-child(2) {
+        animation-delay: 120ms;
+    }
+
+    .tm-stagger > *:nth-child(3) {
+        animation-delay: 170ms;
+    }
+
+    .tm-stagger > *:nth-child(4) {
+        animation-delay: 220ms;
+    }
+
+    .tm-stagger > *:nth-child(5) {
+        animation-delay: 270ms;
+    }
+
+    .tm-stagger > *:nth-child(6) {
+        animation-delay: 320ms;
+    }
+}
+
+@layer base {
+    a,
+    button {
+        transition:
+            color 160ms ease,
+            background-color 180ms ease,
+            border-color 180ms ease,
+            transform 180ms ease,
+            box-shadow 220ms ease;
+    }
+
+    button:active,
+    a:active {
+        transform: translateY(1px) scale(0.995);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tm-shell,
+    .tm-fade-up,
+    .tm-fade-in,
+    .tm-stagger > * {
+        animation: none !important;
+    }
+
+    a,
+    button,
+    .tm-subtle-card {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
+@keyframes tm-fade-up {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 14px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes tm-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }

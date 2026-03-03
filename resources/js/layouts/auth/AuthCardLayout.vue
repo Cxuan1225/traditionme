@@ -23,10 +23,10 @@ defineProps<{
         <div
             class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.16),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.12),transparent_35%)]"
         />
-        <div class="flex w-full max-w-md flex-col gap-6">
+        <div class="tm-fade-up flex w-full max-w-md flex-col gap-6">
             <Link
                 :href="home()"
-                class="flex items-center gap-2 self-center font-medium"
+                class="flex items-center gap-2 self-center font-medium transition hover:-translate-y-0.5"
             >
                 <div
                     class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15 text-primary"

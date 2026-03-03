@@ -32,7 +32,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
         </div>
 
         <header
-            class="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur"
+            class="tm-fade-in sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur"
         >
             <div
                 class="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:px-10"
@@ -60,13 +60,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 >
                     <Link
                         :href="home()"
-                        class="rounded-full px-4 py-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                        class="rounded-full px-4 py-2 text-muted-foreground transition hover:-translate-y-0.5 hover:bg-secondary hover:text-foreground"
                     >
                         Home
                     </Link>
                     <Link
                         :href="shop.index()"
-                        class="rounded-full px-4 py-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                        class="rounded-full px-4 py-2 text-muted-foreground transition hover:-translate-y-0.5 hover:bg-secondary hover:text-foreground"
                     >
                         Shop
                     </Link>
@@ -75,7 +75,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 <nav class="flex items-center gap-2 text-sm font-semibold">
                     <Link
                         :href="cart.show()"
-                        class="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary/50"
+                        class="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-semibold text-foreground transition hover:-translate-y-0.5 hover:border-primary/50"
                     >
                         <span class="inline-flex items-center gap-2">
                             <ShoppingBag class="size-4" />
@@ -146,13 +146,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <template v-else>
                         <Link
                             :href="login()"
-                            class="rounded-full border border-border px-4 py-2 text-foreground transition hover:border-primary/50"
+                            class="rounded-full border border-border px-4 py-2 text-foreground transition hover:-translate-y-0.5 hover:border-primary/50"
                         >
                             Log in
                         </Link>
                         <Link
                             :href="register()"
-                            class="rounded-full bg-primary px-4 py-2 font-bold text-primary-foreground transition hover:bg-primary/90"
+                            class="rounded-full bg-primary px-4 py-2 font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:bg-primary/90"
                         >
                             Register
                         </Link>
@@ -162,30 +162,30 @@ const isAuthenticated = computed(() => Boolean(user.value));
 
             <div class="border-t border-border bg-card/80">
                 <div
-                    class="mx-auto flex w-full max-w-7xl gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-10"
+                    class="tm-stagger mx-auto flex w-full max-w-7xl gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-10"
                 >
                     <span
-                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase transition hover:-translate-y-0.5 hover:border-primary/45"
                     >
                         Baju Kurung
                     </span>
                     <span
-                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase transition hover:-translate-y-0.5 hover:border-primary/45"
                     >
                         Kebaya
                     </span>
                     <span
-                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase transition hover:-translate-y-0.5 hover:border-primary/45"
                     >
                         Cheongsam
                     </span>
                     <span
-                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase transition hover:-translate-y-0.5 hover:border-primary/45"
                     >
                         Saree
                     </span>
                     <span
-                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase transition hover:-translate-y-0.5 hover:border-primary/45"
                     >
                         New Arrivals
                     </span>
@@ -194,7 +194,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
         </header>
 
         <main
-            class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
+            class="tm-fade-up mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
         >
             <slot />
         </main>

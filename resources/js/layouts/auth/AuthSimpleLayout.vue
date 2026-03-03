@@ -16,7 +16,9 @@ defineProps<{
             Heritage fashion, modern checkout, secure member access
         </div>
 
-        <header class="border-b border-border bg-background/95 backdrop-blur">
+        <header
+            class="tm-fade-in border-b border-border bg-background/95 backdrop-blur"
+        >
             <div
                 class="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-10"
             >
@@ -54,8 +56,7 @@ defineProps<{
             />
 
             <section
-                class="relative w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card/95 shadow-[0_34px_90px_-55px_rgba(51,25,8,0.8)] backdrop-blur lg:grid lg:grid-cols-[1.05fr_0.95fr]"
-                data-aos="fade-up"
+                class="tm-fade-up relative w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card/95 shadow-[0_34px_90px_-55px_rgba(51,25,8,0.8)] backdrop-blur lg:grid lg:grid-cols-[1.05fr_0.95fr]"
             >
                 <aside
                     class="relative hidden bg-zinc-900 p-10 text-zinc-100 lg:flex lg:flex-col lg:justify-between"
@@ -63,7 +64,7 @@ defineProps<{
                     <div
                         class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(245,158,11,0.35),transparent_55%),radial-gradient(circle_at_85%_70%,rgba(239,68,68,0.28),transparent_60%)]"
                     />
-                    <div class="relative space-y-6">
+                    <div class="tm-stagger relative space-y-6">
                         <p class="tm-kicker text-amber-300">
                             Tradition Me Members
                         </p>
@@ -78,7 +79,7 @@ defineProps<{
                             details, and enjoy a faster checkout experience.
                         </p>
                     </div>
-                    <div class="relative grid gap-3 text-sm">
+                    <div class="tm-stagger relative grid gap-3 text-sm">
                         <div
                             class="rounded-2xl border border-white/20 bg-white/10 px-4 py-3"
                         >
