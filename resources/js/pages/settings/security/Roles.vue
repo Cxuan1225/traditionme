@@ -413,10 +413,10 @@ onMounted(async () => {
         <div class="space-y-4 p-4">
             <section class="tm-shell p-6">
                 <p class="tm-kicker text-primary">Security Administration</p>
-                <h2 class="tm-display mt-2 text-3xl font-black text-foreground">
+                <h2 class="tm-display text-foreground mt-2 text-3xl font-black">
                     Role and permission control
                 </h2>
-                <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
+                <p class="text-muted-foreground mt-2 max-w-2xl text-sm">
                     Manage role bundles, permission synchronization, and user
                     assignments.
                 </p>
@@ -433,7 +433,7 @@ onMounted(async () => {
             </Alert>
 
             <div class="grid gap-4 lg:grid-cols-2">
-                <Card class="h-full border-border bg-card/80">
+                <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>Role catalog</CardTitle>
                         <CardDescription>
@@ -451,14 +451,14 @@ onMounted(async () => {
 
                         <p
                             v-else-if="!abilities.canViewRoles"
-                            class="text-sm text-muted-foreground"
+                            class="text-muted-foreground text-sm"
                         >
                             You do not have access to view roles.
                         </p>
 
                         <p
                             v-else-if="roles.length === 0"
-                            class="text-sm text-muted-foreground"
+                            class="text-muted-foreground text-sm"
                         >
                             No roles available yet.
                         </p>
@@ -468,7 +468,7 @@ onMounted(async () => {
                                 v-for="role in roles"
                                 :key="role.id"
                                 type="button"
-                                class="w-full rounded-lg border border-border bg-background/70 p-3 text-left transition hover:bg-muted/50"
+                                class="tm-list-item hover:bg-muted/50 w-full text-left"
                                 :class="{
                                     'border-primary bg-muted/60':
                                         selectedRoleId === role.id,
@@ -484,7 +484,7 @@ onMounted(async () => {
                                         permissions
                                     </Badge>
                                 </div>
-                                <p class="mt-1 text-xs text-muted-foreground">
+                                <p class="text-muted-foreground mt-1 text-xs">
                                     Guard: {{ role.guard_name }}
                                 </p>
                             </button>
@@ -501,7 +501,7 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full border-border bg-card/80">
+                <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>Create role</CardTitle>
                         <CardDescription>
@@ -510,8 +510,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
-                        <div class="grid gap-2">
-                            <Label for="role-name">Role name</Label>
+                        <div class="tm-form-field">
+                            <Label for="role-name" class="tm-label"
+                                >Role name</Label
+                            >
                             <Input
                                 id="role-name"
                                 v-model="createRoleName"
@@ -526,11 +528,11 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Initial permissions</Label>
                             <div
-                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3"
+                                class="tm-card max-h-56 space-y-2 overflow-y-auto p-3"
                             >
                                 <p
                                     v-if="permissions.length === 0"
-                                    class="text-sm text-muted-foreground"
+                                    class="text-muted-foreground text-sm"
                                 >
                                     No permissions available.
                                 </p>
@@ -585,7 +587,7 @@ onMounted(async () => {
             </div>
 
             <div class="grid gap-4 lg:grid-cols-2">
-                <Card class="h-full border-border bg-card/80">
+                <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>Sync role permissions</CardTitle>
                         <CardDescription>
@@ -593,8 +595,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
-                        <div class="grid gap-2">
-                            <Label for="selected-role">Selected role</Label>
+                        <div class="tm-form-field">
+                            <Label for="selected-role" class="tm-label"
+                                >Selected role</Label
+                            >
                             <Input
                                 id="selected-role"
                                 :model-value="
@@ -607,11 +611,11 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Permissions</Label>
                             <div
-                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3"
+                                class="tm-card max-h-56 space-y-2 overflow-y-auto p-3"
                             >
                                 <p
                                     v-if="permissions.length === 0"
-                                    class="text-sm text-muted-foreground"
+                                    class="text-muted-foreground text-sm"
                                 >
                                     No permissions available.
                                 </p>
@@ -665,7 +669,7 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full border-border bg-card/80">
+                <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>Assign roles to user</CardTitle>
                         <CardDescription>
@@ -673,8 +677,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
-                        <div class="grid gap-2">
-                            <Label for="assign-user-id">User ID</Label>
+                        <div class="tm-form-field">
+                            <Label for="assign-user-id" class="tm-label"
+                                >User ID</Label
+                            >
                             <Input
                                 id="assign-user-id"
                                 v-model="assignUserId"
@@ -690,11 +696,11 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Roles</Label>
                             <div
-                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3"
+                                class="tm-card max-h-56 space-y-2 overflow-y-auto p-3"
                             >
                                 <p
                                     v-if="availableRoleNames.length === 0"
-                                    class="text-sm text-muted-foreground"
+                                    class="text-muted-foreground text-sm"
                                 >
                                     No roles available for assignment.
                                 </p>
@@ -732,14 +738,14 @@ onMounted(async () => {
 
                         <div
                             v-if="assignedUser"
-                            class="rounded-md border border-border bg-background/70 p-3 text-sm text-muted-foreground"
+                            class="tm-card text-muted-foreground p-3 text-sm"
                         >
                             Updated user:
-                            <span class="font-medium text-foreground">
+                            <span class="text-foreground font-medium">
                                 {{ assignedUser.name }}
                             </span>
                             ({{ assignedUser.email }}) with
-                            <span class="font-medium text-foreground">
+                            <span class="text-foreground font-medium">
                                 {{ assignedUser.roles.length }}
                             </span>
                             role(s).

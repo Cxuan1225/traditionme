@@ -77,7 +77,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
 <template>
     <Head title="Tradition Me"> </Head>
 
-    <div class="min-h-screen bg-background text-foreground">
+    <div class="bg-background text-foreground min-h-screen">
         <div
             class="bg-zinc-900 px-4 py-2 text-center text-xs font-semibold tracking-wide text-zinc-100 sm:text-sm"
         >
@@ -85,14 +85,14 @@ const isAuthenticated = computed(() => Boolean(user.value));
         </div>
 
         <header
-            class="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur"
+            class="border-border bg-background/95 sticky top-0 z-20 border-b backdrop-blur"
         >
             <div
                 class="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[auto_1fr_auto] lg:px-10"
             >
                 <Link :href="home()" class="flex items-center gap-3">
                     <span
-                        class="inline-flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-extrabold tracking-wide text-primary-foreground"
+                        class="bg-primary text-primary-foreground inline-flex size-10 items-center justify-center rounded-xl text-sm font-extrabold tracking-wide"
                     >
                         TM
                     </span>
@@ -101,7 +101,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             Malaysian Multi-Cultural Fashion
                         </p>
                         <p
-                            class="tm-display text-2xl font-extrabold text-foreground"
+                            class="tm-display text-foreground text-2xl font-extrabold"
                         >
                             Tradition Me
                         </p>
@@ -113,13 +113,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 >
                     <Link
                         :href="home()"
-                        class="rounded-full px-4 py-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                        class="text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full px-4 py-2 transition"
                     >
                         Home
                     </Link>
                     <Link
                         :href="shop.index()"
-                        class="rounded-full px-4 py-2 text-muted-foreground transition hover:bg-secondary hover:text-foreground"
+                        class="text-muted-foreground hover:bg-secondary hover:text-foreground rounded-full px-4 py-2 transition"
                     >
                         Shop
                     </Link>
@@ -128,7 +128,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 <nav class="flex items-center gap-2 text-sm font-semibold">
                     <Link
                         :href="cart.show()"
-                        class="rounded-full border border-border bg-card/80 px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary/45"
+                        class="border-border bg-card/80 text-foreground hover:border-primary/45 rounded-full border px-4 py-2 text-sm font-semibold transition"
                     >
                         <span class="inline-flex items-center gap-2">
                             <ShoppingBag class="size-4" />
@@ -141,10 +141,10 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             <DropdownMenuTrigger as-child>
                                 <button
                                     type="button"
-                                    class="inline-flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1.5 text-foreground transition hover:border-primary/45"
+                                    class="border-border bg-card text-foreground hover:border-primary/45 inline-flex items-center gap-2 rounded-full border px-2 py-1.5 transition"
                                 >
                                     <Avatar
-                                        class="size-8 rounded-full border border-border"
+                                        class="border-border size-8 rounded-full border"
                                     >
                                         <AvatarImage
                                             v-if="user?.avatar"
@@ -152,7 +152,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                                             :alt="user.name"
                                         />
                                         <AvatarFallback
-                                            class="bg-primary text-xs font-bold text-primary-foreground"
+                                            class="bg-primary text-primary-foreground text-xs font-bold"
                                         >
                                             {{ getInitials(user?.name) }}
                                         </AvatarFallback>
@@ -163,12 +163,12 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             <DropdownMenuContent align="end" class="w-52">
                                 <div class="px-2 py-1">
                                     <p
-                                        class="truncate text-sm font-semibold text-foreground"
+                                        class="text-foreground truncate text-sm font-semibold"
                                     >
                                         {{ user?.name }}
                                     </p>
                                     <p
-                                        class="truncate text-xs text-muted-foreground"
+                                        class="text-muted-foreground truncate text-xs"
                                     >
                                         {{ user?.email }}
                                     </p>
@@ -214,14 +214,14 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <template v-else>
                         <Link
                             :href="login()"
-                            class="rounded-full border border-border px-4 py-2 text-foreground transition hover:border-primary/45"
+                            class="border-border text-foreground hover:border-primary/45 rounded-full border px-4 py-2 transition"
                         >
                             Log in
                         </Link>
                         <Link
                             v-if="canRegister"
                             :href="register()"
-                            class="rounded-full bg-primary px-4 py-2 text-primary-foreground transition hover:bg-primary/90"
+                            class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 py-2 transition"
                         >
                             Register
                         </Link>
@@ -229,14 +229,14 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 </nav>
             </div>
 
-            <div class="border-t border-border bg-card/80">
+            <div class="border-border bg-card/80 border-t">
                 <div
                     class="mx-auto flex w-full max-w-7xl gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-10"
                 >
                     <span
                         v-for="item in categories"
                         :key="item.slug"
-                        class="rounded-full border border-border bg-background px-4 py-1 text-xs font-semibold tracking-wide whitespace-nowrap text-muted-foreground uppercase"
+                        class="border-border bg-background text-muted-foreground whitespace-nowrap rounded-full border px-4 py-1 text-xs font-semibold uppercase tracking-wide"
                     >
                         {{ item.name }}
                     </span>
@@ -254,15 +254,15 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 >
                     <p class="tm-kicker text-primary">Mega Raya Sale 2026</p>
                     <h1
-                        class="tm-display mt-3 max-w-2xl text-4xl leading-tight font-black text-foreground sm:text-5xl"
+                        class="tm-display text-foreground mt-3 max-w-2xl text-4xl font-black leading-tight sm:text-5xl"
                     >
                         E-commerce for Malaysian
-                        <span class="tm-display block text-primary"
+                        <span class="tm-display text-primary block"
                             >heritage fashion</span
                         >
                     </h1>
                     <p
-                        class="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg"
+                        class="text-muted-foreground mt-4 max-w-2xl text-base sm:text-lg"
                     >
                         Shop curated traditional and modern pieces inspired by
                         Malay, Chinese, Indian, Orang Asli, Sabah, and Sarawak
@@ -271,7 +271,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <div class="mt-6 flex flex-wrap gap-3">
                         <Link
                             :href="shop.index()"
-                            class="rounded-full bg-primary px-6 py-3 text-sm font-bold tracking-wide text-primary-foreground uppercase transition hover:bg-primary/90"
+                            class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6 py-3 text-sm font-bold uppercase tracking-wide transition"
                         >
                             Shop Now
                         </Link>
@@ -281,13 +281,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                                     query: { category: 'new-arrivals' },
                                 })
                             "
-                            class="rounded-full border border-primary/45 bg-card/70 px-6 py-3 text-sm font-bold tracking-wide text-foreground uppercase transition hover:border-primary"
+                            class="border-primary/45 bg-card/70 text-foreground hover:border-primary rounded-full border px-6 py-3 text-sm font-bold uppercase tracking-wide transition"
                         >
                             View New Arrivals
                         </Link>
                     </div>
                     <div
-                        class="mt-6 flex flex-wrap gap-4 text-sm font-semibold text-muted-foreground"
+                        class="text-muted-foreground mt-6 flex flex-wrap gap-4 text-sm font-semibold"
                     >
                         <span>Secure checkout</span>
                         <span>7-day returns</span>
@@ -301,7 +301,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     data-aos-delay="120"
                 >
                     <p
-                        class="text-xs font-bold tracking-[0.2em] text-amber-300 uppercase"
+                        class="text-xs font-bold uppercase tracking-[0.2em] text-amber-300"
                     >
                         Flash Deals
                     </p>
@@ -310,7 +310,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             class="rounded-2xl border border-white/20 bg-white/5 p-4"
                         >
                             <p
-                                class="text-xs font-semibold tracking-[0.16em] text-amber-200 uppercase"
+                                class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-200"
                             >
                                 Today Only
                             </p>
@@ -326,7 +326,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             class="rounded-2xl border border-white/20 bg-white/5 p-4"
                         >
                             <p
-                                class="text-xs font-semibold tracking-[0.16em] text-emerald-200 uppercase"
+                                class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-200"
                             >
                                 Express Tailoring
                             </p>
@@ -344,10 +344,8 @@ const isAuthenticated = computed(() => Boolean(user.value));
 
             <section class="mt-8" data-aos="fade-up" data-aos-delay="80">
                 <div class="mb-4 flex items-end justify-between">
-                    <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">
-                        Featured Products
-                    </h2>
-                    <span class="text-sm font-semibold text-zinc-600"
+                    <h2 class="tm-title">Featured Products</h2>
+                    <span class="tm-muted font-semibold"
                         >Showing {{ products.length }} of
                         {{ totalProducts }} items</span
                     >
@@ -358,11 +356,11 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <article
                         v-for="product in products"
                         :key="product.name"
-                        class="rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-xl"
+                        class="tm-card p-4 transition duration-300 hover:-translate-y-1.5 hover:shadow-xl"
                     >
                         <div class="mb-3 flex items-center justify-between">
                             <span
-                                class="rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-bold tracking-wide text-white uppercase"
+                                class="rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white"
                             >
                                 {{ product.badge }}
                             </span>
@@ -390,7 +388,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         <button
                             type="button"
                             @click="addToCart(product.slug)"
-                            class="mt-4 w-full rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-bold tracking-wide text-white uppercase transition hover:-translate-y-0.5 hover:bg-zinc-700"
+                            class="mt-4 w-full rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-zinc-700"
                         >
                             Add to Cart
                         </button>
@@ -407,7 +405,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <p class="text-sm font-bold text-zinc-900">
                         Trusted by 10,000+ shoppers
                     </p>
-                    <p class="mt-1 text-sm text-zinc-600">
+                    <p class="tm-muted mt-1">
                         Verified reviews from families across Malaysia.
                     </p>
                 </article>
@@ -415,7 +413,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <p class="text-sm font-bold text-zinc-900">
                         Secure payment options
                     </p>
-                    <p class="mt-1 text-sm text-zinc-600">
+                    <p class="tm-muted mt-1">
                         FPX, cards, and e-wallets supported.
                     </p>
                 </article>
@@ -423,7 +421,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <p class="text-sm font-bold text-zinc-900">
                         Easy size exchange
                     </p>
-                    <p class="mt-1 text-sm text-zinc-600">
+                    <p class="tm-muted mt-1">
                         One-time exchange within 7 days.
                     </p>
                 </article>
@@ -431,10 +429,8 @@ const isAuthenticated = computed(() => Boolean(user.value));
 
             <section class="mt-8" data-aos="fade-up" data-aos-delay="160">
                 <div class="mb-4 flex items-end justify-between">
-                    <h2 class="text-2xl font-black text-zinc-900 sm:text-3xl">
-                        Shop by Occasion
-                    </h2>
-                    <span class="text-sm font-semibold text-zinc-600"
+                    <h2 class="tm-title">Shop by Occasion</h2>
+                    <span class="tm-muted font-semibold"
                         >Tailored collections for real events</span
                     >
                 </div>
@@ -445,19 +441,19 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         class="tm-night-panel p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                     >
                         <span
-                            class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold tracking-wide text-amber-800 uppercase"
+                            class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-amber-800"
                         >
                             {{ occasion.badge }}
                         </span>
-                        <h3 class="mt-4 text-xl font-extrabold text-zinc-900">
+                        <h3 class="tm-subtitle mt-4">
                             {{ occasion.name }}
                         </h3>
-                        <p class="mt-2 text-sm text-zinc-600">
+                        <p class="tm-muted mt-2">
                             {{ occasion.description }}
                         </p>
                         <Link
                             :href="collections.show({ slug: occasion.slug })"
-                            class="mt-4 rounded-full border border-zinc-900 px-4 py-2 text-xs font-bold tracking-wide text-zinc-900 uppercase transition hover:bg-zinc-900 hover:text-white"
+                            class="mt-4 rounded-full border border-zinc-900 px-4 py-2 text-xs font-bold uppercase tracking-wide text-zinc-900 transition hover:bg-zinc-900 hover:text-white"
                         >
                             View Collection
                         </Link>
@@ -480,13 +476,11 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         <div
                             v-for="review in reviews"
                             :key="review.name"
-                            class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4"
+                            class="tm-card p-4"
                         >
-                            <p class="text-sm text-zinc-700">
-                                "{{ review.comment }}"
-                            </p>
+                            <p class="tm-body">"{{ review.comment }}"</p>
                             <p
-                                class="mt-2 text-xs font-bold tracking-wide text-zinc-500 uppercase"
+                                class="mt-2 text-xs font-bold uppercase tracking-wide text-zinc-500"
                             >
                                 {{ review.name }} · {{ review.location }}
                             </p>
@@ -503,7 +497,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             class="rounded-2xl border border-white/20 bg-white/5 p-4"
                         >
                             <p
-                                class="text-xs font-bold tracking-[0.16em] text-amber-200 uppercase"
+                                class="text-xs font-bold uppercase tracking-[0.16em] text-amber-200"
                             >
                                 Step 1
                             </p>
@@ -516,7 +510,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             class="rounded-2xl border border-white/20 bg-white/5 p-4"
                         >
                             <p
-                                class="text-xs font-bold tracking-[0.16em] text-amber-200 uppercase"
+                                class="text-xs font-bold uppercase tracking-[0.16em] text-amber-200"
                             >
                                 Step 2
                             </p>
@@ -529,7 +523,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             class="rounded-2xl border border-white/20 bg-white/5 p-4"
                         >
                             <p
-                                class="text-xs font-bold tracking-[0.16em] text-amber-200 uppercase"
+                                class="text-xs font-bold uppercase tracking-[0.16em] text-amber-200"
                             >
                                 Step 3
                             </p>
@@ -554,29 +548,29 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         Frequently Asked Questions
                     </h2>
                     <div class="mt-4 space-y-3">
-                        <div class="rounded-2xl border border-zinc-200 p-4">
+                        <div class="tm-card p-4">
                             <p class="text-sm font-bold text-zinc-900">
                                 Do you ship across all Malaysia regions?
                             </p>
-                            <p class="mt-1 text-sm text-zinc-600">
+                            <p class="tm-muted mt-1">
                                 Yes, we ship nationwide including Sabah and
                                 Sarawak.
                             </p>
                         </div>
-                        <div class="rounded-2xl border border-zinc-200 p-4">
+                        <div class="tm-card p-4">
                             <p class="text-sm font-bold text-zinc-900">
                                 Can I request custom measurements?
                             </p>
-                            <p class="mt-1 text-sm text-zinc-600">
+                            <p class="tm-muted mt-1">
                                 Yes, selected products support custom tailoring
                                 during checkout.
                             </p>
                         </div>
-                        <div class="rounded-2xl border border-zinc-200 p-4">
+                        <div class="tm-card p-4">
                             <p class="text-sm font-bold text-zinc-900">
                                 What if my size is not suitable?
                             </p>
-                            <p class="mt-1 text-sm text-zinc-600">
+                            <p class="tm-muted mt-1">
                                 You can request one size exchange within 7 days
                                 after delivery.
                             </p>
@@ -585,10 +579,10 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 </article>
 
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-orange-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-border dark:from-zinc-900 dark:to-zinc-800"
+                    class="dark:border-border rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-orange-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:from-zinc-900 dark:to-zinc-800"
                 >
                     <p
-                        class="text-xs font-bold tracking-[0.2em] text-red-700 uppercase"
+                        class="text-xs font-bold uppercase tracking-[0.2em] text-red-700"
                     >
                         Member Benefits
                     </p>
@@ -597,7 +591,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     >
                         Get Early Access to New Drops
                     </h2>
-                    <p class="mt-2 text-sm text-zinc-700">
+                    <p class="tm-body mt-2">
                         Join our member list for launch alerts, special
                         discounts, and styling updates for every festive season.
                     </p>
@@ -613,7 +607,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             required
                             autocomplete="email"
                             placeholder="Enter your email address"
-                            class="w-full rounded-full border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-700 transition outline-none focus:border-zinc-500"
+                            class="tm-input-surface w-full rounded-full px-4 py-3 text-sm text-zinc-700 outline-none transition focus:border-zinc-500"
                         />
                         <input
                             type="hidden"
@@ -628,7 +622,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         </p>
                         <button
                             type="submit"
-                            class="mt-4 rounded-full bg-zinc-900 px-6 py-3 text-sm font-bold tracking-wide text-white uppercase transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+                            class="mt-4 rounded-full bg-zinc-900 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
                             :disabled="processing"
                         >
                             {{

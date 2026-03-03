@@ -255,8 +255,104 @@
 }
 
 @layer components {
+    .tm-title-xl {
+        @apply tm-display text-4xl font-black leading-tight sm:text-5xl;
+    }
+
+    .tm-title-lg {
+        @apply tm-display text-3xl font-black leading-tight;
+    }
+
+    .tm-title {
+        @apply tm-display text-2xl font-black leading-tight;
+    }
+
+    .tm-subtitle {
+        @apply text-foreground text-lg font-semibold leading-snug;
+    }
+
+    .tm-body {
+        @apply text-foreground/85 text-sm leading-relaxed;
+    }
+
+    .tm-body-sm {
+        @apply text-muted-foreground text-xs leading-relaxed;
+    }
+
+    .tm-muted {
+        @apply text-muted-foreground text-sm;
+    }
+
+    .tm-section {
+        @apply tm-shell p-6 lg:p-8;
+    }
+
+    .tm-panel {
+        @apply border-border bg-card/90 rounded-3xl border shadow-sm;
+    }
+
+    .tm-card {
+        @apply border-border bg-background/70 rounded-2xl border shadow-sm backdrop-blur;
+    }
+
+    .tm-list-item {
+        @apply border-border bg-background/65 rounded-2xl border p-3 transition;
+    }
+
+    .tm-list-item:hover {
+        @apply border-primary/45 bg-background;
+    }
+
+    .tm-stat {
+        @apply border-border bg-background/70 rounded-xl border px-4 py-3;
+    }
+
+    .tm-chip {
+        @apply border-border bg-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
+    }
+
+    .tm-chip-strong {
+        @apply border-primary/45 bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide;
+    }
+
+    .tm-form-field {
+        @apply grid gap-2;
+    }
+
+    .tm-label {
+        @apply text-foreground text-sm font-semibold;
+    }
+
+    .tm-input-surface {
+        @apply border-border bg-card h-11 rounded-xl;
+    }
+
+    .tm-table-wrap {
+        @apply border-border bg-card/85 overflow-x-auto rounded-2xl border;
+    }
+
+    .tm-table {
+        @apply w-full min-w-[640px] border-collapse text-left;
+    }
+
+    .tm-th {
+        @apply border-border bg-secondary/55 text-muted-foreground border-b px-4 py-3 text-xs font-bold uppercase tracking-[0.14em];
+    }
+
+    .tm-td {
+        @apply border-border/70 text-foreground border-b px-4 py-3 align-middle text-sm;
+    }
+
+    .tm-tr {
+        @apply transition;
+    }
+
+    .tm-tr:hover .tm-td {
+        @apply bg-secondary/35;
+    }
+
     .tm-shell {
-        @apply relative overflow-hidden rounded-[2rem] border border-border/80 bg-card/92 shadow-[0_22px_60px_-42px_rgba(32,18,6,0.7)] backdrop-blur;
+        @apply border-border/80 bg-card/92 relative overflow-hidden rounded-[2rem] border shadow-[0_22px_60px_-42px_rgba(32,18,6,0.7)] backdrop-blur;
         animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
@@ -266,15 +362,15 @@
 
     .tm-shell::before {
         content: '';
-        @apply pointer-events-none absolute -top-24 -right-20 h-56 w-56 rounded-full bg-amber-400/20 blur-3xl;
+        @apply pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-amber-400/20 blur-3xl;
     }
 
     .tm-kicker {
-        @apply text-[11px] font-bold tracking-[0.24em] uppercase;
+        @apply text-[11px] font-bold uppercase tracking-[0.24em];
     }
 
     .tm-subtle-card {
-        @apply rounded-2xl border border-border/90 bg-background/70 shadow-sm backdrop-blur transition duration-300;
+        @apply border-border/90 bg-background/70 rounded-2xl border shadow-sm backdrop-blur transition duration-300;
     }
 
     .tm-subtle-card:hover {

@@ -338,10 +338,10 @@ onMounted(async () => {
         <div class="space-y-4 p-4">
             <section class="tm-shell p-6">
                 <p class="tm-kicker text-primary">Catalog Management</p>
-                <h2 class="tm-display mt-2 text-3xl font-black text-foreground">
+                <h2 class="tm-display text-foreground mt-2 text-3xl font-black">
                     Product control center
                 </h2>
-                <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
+                <p class="text-muted-foreground mt-2 max-w-2xl text-sm">
                     Maintain pricing, visibility, and merchandising fields for
                     storefront publishing.
                 </p>
@@ -358,7 +358,7 @@ onMounted(async () => {
             </Alert>
 
             <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                <Card class="h-full border-border bg-card/85">
+                <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>Products</CardTitle>
                         <CardDescription>
@@ -376,82 +376,106 @@ onMounted(async () => {
 
                         <p
                             v-else-if="!abilities.canViewProducts"
-                            class="text-sm text-muted-foreground"
+                            class="text-muted-foreground text-sm"
                         >
                             You do not have access to view products.
                         </p>
 
                         <p
                             v-else-if="products.length === 0"
-                            class="text-sm text-muted-foreground"
+                            class="text-muted-foreground text-sm"
                         >
                             No products available yet.
                         </p>
 
-                        <div v-else class="space-y-3">
-                            <div
-                                v-for="product in products"
-                                :key="product.id"
-                                class="rounded-2xl border border-border bg-background/70 p-3"
-                            >
-                                <div
-                                    class="flex items-center justify-between gap-3"
-                                >
-                                    <div>
-                                        <p class="font-medium">
-                                            {{ product.name }}
-                                        </p>
-                                        <p
-                                            class="text-xs text-muted-foreground"
-                                        >
-                                            {{ product.slug }}
-                                        </p>
-                                    </div>
-                                    <Badge
-                                        :variant="
-                                            product.is_active
-                                                ? 'default'
-                                                : 'secondary'
-                                        "
+                        <div v-else class="tm-table-wrap">
+                            <table class="tm-table">
+                                <thead>
+                                    <tr>
+                                        <th class="tm-th">Product</th>
+                                        <th class="tm-th">Category</th>
+                                        <th class="tm-th">Price (sen)</th>
+                                        <th class="tm-th">Status</th>
+                                        <th class="tm-th text-right">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="product in products"
+                                        :key="product.id"
+                                        class="tm-tr"
                                     >
-                                        {{
-                                            product.is_active
-                                                ? 'Active'
-                                                : 'Inactive'
-                                        }}
-                                    </Badge>
-                                </div>
-
-                                <p class="mt-2 text-xs text-muted-foreground">
-                                    {{ product.category }} ·
-                                    {{ product.price_in_sen }} sen
-                                </p>
-
-                                <div class="mt-3 flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        :disabled="!abilities.canUpdateProducts"
-                                        @click="startEdit(product)"
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        :disabled="
-                                            !abilities.canDeleteProducts ||
-                                            deleting === product.id
-                                        "
-                                        @click="removeProduct(product.id)"
-                                    >
-                                        <Spinner
-                                            v-if="deleting === product.id"
-                                        />
-                                        Delete
-                                    </Button>
-                                </div>
-                            </div>
+                                        <td class="tm-td">
+                                            <p class="font-medium">
+                                                {{ product.name }}
+                                            </p>
+                                            <p
+                                                class="text-muted-foreground text-xs"
+                                            >
+                                                {{ product.slug }}
+                                            </p>
+                                        </td>
+                                        <td class="tm-td">
+                                            {{ product.category }}
+                                        </td>
+                                        <td class="tm-td">
+                                            {{ product.price_in_sen }}
+                                        </td>
+                                        <td class="tm-td">
+                                            <Badge
+                                                :variant="
+                                                    product.is_active
+                                                        ? 'default'
+                                                        : 'secondary'
+                                                "
+                                            >
+                                                {{
+                                                    product.is_active
+                                                        ? 'Active'
+                                                        : 'Inactive'
+                                                }}
+                                            </Badge>
+                                        </td>
+                                        <td class="tm-td">
+                                            <div class="flex justify-end gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    :disabled="
+                                                        !abilities.canUpdateProducts
+                                                    "
+                                                    @click="startEdit(product)"
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    :disabled="
+                                                        !abilities.canDeleteProducts ||
+                                                        deleting === product.id
+                                                    "
+                                                    @click="
+                                                        removeProduct(
+                                                            product.id,
+                                                        )
+                                                    "
+                                                >
+                                                    <Spinner
+                                                        v-if="
+                                                            deleting ===
+                                                            product.id
+                                                        "
+                                                    />
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </CardContent>
                     <CardFooter>
@@ -465,7 +489,7 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full border-border bg-card/85">
+                <Card class="tm-panel h-full">
                     <CardHeader>
                         <CardTitle>{{
                             editingId ? 'Edit product' : 'Create product'
@@ -475,13 +499,13 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
-                        <div class="grid gap-2">
-                            <Label for="name">Name</Label>
+                        <div class="tm-form-field">
+                            <Label for="name" class="tm-label">Name</Label>
                             <Input id="name" v-model="form.name" />
                         </div>
 
-                        <div class="grid gap-2">
-                            <Label for="slug">Slug</Label>
+                        <div class="tm-form-field">
+                            <Label for="slug" class="tm-label">Slug</Label>
                             <Input
                                 id="slug"
                                 v-model="form.slug"
@@ -489,22 +513,26 @@ onMounted(async () => {
                             />
                         </div>
 
-                        <div class="grid gap-2">
-                            <Label for="category">Category</Label>
+                        <div class="tm-form-field">
+                            <Label for="category" class="tm-label"
+                                >Category</Label
+                            >
                             <Input id="category" v-model="form.category" />
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="grid gap-2">
-                                <Label for="price">Price (sen)</Label>
+                            <div class="tm-form-field">
+                                <Label for="price" class="tm-label"
+                                    >Price (sen)</Label
+                                >
                                 <Input
                                     id="price"
                                     v-model="form.price_in_sen"
                                     inputmode="numeric"
                                 />
                             </div>
-                            <div class="grid gap-2">
-                                <Label for="original-price"
+                            <div class="tm-form-field">
+                                <Label for="original-price" class="tm-label"
                                     >Original price (sen)</Label
                                 >
                                 <Input
@@ -515,8 +543,8 @@ onMounted(async () => {
                             </div>
                         </div>
 
-                        <div class="grid gap-2">
-                            <Label for="badge">Badge</Label>
+                        <div class="tm-form-field">
+                            <Label for="badge" class="tm-label">Badge</Label>
                             <Input
                                 id="badge"
                                 v-model="form.badge"
@@ -524,8 +552,10 @@ onMounted(async () => {
                             />
                         </div>
 
-                        <div class="grid gap-2">
-                            <Label for="gradient">Gradient classes</Label>
+                        <div class="tm-form-field">
+                            <Label for="gradient" class="tm-label"
+                                >Gradient classes</Label
+                            >
                             <Input
                                 id="gradient"
                                 v-model="form.gradient"
