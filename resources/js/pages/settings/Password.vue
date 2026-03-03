@@ -26,7 +26,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <h1 class="sr-only">Password settings</h1>
 
         <SettingsLayout>
-            <div class="space-y-6">
+            <div class="tm-shell space-y-6 p-5 lg:p-6">
+                <p class="tm-kicker text-primary">Credentials</p>
                 <Heading
                     variant="small"
                     title="Update password"
@@ -44,7 +45,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         'password_confirmation',
                         'current_password',
                     ]"
-                    class="space-y-6"
+                    class="tm-subtle-card space-y-6 p-5"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
                     <div class="grid gap-2">

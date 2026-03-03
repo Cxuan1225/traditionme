@@ -21,7 +21,7 @@ defineProps<{
 
         <div
             v-if="status === 'verification-link-sent'"
-            class="mb-4 text-center text-sm font-medium text-green-600"
+            class="mb-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700"
         >
             A new verification link has been sent to the email address you
             provided during registration.
@@ -29,10 +29,13 @@ defineProps<{
 
         <Form
             v-bind="send.form()"
-            class="space-y-6 text-center"
+            class="tm-shell space-y-6 p-5 text-center"
             v-slot="{ processing }"
         >
-            <Button :disabled="processing" variant="secondary">
+            <Button
+                :disabled="processing"
+                class="h-11 rounded-xl bg-primary px-6 text-primary-foreground hover:bg-primary/90"
+            >
                 <Spinner v-if="processing" />
                 Resend verification email
             </Button>
@@ -40,7 +43,7 @@ defineProps<{
             <TextLink
                 :href="logout()"
                 as="button"
-                class="mx-auto block text-sm"
+                class="mx-auto block text-sm font-semibold !text-primary hover:!text-primary/80"
             >
                 Log out
             </TextLink>

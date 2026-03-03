@@ -22,9 +22,12 @@ import type { NavItem } from '@/types';
 const page = usePage<{ auth?: { permissions?: string[] } }>();
 const permissions = computed(() => page.props.auth?.permissions ?? []);
 const canManageProducts = computed(() =>
-    ['products.view', 'products.create', 'products.update', 'products.delete'].some((permission) =>
-        permissions.value.includes(permission),
-    ),
+    [
+        'products.view',
+        'products.create',
+        'products.update',
+        'products.delete',
+    ].some((permission) => permissions.value.includes(permission)),
 );
 
 const mainNavItems = computed<NavItem[]>(() => {

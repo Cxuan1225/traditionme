@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LockKeyhole, ShieldCheck, ShoppingBag, UserRound } from 'lucide-vue-next';
+import {
+    LockKeyhole,
+    ShieldCheck,
+    ShoppingBag,
+    UserRound,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
@@ -19,9 +24,27 @@ type AccountNavItem = NavItem & {
 };
 
 const sidebarNavItems: AccountNavItem[] = [
-    { title: 'Profile', href: editProfile(), icon: UserRound, caption: 'Personal details', status: 'Primary' },
-    { title: 'Password', href: editPassword(), icon: LockKeyhole, caption: 'Sign-in protection', status: 'Security' },
-    { title: 'Two-factor auth', href: show(), icon: ShieldCheck, caption: 'Verification security', status: 'Recommended' },
+    {
+        title: 'Profile',
+        href: editProfile(),
+        icon: UserRound,
+        caption: 'Personal details',
+        status: 'Primary',
+    },
+    {
+        title: 'Password',
+        href: editPassword(),
+        icon: LockKeyhole,
+        caption: 'Sign-in protection',
+        status: 'Security',
+    },
+    {
+        title: 'Two-factor auth',
+        href: show(),
+        icon: ShieldCheck,
+        caption: 'Verification security',
+        status: 'Recommended',
+    },
 ];
 
 const { isCurrentOrParentUrl } = useCurrentUrl();
@@ -34,62 +57,130 @@ const isEmailVerified = computed(() => Boolean(user.value?.email_verified_at));
 <template>
     <div class="space-y-8">
         <section
-            class="relative overflow-hidden rounded-[2rem] border border-zinc-200 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 text-zinc-100 shadow-sm"
+            class="tm-shell relative overflow-hidden bg-zinc-900 p-6 text-zinc-100 lg:p-8"
         >
-            <div class="absolute top-0 right-0 h-36 w-36 rounded-full bg-amber-400/30 blur-2xl" />
-            <div class="absolute bottom-0 left-0 h-28 w-28 rounded-full bg-red-400/20 blur-2xl" />
-            <p class="relative text-xs font-bold tracking-[0.22em] text-amber-300 uppercase">Buyer Control Center</p>
-            <h1 class="relative mt-2 text-3xl font-black tracking-tight sm:text-4xl">Account settings</h1>
-            <p class="relative mt-2 max-w-2xl text-sm text-zinc-300 sm:text-base">
-                Control your personal details and security preferences for your shopping account.
+            <div class="tm-dot-grid absolute inset-0 opacity-35" />
+            <div
+                class="absolute top-0 right-0 h-40 w-40 rounded-full bg-amber-400/30 blur-2xl"
+            />
+            <div
+                class="absolute -bottom-6 left-0 h-32 w-32 rounded-full bg-red-400/25 blur-2xl"
+            />
+            <p class="tm-kicker relative text-amber-300">
+                Buyer Control Center
+            </p>
+            <h1
+                class="relative mt-2 text-3xl font-black tracking-tight sm:text-4xl"
+            >
+                Account settings
+            </h1>
+            <p
+                class="relative mt-2 max-w-2xl text-sm text-zinc-300 sm:text-base"
+            >
+                Control your personal details and security preferences for your
+                shopping account.
             </p>
             <div class="relative mt-5 grid gap-2 sm:grid-cols-3">
-                <div class="rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
-                    <p class="text-[11px] font-bold tracking-[0.14em] text-zinc-300 uppercase">Account</p>
-                    <p class="mt-1 truncate text-sm font-semibold text-zinc-100">{{ user?.name ?? 'Guest' }}</p>
+                <div
+                    class="rounded-2xl border border-white/20 bg-white/10 px-3 py-2"
+                >
+                    <p
+                        class="text-[11px] font-bold tracking-[0.14em] text-zinc-300 uppercase"
+                    >
+                        Account
+                    </p>
+                    <p
+                        class="mt-1 truncate text-sm font-semibold text-zinc-100"
+                    >
+                        {{ user?.name ?? 'Guest' }}
+                    </p>
                 </div>
-                <div class="rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
-                    <p class="text-[11px] font-bold tracking-[0.14em] text-zinc-300 uppercase">Email status</p>
-                    <p class="mt-1 text-sm font-semibold text-zinc-100">{{ isEmailVerified ? 'Verified' : 'Verification needed' }}</p>
+                <div
+                    class="rounded-2xl border border-white/20 bg-white/10 px-3 py-2"
+                >
+                    <p
+                        class="text-[11px] font-bold tracking-[0.14em] text-zinc-300 uppercase"
+                    >
+                        Email status
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-zinc-100">
+                        {{
+                            isEmailVerified ? 'Verified' : 'Verification needed'
+                        }}
+                    </p>
                 </div>
-                <div class="rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
-                    <p class="text-[11px] font-bold tracking-[0.14em] text-zinc-300 uppercase">Security</p>
-                    <p class="mt-1 text-sm font-semibold text-zinc-100">Manage password & 2FA</p>
+                <div
+                    class="rounded-2xl border border-white/20 bg-white/10 px-3 py-2"
+                >
+                    <p
+                        class="text-[11px] font-bold tracking-[0.14em] text-zinc-300 uppercase"
+                    >
+                        Security
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-zinc-100">
+                        Manage password & 2FA
+                    </p>
                 </div>
             </div>
         </section>
 
-        <section class="rounded-[2rem] border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 lg:p-7">
+        <section class="tm-shell p-5 lg:p-7">
             <div class="mb-6 grid gap-3 sm:grid-cols-3">
                 <Link
                     :href="editProfile()"
-                    class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 transition hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/90"
+                    class="tm-subtle-card p-4 transition hover:border-primary/40 hover:bg-background dark:hover:bg-zinc-900"
                 >
-                    <p class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Quick action</p>
-                    <p class="mt-2 text-sm font-bold text-zinc-900 dark:text-zinc-100">Edit profile</p>
+                    <p
+                        class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400"
+                    >
+                        Quick action
+                    </p>
+                    <p
+                        class="mt-2 text-sm font-bold text-zinc-900 dark:text-zinc-100"
+                    >
+                        Edit profile
+                    </p>
                 </Link>
                 <Link
                     :href="shop.index()"
-                    class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 transition hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/90"
+                    class="tm-subtle-card p-4 transition hover:border-primary/40 hover:bg-background dark:hover:bg-zinc-900"
                 >
-                    <p class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Quick action</p>
-                    <p class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                    <p
+                        class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400"
+                    >
+                        Quick action
+                    </p>
+                    <p
+                        class="mt-2 inline-flex items-center gap-2 text-sm font-bold text-zinc-900 dark:text-zinc-100"
+                    >
                         <ShoppingBag class="size-4" />
                         Continue shopping
                     </p>
                 </Link>
                 <Link
                     :href="cart.show()"
-                    class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 transition hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/90"
+                    class="tm-subtle-card p-4 transition hover:border-primary/40 hover:bg-background dark:hover:bg-zinc-900"
                 >
-                    <p class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Quick action</p>
-                    <p class="mt-2 text-sm font-bold text-zinc-900 dark:text-zinc-100">Review cart</p>
+                    <p
+                        class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400"
+                    >
+                        Quick action
+                    </p>
+                    <p
+                        class="mt-2 text-sm font-bold text-zinc-900 dark:text-zinc-100"
+                    >
+                        Review cart
+                    </p>
                 </Link>
             </div>
 
             <div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
                 <aside class="w-full lg:w-72">
-                    <p class="mb-3 text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Setting Areas</p>
+                    <p
+                        class="mb-3 text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400"
+                    >
+                        Setting Areas
+                    </p>
                     <nav class="grid gap-2.5" aria-label="Account settings">
                         <Link
                             v-for="item in sidebarNavItems"
@@ -99,21 +190,26 @@ const isEmailVerified = computed(() => Boolean(user.value?.email_verified_at));
                                 cn(
                                     'group flex w-full items-start gap-3 rounded-2xl border px-4 py-3 transition',
                                     isCurrentOrParentUrl(item.href)
-                                        ? 'border-zinc-900 bg-zinc-900 text-zinc-100 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900'
-                                        : 'border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/90',
+                                        ? 'border-primary bg-primary text-primary-foreground dark:border-primary dark:bg-primary dark:text-primary-foreground'
+                                        : 'border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-primary/35 hover:bg-orange-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-primary/60 dark:hover:bg-zinc-800/90',
                                 )
                             "
                         >
-                            <component :is="item.icon" class="mt-0.5 size-4 shrink-0" />
+                            <component
+                                :is="item.icon"
+                                class="mt-0.5 size-4 shrink-0"
+                            />
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <p class="text-sm font-bold leading-tight">{{ item.title }}</p>
+                                    <p class="text-sm leading-tight font-bold">
+                                        {{ item.title }}
+                                    </p>
                                     <span
                                         :class="
                                             cn(
                                                 'rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
                                                 isCurrentOrParentUrl(item.href)
-                                                    ? 'bg-white/15 text-zinc-200 dark:bg-zinc-900/10 dark:text-zinc-700'
+                                                    ? 'bg-white/15 text-zinc-100 dark:bg-black/15 dark:text-zinc-100'
                                                     : 'bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300',
                                             )
                                         "

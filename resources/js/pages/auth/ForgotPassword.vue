@@ -24,15 +24,21 @@ defineProps<{
 
         <div
             v-if="status"
-            class="mb-4 text-center text-sm font-medium text-green-600"
+            class="mb-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-700"
         >
             {{ status }}
         </div>
 
         <div class="space-y-6">
-            <Form v-bind="email.form()" v-slot="{ errors, processing }">
+            <Form
+                v-bind="email.form()"
+                v-slot="{ errors, processing }"
+                class="tm-shell p-5"
+            >
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
+                    <Label for="email" class="font-semibold text-foreground"
+                        >Email address</Label
+                    >
                     <Input
                         id="email"
                         type="email"
@@ -40,13 +46,14 @@ defineProps<{
                         autocomplete="off"
                         autofocus
                         placeholder="email@example.com"
+                        class="h-11 rounded-xl border-border bg-background"
                     />
                     <InputError :message="errors.email" />
                 </div>
 
                 <div class="my-6 flex items-center justify-start">
                     <Button
-                        class="w-full"
+                        class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
                         :disabled="processing"
                         data-test="email-password-reset-link-button"
                     >
@@ -58,7 +65,11 @@ defineProps<{
 
             <div class="space-x-1 text-center text-sm text-muted-foreground">
                 <span>Or, return to</span>
-                <TextLink :href="login()">log in</TextLink>
+                <TextLink
+                    :href="login()"
+                    class="font-semibold !text-primary hover:!text-primary/80"
+                    >log in</TextLink
+                >
             </div>
         </div>
     </AuthLayout>

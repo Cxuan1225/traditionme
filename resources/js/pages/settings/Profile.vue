@@ -39,7 +39,8 @@ const user = computed(() => page.props.auth.user);
         <h1 class="sr-only">Profile settings</h1>
 
         <SettingsLayout>
-            <div class="flex flex-col space-y-6">
+            <div class="tm-shell flex flex-col space-y-6 p-5 lg:p-6">
+                <p class="tm-kicker text-primary">Account Identity</p>
                 <Heading
                     variant="small"
                     title="Profile information"
@@ -48,7 +49,7 @@ const user = computed(() => page.props.auth.user);
 
                 <Form
                     v-bind="ProfileController.update.form()"
-                    class="space-y-6"
+                    class="tm-subtle-card space-y-6 p-5"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
                     <div class="grid gap-2">
@@ -125,7 +126,9 @@ const user = computed(() => page.props.auth.user);
                 </Form>
             </div>
 
-            <DeleteUser />
+            <div class="tm-shell p-5">
+                <DeleteUser />
+            </div>
         </SettingsLayout>
     </AppLayout>
 </template>

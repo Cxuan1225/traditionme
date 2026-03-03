@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
     <div
@@ -8,6 +7,8 @@
         <span class="text-xs font-extrabold tracking-wide">TM</span>
     </div>
     <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold">Tradition Me</span>
+        <span class="mb-0.5 truncate leading-tight font-semibold"
+            >Tradition Me</span
+        >
     </div>
 </template>

@@ -21,7 +21,9 @@ import type { Auth } from '@/types';
 
 const page = usePage<{ auth?: Auth }>();
 const isAdminMode = computed(
-    () => page.props.auth?.isAdmin === true && page.props.auth?.adminViewMode === 'admin',
+    () =>
+        page.props.auth?.isAdmin === true &&
+        page.props.auth?.adminViewMode === 'admin',
 );
 </script>
 
@@ -33,16 +35,33 @@ const isAdminMode = computed(
         title="Confirm your password"
         description="This is a secure area of the application. Please confirm your password before continuing."
     >
-        <Form v-bind="store.form()" reset-on-success v-slot="{ errors, processing }">
+        <Form
+            v-bind="store.form()"
+            reset-on-success
+            v-slot="{ errors, processing }"
+            class="tm-shell p-5"
+        >
             <div class="space-y-6">
                 <div class="grid gap-2">
                     <Label for="password">Password</Label>
-                    <Input id="password" type="password" name="password" class="mt-1 block w-full" required autocomplete="current-password" autofocus />
+                    <Input
+                        id="password"
+                        type="password"
+                        name="password"
+                        class="mt-1 block w-full"
+                        required
+                        autocomplete="current-password"
+                        autofocus
+                    />
                     <InputError :message="errors.password" />
                 </div>
 
                 <div class="flex items-center">
-                    <Button class="w-full" :disabled="processing" data-test="confirm-password-button">
+                    <Button
+                        class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                        :disabled="processing"
+                        data-test="confirm-password-button"
+                    >
                         <Spinner v-if="processing" />
                         Confirm password
                     </Button>
@@ -53,15 +72,21 @@ const isAdminMode = computed(
 
     <AdminLayout v-else-if="isAdminMode">
         <div class="mx-auto max-w-xl py-8">
-            <Card class="border-border bg-card/80">
+            <Card class="tm-shell border-border bg-card/90">
                 <CardHeader>
                     <CardTitle>Confirm your password</CardTitle>
                     <CardDescription>
-                        Secure action detected. Confirm your password to continue with two-factor settings.
+                        Secure action detected. Confirm your password to
+                        continue with two-factor settings.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Form v-bind="store.form()" reset-on-success v-slot="{ errors, processing }" class="space-y-6">
+                    <Form
+                        v-bind="store.form()"
+                        reset-on-success
+                        v-slot="{ errors, processing }"
+                        class="space-y-6"
+                    >
                         <div class="grid gap-2">
                             <Label for="admin-password">Password</Label>
                             <Input
@@ -75,7 +100,11 @@ const isAdminMode = computed(
                             />
                             <InputError :message="errors.password" />
                         </div>
-                        <Button class="w-full bg-amber-500 text-zinc-900 hover:bg-amber-400" :disabled="processing" data-test="confirm-password-button">
+                        <Button
+                            class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                            :disabled="processing"
+                            data-test="confirm-password-button"
+                        >
                             <Spinner v-if="processing" />
                             Confirm password
                         </Button>
@@ -87,15 +116,21 @@ const isAdminMode = computed(
 
     <StorefrontLayout v-else>
         <div class="mx-auto max-w-xl py-8">
-            <Card class="border-zinc-300 bg-zinc-100/90 dark:border-zinc-800 dark:bg-zinc-900/70">
+            <Card class="tm-shell border-border bg-card/90">
                 <CardHeader>
                     <CardTitle>Confirm your password</CardTitle>
                     <CardDescription>
-                        Secure action detected. Confirm your password to continue with two-factor settings.
+                        Secure action detected. Confirm your password to
+                        continue with two-factor settings.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Form v-bind="store.form()" reset-on-success v-slot="{ errors, processing }" class="space-y-6">
+                    <Form
+                        v-bind="store.form()"
+                        reset-on-success
+                        v-slot="{ errors, processing }"
+                        class="space-y-6"
+                    >
                         <div class="grid gap-2">
                             <Label for="account-password">Password</Label>
                             <Input
@@ -109,7 +144,11 @@ const isAdminMode = computed(
                             />
                             <InputError :message="errors.password" />
                         </div>
-                        <Button class="w-full" :disabled="processing" data-test="confirm-password-button">
+                        <Button
+                            class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                            :disabled="processing"
+                            data-test="confirm-password-button"
+                        >
                             <Spinner v-if="processing" />
                             Confirm password
                         </Button>

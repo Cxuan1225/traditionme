@@ -85,19 +85,21 @@ const assignedUser = ref<UserSecurityResource | null>(null);
 const abilities = computed<Required<Capabilities>>(() => ({
     canViewRoles: props.capabilities?.canViewRoles ?? true,
     canCreateRoles: props.capabilities?.canCreateRoles ?? true,
-    canManageRolePermissions: props.capabilities?.canManageRolePermissions ?? true,
+    canManageRolePermissions:
+        props.capabilities?.canManageRolePermissions ?? true,
     canAssignUserRoles: props.capabilities?.canAssignUserRoles ?? true,
 }));
 
-const selectedRole = computed<RoleResource | null>(() =>
-    roles.value.find((role) => role.id === selectedRoleId.value) ?? null,
+const selectedRole = computed<RoleResource | null>(
+    () => roles.value.find((role) => role.id === selectedRoleId.value) ?? null,
 );
 
 const availableRoleNames = computed<string[]>(() =>
     roles.value.map((role) => role.name),
 );
 
-const isChecked = (name: string, list: string[]): boolean => list.includes(name);
+const isChecked = (name: string, list: string[]): boolean =>
+    list.includes(name);
 
 const parsePermissionCollection = (value: unknown): PermissionResource[] => {
     if (!value) {
@@ -129,7 +131,11 @@ const parseRoleCollection = (value: unknown): RoleResource[] => {
 
     return value
         .filter(
-            (item): item is Omit<RoleResource, 'permissions'> & { permissions?: unknown } =>
+            (
+                item,
+            ): item is Omit<RoleResource, 'permissions'> & {
+                permissions?: unknown;
+            } =>
                 Boolean(item) &&
                 typeof item === 'object' &&
                 typeof (item as RoleResource).id === 'number' &&
@@ -192,7 +198,7 @@ const readCookie = (name: string): string | null => {
     return decodeURIComponent(cookie.trim().slice(encodedName.length));
 };
 
-const requestJson = async <T>(
+const requestJson = async <T,>(
     endpoint: string,
     options: {
         method?: 'GET' | 'POST' | 'PUT';
@@ -261,13 +267,19 @@ const loadRoleData = async (): Promise<void> => {
         syncRolePermissionSelection();
     } catch (error) {
         pageError.value =
-            error instanceof Error ? error.message : 'Unable to load RBAC data.';
+            error instanceof Error
+                ? error.message
+                : 'Unable to load RBAC data.';
     } finally {
         loading.value = false;
     }
 };
 
-const toggleArrayItem = (list: string[], item: string, checked: boolean): string[] => {
+const toggleArrayItem = (
+    list: string[],
+    item: string,
+    checked: boolean,
+): string[] => {
     if (checked) {
         return list.includes(item) ? list : [...list, item];
     }
@@ -306,7 +318,10 @@ const createRole = async (): Promise<void> => {
 };
 
 const syncRolePermissions = async (): Promise<void> => {
-    if (!abilities.value.canManageRolePermissions || selectedRoleId.value === null) {
+    if (
+        !abilities.value.canManageRolePermissions ||
+        selectedRoleId.value === null
+    ) {
         return;
     }
 
@@ -315,25 +330,33 @@ const syncRolePermissions = async (): Promise<void> => {
     pageSuccess.value = null;
 
     try {
-        await requestJson(RolePermissionController.update.url({ role: selectedRoleId.value }), {
-            method: 'PUT',
-            body: {
-                permissions: rolePermissionNames.value,
+        await requestJson(
+            RolePermissionController.update.url({ role: selectedRoleId.value }),
+            {
+                method: 'PUT',
+                body: {
+                    permissions: rolePermissionNames.value,
+                },
             },
-        });
+        );
 
         pageSuccess.value = 'Role permissions updated.';
         await loadRoleData();
     } catch (error) {
         pageError.value =
-            error instanceof Error ? error.message : 'Unable to sync role permissions.';
+            error instanceof Error
+                ? error.message
+                : 'Unable to sync role permissions.';
     } finally {
         submittingSyncPermissions.value = false;
     }
 };
 
 const assignRolesToUser = async (): Promise<void> => {
-    if (!abilities.value.canAssignUserRoles || assignUserId.value.trim() === '') {
+    if (
+        !abilities.value.canAssignUserRoles ||
+        assignUserId.value.trim() === ''
+    ) {
         return;
     }
 
@@ -347,18 +370,23 @@ const assignRolesToUser = async (): Promise<void> => {
             throw new Error('User ID must be a positive integer.');
         }
 
-        const payload = await requestJson(UserRoleController.update.url({ user: userId }), {
-            method: 'PUT',
-            body: {
-                roles: assignUserRoleNames.value,
+        const payload = await requestJson(
+            UserRoleController.update.url({ user: userId }),
+            {
+                method: 'PUT',
+                body: {
+                    roles: assignUserRoleNames.value,
+                },
             },
-        });
+        );
 
         assignedUser.value = parseUserResource(payload);
         pageSuccess.value = 'User roles updated.';
     } catch (error) {
         pageError.value =
-            error instanceof Error ? error.message : 'Unable to assign user roles.';
+            error instanceof Error
+                ? error.message
+                : 'Unable to assign user roles.';
     } finally {
         submittingAssignUserRoles.value = false;
     }
@@ -382,7 +410,18 @@ onMounted(async () => {
     <Head title="Security roles" />
 
     <AdminLayout :breadcrumbs="breadcrumbItems">
-        <div class="flex flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+        <div class="space-y-4 p-4">
+            <section class="tm-shell p-6">
+                <p class="tm-kicker text-primary">Security Administration</p>
+                <h2 class="tm-display mt-2 text-3xl font-black text-foreground">
+                    Role and permission control
+                </h2>
+                <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
+                    Manage role bundles, permission synchronization, and user
+                    assignments.
+                </p>
+            </section>
+
             <Alert v-if="pageError" variant="destructive">
                 <AlertTitle>Request failed</AlertTitle>
                 <AlertDescription>{{ pageError }}</AlertDescription>
@@ -402,7 +441,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
-                        <div v-if="loading" class="flex items-center gap-2 text-sm">
+                        <div
+                            v-if="loading"
+                            class="flex items-center gap-2 text-sm"
+                        >
                             <Spinner />
                             Loading roles...
                         </div>
@@ -427,13 +469,19 @@ onMounted(async () => {
                                 :key="role.id"
                                 type="button"
                                 class="w-full rounded-lg border border-border bg-background/70 p-3 text-left transition hover:bg-muted/50"
-                                :class="{ 'border-primary bg-muted/60': selectedRoleId === role.id }"
+                                :class="{
+                                    'border-primary bg-muted/60':
+                                        selectedRoleId === role.id,
+                                }"
                                 @click="selectedRoleId = role.id"
                             >
-                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                <div
+                                    class="flex flex-wrap items-center justify-between gap-2"
+                                >
                                     <p class="font-medium">{{ role.name }}</p>
                                     <Badge variant="secondary">
-                                        {{ role.permissions.length }} permissions
+                                        {{ role.permissions.length }}
+                                        permissions
                                     </Badge>
                                 </div>
                                 <p class="mt-1 text-xs text-muted-foreground">
@@ -457,7 +505,8 @@ onMounted(async () => {
                     <CardHeader>
                         <CardTitle>Create role</CardTitle>
                         <CardDescription>
-                            Add a new role with an optional initial permission set.
+                            Add a new role with an optional initial permission
+                            set.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
@@ -467,13 +516,18 @@ onMounted(async () => {
                                 id="role-name"
                                 v-model="createRoleName"
                                 placeholder="seller"
-                                :disabled="!abilities.canCreateRoles || submittingCreateRole"
+                                :disabled="
+                                    !abilities.canCreateRoles ||
+                                    submittingCreateRole
+                                "
                             />
                         </div>
 
                         <div class="space-y-2">
                             <Label>Initial permissions</Label>
-                            <div class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3">
+                            <div
+                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3"
+                            >
                                 <p
                                     v-if="permissions.length === 0"
                                     class="text-sm text-muted-foreground"
@@ -507,7 +561,9 @@ onMounted(async () => {
                                                     ))
                                         "
                                     />
-                                    <span class="text-sm">{{ permission.name }}</span>
+                                    <span class="text-sm">{{
+                                        permission.name
+                                    }}</span>
                                 </Label>
                             </div>
                         </div>
@@ -541,14 +597,18 @@ onMounted(async () => {
                             <Label for="selected-role">Selected role</Label>
                             <Input
                                 id="selected-role"
-                                :model-value="selectedRole?.name ?? 'No role selected'"
+                                :model-value="
+                                    selectedRole?.name ?? 'No role selected'
+                                "
                                 disabled
                             />
                         </div>
 
                         <div class="space-y-2">
                             <Label>Permissions</Label>
-                            <div class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3">
+                            <div
+                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3"
+                            >
                                 <p
                                     v-if="permissions.length === 0"
                                     class="text-sm text-muted-foreground"
@@ -563,7 +623,10 @@ onMounted(async () => {
                                 >
                                     <Checkbox
                                         :model-value="
-                                            isChecked(permission.name, rolePermissionNames)
+                                            isChecked(
+                                                permission.name,
+                                                rolePermissionNames,
+                                            )
                                         "
                                         :disabled="
                                             !abilities.canManageRolePermissions ||
@@ -572,14 +635,17 @@ onMounted(async () => {
                                         "
                                         @update:model-value="
                                             (value) =>
-                                                (rolePermissionNames = toggleArrayItem(
-                                                    rolePermissionNames,
-                                                    permission.name,
-                                                    value === true,
-                                                ))
+                                                (rolePermissionNames =
+                                                    toggleArrayItem(
+                                                        rolePermissionNames,
+                                                        permission.name,
+                                                        value === true,
+                                                    ))
                                         "
                                     />
-                                    <span class="text-sm">{{ permission.name }}</span>
+                                    <span class="text-sm">{{
+                                        permission.name
+                                    }}</span>
                                 </Label>
                             </div>
                         </div>
@@ -623,7 +689,9 @@ onMounted(async () => {
 
                         <div class="space-y-2">
                             <Label>Roles</Label>
-                            <div class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3">
+                            <div
+                                class="max-h-56 space-y-2 overflow-y-auto rounded-md border border-border bg-background/70 p-3"
+                            >
                                 <p
                                     v-if="availableRoleNames.length === 0"
                                     class="text-sm text-muted-foreground"
@@ -638,7 +706,10 @@ onMounted(async () => {
                                 >
                                     <Checkbox
                                         :model-value="
-                                            isChecked(roleName, assignUserRoleNames)
+                                            isChecked(
+                                                roleName,
+                                                assignUserRoleNames,
+                                            )
                                         "
                                         :disabled="
                                             !abilities.canAssignUserRoles ||
@@ -646,11 +717,12 @@ onMounted(async () => {
                                         "
                                         @update:model-value="
                                             (value) =>
-                                                (assignUserRoleNames = toggleArrayItem(
-                                                    assignUserRoleNames,
-                                                    roleName,
-                                                    value === true,
-                                                ))
+                                                (assignUserRoleNames =
+                                                    toggleArrayItem(
+                                                        assignUserRoleNames,
+                                                        roleName,
+                                                        value === true,
+                                                    ))
                                         "
                                     />
                                     <span class="text-sm">{{ roleName }}</span>
@@ -658,7 +730,10 @@ onMounted(async () => {
                             </div>
                         </div>
 
-                        <div v-if="assignedUser" class="rounded-md border border-border bg-background/70 p-3 text-sm text-muted-foreground">
+                        <div
+                            v-if="assignedUser"
+                            class="rounded-md border border-border bg-background/70 p-3 text-sm text-muted-foreground"
+                        >
                             Updated user:
                             <span class="font-medium text-foreground">
                                 {{ assignedUser.name }}

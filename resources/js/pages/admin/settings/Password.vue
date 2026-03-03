@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { KeyRound, ShieldCheck, TriangleAlert } from 'lucide-vue-next';
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -26,12 +27,24 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <h1 class="sr-only">Password settings</h1>
 
         <SettingsLayout>
-            <div class="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
-                />
+            <div
+                class="space-y-6 rounded-[1.75rem] border border-border bg-card/90 p-6 shadow-sm"
+            >
+                <div
+                    class="rounded-2xl border border-primary/25 bg-gradient-to-r from-emerald-50 via-cyan-50 to-teal-100 p-5 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900"
+                >
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full border border-primary/35 bg-white/80 px-3 py-1 text-xs font-bold tracking-[0.14em] text-primary uppercase dark:border-primary/50 dark:bg-zinc-900 dark:text-amber-300"
+                    >
+                        <KeyRound class="size-3.5" />
+                        Credentials
+                    </div>
+                    <Heading
+                        variant="small"
+                        title="Update password"
+                        description="Protect administrative access with a unique password rotation policy."
+                    />
+                </div>
 
                 <Form
                     v-bind="PasswordController.update.form()"
@@ -44,7 +57,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         'password_confirmation',
                         'current_password',
                     ]"
-                    class="space-y-6"
+                    class="space-y-6 rounded-2xl border border-border bg-background/60 p-5"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
                     <div class="grid gap-2">
@@ -53,7 +66,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             id="current_password"
                             name="current_password"
                             type="password"
-                            class="mt-1 block w-full"
+                            class="mt-1 block h-11 w-full rounded-xl border-border bg-card"
                             autocomplete="current-password"
                             placeholder="Current password"
                         />
@@ -66,7 +79,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             id="password"
                             name="password"
                             type="password"
-                            class="mt-1 block w-full"
+                            class="mt-1 block h-11 w-full rounded-xl border-border bg-card"
                             autocomplete="new-password"
                             placeholder="New password"
                         />
@@ -81,7 +94,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                             id="password_confirmation"
                             name="password_confirmation"
                             type="password"
-                            class="mt-1 block w-full"
+                            class="mt-1 block h-11 w-full rounded-xl border-border bg-card"
                             autocomplete="new-password"
                             placeholder="Confirm password"
                         />
@@ -91,6 +104,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     <div class="flex items-center gap-4">
                         <Button
                             :disabled="processing"
+                            class="h-11 rounded-full bg-primary px-6 text-primary-foreground hover:bg-primary/90"
                             data-test="update-password-button"
                             >Save password</Button
                         >
@@ -103,13 +117,43 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-muted-foreground"
                             >
                                 Saved.
                             </p>
                         </Transition>
                     </div>
                 </Form>
+
+                <aside
+                    class="rounded-2xl border border-border bg-background/60 p-4"
+                >
+                    <p
+                        class="text-xs font-bold tracking-[0.14em] text-muted-foreground uppercase"
+                    >
+                        Security checklist
+                    </p>
+                    <div class="mt-3 space-y-2 text-sm text-foreground/80">
+                        <p class="rounded-xl bg-secondary px-3 py-2">
+                            <span class="inline-flex items-center gap-2"
+                                ><ShieldCheck class="size-3.5" />Use 12+
+                                characters</span
+                            >
+                        </p>
+                        <p class="rounded-xl bg-secondary px-3 py-2">
+                            <span class="inline-flex items-center gap-2"
+                                ><ShieldCheck class="size-3.5" />Mix letters,
+                                numbers, symbols</span
+                            >
+                        </p>
+                        <p class="rounded-xl bg-secondary px-3 py-2">
+                            <span class="inline-flex items-center gap-2"
+                                ><TriangleAlert class="size-3.5" />Avoid reused
+                                credentials</span
+                            >
+                        </p>
+                    </div>
+                </aside>
             </div>
         </SettingsLayout>
     </AdminLayout>

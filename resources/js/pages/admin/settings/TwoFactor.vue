@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
+import {
+    ShieldBan,
+    ShieldCheck,
+    ShieldEllipsis,
+    Smartphone,
+} from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
 import Heading from '@/components/Heading.vue';
 import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue';
@@ -45,16 +50,28 @@ onUnmounted(() => {
         <h1 class="sr-only">Two-factor authentication settings</h1>
 
         <SettingsLayout>
-            <div class="space-y-6">
-                <Heading
-                    variant="small"
-                    title="Two-factor authentication"
-                    description="Manage your two-factor authentication settings"
-                />
+            <div
+                class="space-y-6 rounded-[1.75rem] border border-border bg-card/90 p-6 shadow-sm"
+            >
+                <div
+                    class="rounded-2xl border border-primary/25 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-100 p-5 dark:from-zinc-900 dark:via-zinc-900 dark:to-zinc-900"
+                >
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full border border-primary/35 bg-white/80 px-3 py-1 text-xs font-bold tracking-[0.14em] text-primary uppercase dark:border-primary/50 dark:bg-zinc-900 dark:text-amber-300"
+                    >
+                        <ShieldEllipsis class="size-3.5" />
+                        Protection
+                    </div>
+                    <Heading
+                        variant="small"
+                        title="Two-factor authentication"
+                        description="Require an additional verification code before admin access."
+                    />
+                </div>
 
                 <div
                     v-if="!twoFactorEnabled"
-                    class="flex flex-col items-start justify-start space-y-4"
+                    class="flex flex-col items-start justify-start space-y-4 rounded-2xl border border-border bg-background/60 p-5"
                 >
                     <Badge variant="destructive">Disabled</Badge>
 
@@ -68,6 +85,7 @@ onUnmounted(() => {
                     <div>
                         <Button
                             v-if="hasSetupData"
+                            class="rounded-full"
                             @click="showSetupModal = true"
                         >
                             <ShieldCheck />Continue setup
@@ -78,7 +96,11 @@ onUnmounted(() => {
                             @success="showSetupModal = true"
                             #default="{ processing }"
                         >
-                            <Button type="submit" :disabled="processing">
+                            <Button
+                                type="submit"
+                                :disabled="processing"
+                                class="rounded-full"
+                            >
                                 <ShieldCheck />Enable 2FA</Button
                             ></Form
                         >
@@ -87,7 +109,7 @@ onUnmounted(() => {
 
                 <div
                     v-else
-                    class="flex flex-col items-start justify-start space-y-4"
+                    class="flex flex-col items-start justify-start space-y-4 rounded-2xl border border-border bg-background/60 p-5"
                 >
                     <Badge variant="default">Enabled</Badge>
 
@@ -106,6 +128,7 @@ onUnmounted(() => {
                                 variant="destructive"
                                 type="submit"
                                 :disabled="processing"
+                                class="rounded-full"
                             >
                                 <ShieldBan />
                                 Disable 2FA
@@ -113,6 +136,30 @@ onUnmounted(() => {
                         </Form>
                     </div>
                 </div>
+
+                <aside
+                    class="rounded-2xl border border-border bg-background/60 p-4"
+                >
+                    <p
+                        class="text-xs font-bold tracking-[0.14em] text-muted-foreground uppercase"
+                    >
+                        How it works
+                    </p>
+                    <div class="mt-3 space-y-2 text-sm text-foreground/80">
+                        <p class="rounded-xl bg-secondary px-3 py-2">
+                            <span class="inline-flex items-center gap-2"
+                                ><Smartphone class="size-3.5" />Use an
+                                authenticator app.</span
+                            >
+                        </p>
+                        <p class="rounded-xl bg-secondary px-3 py-2">
+                            Scan the setup QR code.
+                        </p>
+                        <p class="rounded-xl bg-secondary px-3 py-2">
+                            Enter one-time code to complete activation.
+                        </p>
+                    </div>
+                </aside>
 
                 <TwoFactorSetupModal
                     v-model:isOpen="showSetupModal"

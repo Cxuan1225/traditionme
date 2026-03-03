@@ -22,13 +22,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
         <h1 class="sr-only">Appearance settings</h1>
 
         <SettingsLayout>
-            <div class="space-y-6">
+            <div class="tm-shell space-y-6 p-5 lg:p-6">
+                <p class="tm-kicker text-primary">Display</p>
                 <Heading
                     variant="small"
                     title="Appearance settings"
                     description="Update your account's appearance settings"
                 />
-                <AppearanceTabs />
+                <div class="tm-subtle-card p-5">
+                    <AppearanceTabs />
+                </div>
             </div>
         </SettingsLayout>
     </AppLayout>

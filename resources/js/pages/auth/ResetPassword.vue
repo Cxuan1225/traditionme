@@ -29,30 +29,35 @@ const inputEmail = ref(props.email);
             :transform="(data) => ({ ...data, token, email })"
             :reset-on-success="['password', 'password_confirmation']"
             v-slot="{ errors, processing }"
+            class="tm-shell p-5"
         >
             <div class="grid gap-6">
                 <div class="grid gap-2">
-                    <Label for="email">Email</Label>
+                    <Label for="email" class="font-semibold text-foreground"
+                        >Email</Label
+                    >
                     <Input
                         id="email"
                         type="email"
                         name="email"
                         autocomplete="email"
                         v-model="inputEmail"
-                        class="mt-1 block w-full"
+                        class="mt-1 block h-11 w-full rounded-xl border-border bg-background"
                         readonly
                     />
                     <InputError :message="errors.email" class="mt-2" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password">Password</Label>
+                    <Label for="password" class="font-semibold text-foreground"
+                        >Password</Label
+                    >
                     <Input
                         id="password"
                         type="password"
                         name="password"
                         autocomplete="new-password"
-                        class="mt-1 block w-full"
+                        class="mt-1 block h-11 w-full rounded-xl border-border bg-background"
                         autofocus
                         placeholder="Password"
                     />
@@ -60,7 +65,10 @@ const inputEmail = ref(props.email);
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="password_confirmation">
+                    <Label
+                        for="password_confirmation"
+                        class="font-semibold text-foreground"
+                    >
                         Confirm password
                     </Label>
                     <Input
@@ -68,7 +76,7 @@ const inputEmail = ref(props.email);
                         type="password"
                         name="password_confirmation"
                         autocomplete="new-password"
-                        class="mt-1 block w-full"
+                        class="mt-1 block h-11 w-full rounded-xl border-border bg-background"
                         placeholder="Confirm password"
                     />
                     <InputError :message="errors.password_confirmation" />
@@ -76,7 +84,7 @@ const inputEmail = ref(props.email);
 
                 <Button
                     type="submit"
-                    class="mt-4 w-full"
+                    class="mt-4 h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
                     :disabled="processing"
                     data-test="reset-password-button"
                 >

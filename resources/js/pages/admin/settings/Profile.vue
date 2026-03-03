@@ -86,17 +86,29 @@ onBeforeUnmount(() => {
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70">
-                        <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Profile photo</p>
-                        <div class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center">
-                            <Avatar class="h-24 w-20 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                    <div
+                        class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/70"
+                    >
+                        <p
+                            class="text-sm font-semibold text-zinc-900 dark:text-zinc-100"
+                        >
+                            Profile photo
+                        </p>
+                        <div
+                            class="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center"
+                        >
+                            <Avatar
+                                class="h-24 w-20 rounded-xl border border-zinc-200 dark:border-zinc-700"
+                            >
                                 <AvatarImage
                                     v-if="displayedAvatar"
                                     :src="displayedAvatar"
                                     :alt="user.name"
                                     class="object-cover object-center"
                                 />
-                                <AvatarFallback class="bg-zinc-900 text-sm font-bold text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900">
+                                <AvatarFallback
+                                    class="bg-zinc-900 text-sm font-bold text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                                >
                                     {{ getInitials(user.name) }}
                                 </AvatarFallback>
                             </Avatar>
@@ -120,8 +132,17 @@ onBeforeUnmount(() => {
                                     />
                                     Remove current photo
                                 </Label>
-                                <input v-if="removeAvatar" type="hidden" name="remove_avatar" value="1" />
-                                <InputError :message="errors.avatar || errors.remove_avatar" />
+                                <input
+                                    v-if="removeAvatar"
+                                    type="hidden"
+                                    name="remove_avatar"
+                                    value="1"
+                                />
+                                <InputError
+                                    :message="
+                                        errors.avatar || errors.remove_avatar
+                                    "
+                                />
                             </div>
                         </div>
                     </div>

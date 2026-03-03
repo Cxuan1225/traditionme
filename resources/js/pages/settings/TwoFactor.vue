@@ -45,7 +45,8 @@ onUnmounted(() => {
         <h1 class="sr-only">Two-factor authentication settings</h1>
 
         <SettingsLayout>
-            <div class="space-y-6">
+            <div class="tm-shell space-y-6 p-5 lg:p-6">
+                <p class="tm-kicker text-primary">Security</p>
                 <Heading
                     variant="small"
                     title="Two-factor authentication"
@@ -54,7 +55,7 @@ onUnmounted(() => {
 
                 <div
                     v-if="!twoFactorEnabled"
-                    class="flex flex-col items-start justify-start space-y-4"
+                    class="tm-subtle-card flex flex-col items-start justify-start space-y-4 p-5"
                 >
                     <Badge variant="destructive">Disabled</Badge>
 
@@ -87,7 +88,7 @@ onUnmounted(() => {
 
                 <div
                     v-else
-                    class="flex flex-col items-start justify-start space-y-4"
+                    class="tm-subtle-card flex flex-col items-start justify-start space-y-4 p-5"
                 >
                     <Badge variant="default">Enabled</Badge>
 

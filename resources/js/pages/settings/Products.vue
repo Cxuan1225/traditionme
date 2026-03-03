@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -108,7 +104,7 @@ const readCookie = (name: string): string | null => {
     return decodeURIComponent(cookie.trim().slice(encodedName.length));
 };
 
-const requestJson = async <T>(
+const requestJson = async <T,>(
     endpoint: string,
     options: {
         method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -192,7 +188,9 @@ const loadProducts = async (): Promise<void> => {
     pageError.value = null;
 
     try {
-        const payload = await requestJson<{ data?: unknown }>(productsIndexRoute.url());
+        const payload = await requestJson<{ data?: unknown }>(
+            productsIndexRoute.url(),
+        );
         products.value = parseCollection(payload.data ?? []);
     } catch (error) {
         pageError.value =
@@ -234,7 +232,10 @@ const startEdit = (product: ProductResource): void => {
 
 const submitForm = async (): Promise<void> => {
     const isEditing = editingId.value !== null;
-    if ((!isEditing && !abilities.value.canCreateProducts) || (isEditing && !abilities.value.canUpdateProducts)) {
+    if (
+        (!isEditing && !abilities.value.canCreateProducts) ||
+        (isEditing && !abilities.value.canUpdateProducts)
+    ) {
         return;
     }
 
@@ -253,10 +254,13 @@ const submitForm = async (): Promise<void> => {
         };
 
         if (isEditing && editingId.value !== null) {
-            const response = await requestJson(productsRoutes.update.url({ product: editingId.value }), {
-                method: 'PUT',
-                body: payload,
-            });
+            const response = await requestJson(
+                productsRoutes.update.url({ product: editingId.value }),
+                {
+                    method: 'PUT',
+                    body: payload,
+                },
+            );
 
             const updated = parseProduct(response);
             if (updated) {
@@ -303,14 +307,18 @@ const removeProduct = async (productId: number): Promise<void> => {
             method: 'DELETE',
         });
 
-        products.value = products.value.filter((product) => product.id !== productId);
+        products.value = products.value.filter(
+            (product) => product.id !== productId,
+        );
         if (editingId.value === productId) {
             resetForm();
         }
         pageSuccess.value = 'Product deleted.';
     } catch (error) {
         pageError.value =
-            error instanceof Error ? error.message : 'Unable to delete product.';
+            error instanceof Error
+                ? error.message
+                : 'Unable to delete product.';
     } finally {
         deleting.value = null;
     }
@@ -327,7 +335,18 @@ onMounted(async () => {
     <Head title="Product management" />
 
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <div class="flex flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+        <div class="space-y-4 p-4">
+            <section class="tm-shell p-6">
+                <p class="tm-kicker text-primary">Catalog Management</p>
+                <h2 class="tm-display mt-2 text-3xl font-black text-foreground">
+                    Product control center
+                </h2>
+                <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
+                    Maintain pricing, visibility, and merchandising fields for
+                    storefront publishing.
+                </p>
+            </section>
+
             <Alert v-if="pageError" variant="destructive">
                 <AlertTitle>Request failed</AlertTitle>
                 <AlertDescription>{{ pageError }}</AlertDescription>
@@ -339,7 +358,7 @@ onMounted(async () => {
             </Alert>
 
             <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/85">
                     <CardHeader>
                         <CardTitle>Products</CardTitle>
                         <CardDescription>
@@ -347,7 +366,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
-                        <div v-if="loading" class="flex items-center gap-2 text-sm">
+                        <div
+                            v-if="loading"
+                            class="flex items-center gap-2 text-sm"
+                        >
                             <Spinner />
                             Loading products...
                         </div>
@@ -370,20 +392,39 @@ onMounted(async () => {
                             <div
                                 v-for="product in products"
                                 :key="product.id"
-                                class="rounded-lg border p-3"
+                                class="rounded-2xl border border-border bg-background/70 p-3"
                             >
-                                <div class="flex items-center justify-between gap-3">
+                                <div
+                                    class="flex items-center justify-between gap-3"
+                                >
                                     <div>
-                                        <p class="font-medium">{{ product.name }}</p>
-                                        <p class="text-xs text-muted-foreground">{{ product.slug }}</p>
+                                        <p class="font-medium">
+                                            {{ product.name }}
+                                        </p>
+                                        <p
+                                            class="text-xs text-muted-foreground"
+                                        >
+                                            {{ product.slug }}
+                                        </p>
                                     </div>
-                                    <Badge :variant="product.is_active ? 'default' : 'secondary'">
-                                        {{ product.is_active ? 'Active' : 'Inactive' }}
+                                    <Badge
+                                        :variant="
+                                            product.is_active
+                                                ? 'default'
+                                                : 'secondary'
+                                        "
+                                    >
+                                        {{
+                                            product.is_active
+                                                ? 'Active'
+                                                : 'Inactive'
+                                        }}
                                     </Badge>
                                 </div>
 
                                 <p class="mt-2 text-xs text-muted-foreground">
-                                    {{ product.category }} · {{ product.price_in_sen }} sen
+                                    {{ product.category }} ·
+                                    {{ product.price_in_sen }} sen
                                 </p>
 
                                 <div class="mt-3 flex gap-2">
@@ -398,10 +439,15 @@ onMounted(async () => {
                                     <Button
                                         variant="destructive"
                                         size="sm"
-                                        :disabled="!abilities.canDeleteProducts || deleting === product.id"
+                                        :disabled="
+                                            !abilities.canDeleteProducts ||
+                                            deleting === product.id
+                                        "
                                         @click="removeProduct(product.id)"
                                     >
-                                        <Spinner v-if="deleting === product.id" />
+                                        <Spinner
+                                            v-if="deleting === product.id"
+                                        />
                                         Delete
                                     </Button>
                                 </div>
@@ -419,9 +465,11 @@ onMounted(async () => {
                     </CardFooter>
                 </Card>
 
-                <Card class="h-full">
+                <Card class="h-full border-border bg-card/85">
                     <CardHeader>
-                        <CardTitle>{{ editingId ? 'Edit product' : 'Create product' }}</CardTitle>
+                        <CardTitle>{{
+                            editingId ? 'Edit product' : 'Create product'
+                        }}</CardTitle>
                         <CardDescription>
                             Define storefront product fields and status.
                         </CardDescription>
@@ -434,7 +482,11 @@ onMounted(async () => {
 
                         <div class="grid gap-2">
                             <Label for="slug">Slug</Label>
-                            <Input id="slug" v-model="form.slug" placeholder="songket-luxe-kurung-set" />
+                            <Input
+                                id="slug"
+                                v-model="form.slug"
+                                placeholder="songket-luxe-kurung-set"
+                            />
                         </div>
 
                         <div class="grid gap-2">
@@ -445,22 +497,40 @@ onMounted(async () => {
                         <div class="grid grid-cols-2 gap-3">
                             <div class="grid gap-2">
                                 <Label for="price">Price (sen)</Label>
-                                <Input id="price" v-model="form.price_in_sen" inputmode="numeric" />
+                                <Input
+                                    id="price"
+                                    v-model="form.price_in_sen"
+                                    inputmode="numeric"
+                                />
                             </div>
                             <div class="grid gap-2">
-                                <Label for="original-price">Original price (sen)</Label>
-                                <Input id="original-price" v-model="form.original_price_in_sen" inputmode="numeric" />
+                                <Label for="original-price"
+                                    >Original price (sen)</Label
+                                >
+                                <Input
+                                    id="original-price"
+                                    v-model="form.original_price_in_sen"
+                                    inputmode="numeric"
+                                />
                             </div>
                         </div>
 
                         <div class="grid gap-2">
                             <Label for="badge">Badge</Label>
-                            <Input id="badge" v-model="form.badge" placeholder="Best Seller" />
+                            <Input
+                                id="badge"
+                                v-model="form.badge"
+                                placeholder="Best Seller"
+                            />
                         </div>
 
                         <div class="grid gap-2">
                             <Label for="gradient">Gradient classes</Label>
-                            <Input id="gradient" v-model="form.gradient" placeholder="from-rose-100 via-orange-50 to-amber-100" />
+                            <Input
+                                id="gradient"
+                                v-model="form.gradient"
+                                placeholder="from-rose-100 via-orange-50 to-amber-100"
+                            />
                         </div>
 
                         <Label class="flex items-center gap-2 text-sm">
@@ -474,13 +544,24 @@ onMounted(async () => {
                     </CardContent>
                     <CardFooter class="flex gap-2">
                         <Button
-                            :disabled="submitting || (!editingId && !abilities.canCreateProducts) || (editingId !== null && !abilities.canUpdateProducts)"
+                            :disabled="
+                                submitting ||
+                                (!editingId && !abilities.canCreateProducts) ||
+                                (editingId !== null &&
+                                    !abilities.canUpdateProducts)
+                            "
                             @click="submitForm"
                         >
                             <Spinner v-if="submitting" />
-                            {{ editingId ? 'Update product' : 'Create product' }}
+                            {{
+                                editingId ? 'Update product' : 'Create product'
+                            }}
                         </Button>
-                        <Button variant="outline" :disabled="submitting" @click="resetForm">
+                        <Button
+                            variant="outline"
+                            :disabled="submitting"
+                            @click="resetForm"
+                        >
                             Clear
                         </Button>
                     </CardFooter>

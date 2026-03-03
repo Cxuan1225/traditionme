@@ -53,7 +53,7 @@ const code = ref<string>('');
             <template v-if="!showRecoveryInput">
                 <Form
                     v-bind="store.form()"
-                    class="space-y-4"
+                    class="tm-shell space-y-4 p-5"
                     reset-on-error
                     @error="code = ''"
                     #default="{ errors, processing, clearErrors }"
@@ -81,7 +81,10 @@ const code = ref<string>('');
                         </div>
                         <InputError :message="errors.code" />
                     </div>
-                    <Button type="submit" class="w-full" :disabled="processing"
+                    <Button
+                        type="submit"
+                        class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                        :disabled="processing"
                         >Continue</Button
                     >
                     <div class="text-center text-sm text-muted-foreground">
@@ -100,7 +103,7 @@ const code = ref<string>('');
             <template v-else>
                 <Form
                     v-bind="store.form()"
-                    class="space-y-4"
+                    class="tm-shell space-y-4 p-5"
                     reset-on-error
                     #default="{ errors, processing, clearErrors }"
                 >
@@ -110,9 +113,13 @@ const code = ref<string>('');
                         placeholder="Enter recovery code"
                         :autofocus="showRecoveryInput"
                         required
+                        class="h-11 rounded-xl border-border bg-background"
                     />
                     <InputError :message="errors.recovery_code" />
-                    <Button type="submit" class="w-full" :disabled="processing"
+                    <Button
+                        type="submit"
+                        class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                        :disabled="processing"
                         >Continue</Button
                     >
 

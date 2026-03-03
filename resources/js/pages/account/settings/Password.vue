@@ -18,9 +18,15 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
         <h1 class="sr-only">Password settings</h1>
 
         <SettingsLayout>
-            <div class="rounded-[1.75rem] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-                <div class="mb-6 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-cyan-50 to-teal-100 p-5 dark:border-zinc-700 dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-800">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-white/80 px-3 py-1 text-xs font-bold tracking-[0.14em] text-emerald-700 uppercase dark:border-zinc-600 dark:bg-zinc-900 dark:text-emerald-300">
+            <div
+                class="rounded-[1.75rem] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+            >
+                <div
+                    class="mb-6 rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 via-cyan-50 to-teal-100 p-5 dark:border-zinc-700 dark:from-zinc-800 dark:via-zinc-800 dark:to-zinc-800"
+                >
+                    <div
+                        class="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-white/80 px-3 py-1 text-xs font-bold tracking-[0.14em] text-emerald-700 uppercase dark:border-zinc-600 dark:bg-zinc-900 dark:text-emerald-300"
+                    >
                         <KeyRound class="size-3.5" />
                         Credentials
                     </div>
@@ -47,7 +53,9 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                         v-slot="{ errors, processing, recentlySuccessful }"
                     >
                         <div class="grid gap-2">
-                            <Label for="current_password">Current password</Label>
+                            <Label for="current_password"
+                                >Current password</Label
+                            >
                             <Input
                                 id="current_password"
                                 name="current_password"
@@ -84,7 +92,9 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                                 autocomplete="new-password"
                                 placeholder="Confirm password"
                             />
-                            <InputError :message="errors.password_confirmation" />
+                            <InputError
+                                :message="errors.password_confirmation"
+                            />
                         </div>
 
                         <div class="flex items-center gap-4">
@@ -111,21 +121,47 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
                         </div>
                     </Form>
 
-                    <aside class="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/90">
-                        <p class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400">Security checklist</p>
-                        <div class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
-                            <p class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">
-                                <span class="inline-flex items-center gap-2"><ShieldCheck class="size-3.5" />At least 12 characters</span>
+                    <aside
+                        class="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/90"
+                    >
+                        <p
+                            class="text-xs font-bold tracking-[0.14em] text-zinc-500 uppercase dark:text-zinc-400"
+                        >
+                            Security checklist
+                        </p>
+                        <div
+                            class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300"
+                        >
+                            <p
+                                class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60"
+                            >
+                                <span class="inline-flex items-center gap-2"
+                                    ><ShieldCheck class="size-3.5" />At least 12
+                                    characters</span
+                                >
                             </p>
-                            <p class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">
-                                <span class="inline-flex items-center gap-2"><ShieldCheck class="size-3.5" />Mixed character types</span>
+                            <p
+                                class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60"
+                            >
+                                <span class="inline-flex items-center gap-2"
+                                    ><ShieldCheck class="size-3.5" />Mixed
+                                    character types</span
+                                >
                             </p>
-                            <p class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60">
-                                <span class="inline-flex items-center gap-2"><TriangleAlert class="size-3.5" />Avoid reused passwords</span>
+                            <p
+                                class="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-700/60"
+                            >
+                                <span class="inline-flex items-center gap-2"
+                                    ><TriangleAlert class="size-3.5" />Avoid
+                                    reused passwords</span
+                                >
                             </p>
                         </div>
-                        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300">
-                            Tip: update your password before major sale periods to keep checkout account safe.
+                        <div
+                            class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 dark:border-amber-800/40 dark:bg-amber-900/20 dark:text-amber-300"
+                        >
+                            Tip: update your password before major sale periods
+                            to keep checkout account safe.
                         </div>
                     </aside>
                 </div>

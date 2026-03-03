@@ -1,24 +1,59 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
+import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
 import { home } from '@/routes';
 </script>
 
 <template>
     <Head title="Cart" />
 
-    <main class="min-h-screen bg-zinc-50 px-4 py-10 sm:px-6 lg:px-10">
-        <div class="mx-auto max-w-4xl rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm">
-            <p class="text-xs font-bold tracking-[0.2em] text-amber-700 uppercase">Tradition Me Cart</p>
-            <h1 class="mt-2 text-3xl font-black text-zinc-900">Your Cart</h1>
-            <p class="mt-3 text-zinc-600">
-                Cart route is now live and can be expanded with line items, pricing, and checkout flows.
-            </p>
-            <Link
-                :href="home()"
-                class="mt-8 inline-flex rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800"
-            >
-                Continue Shopping
-            </Link>
-        </div>
-    </main>
+    <StorefrontLayout>
+        <section class="space-y-5">
+            <article class="tm-shell p-6 lg:p-8">
+                <p class="tm-kicker text-primary">Tradition Me Cart</p>
+                <h1
+                    class="tm-display mt-2 text-3xl font-black text-foreground lg:text-4xl"
+                >
+                    Your Cart
+                </h1>
+                <p class="mt-3 max-w-2xl text-muted-foreground">
+                    Cart route is live and ready for line items, quantity
+                    updates, and checkout progression.
+                </p>
+                <div class="mt-6 grid gap-3 sm:grid-cols-3">
+                    <div class="tm-subtle-card p-4">
+                        <p class="tm-kicker text-muted-foreground">Items</p>
+                        <p class="mt-2 text-2xl font-black text-foreground">
+                            0
+                        </p>
+                    </div>
+                    <div class="tm-subtle-card p-4">
+                        <p class="tm-kicker text-muted-foreground">Subtotal</p>
+                        <p class="mt-2 text-2xl font-black text-foreground">
+                            RM 0.00
+                        </p>
+                    </div>
+                    <div class="tm-subtle-card p-4">
+                        <p class="tm-kicker text-muted-foreground">Status</p>
+                        <p class="mt-2 text-2xl font-black text-foreground">
+                            Draft
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="tm-shell p-6">
+                <p class="text-sm text-muted-foreground">
+                    Checkout stages and payment summaries will render here using
+                    existing cart endpoints.
+                </p>
+                <Link
+                    :href="home()"
+                    class="mt-5 inline-flex rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                >
+                    Continue Shopping
+                </Link>
+            </article>
+        </section>
+    </StorefrontLayout>
 </template>

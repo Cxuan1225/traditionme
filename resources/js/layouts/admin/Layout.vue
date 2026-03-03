@@ -74,40 +74,63 @@ const settingsNav: NavEntry[] = [
         icon: Palette,
     },
 ];
-
 </script>
 
 <template>
     <div class="min-h-screen bg-background text-foreground">
         <div class="grid min-h-screen grid-cols-1 lg:grid-cols-[308px_1fr]">
-            <aside class="relative border-r border-border bg-gradient-to-b from-amber-100/60 via-background to-background px-5 py-6 dark:from-amber-950/20">
-                <div class="pointer-events-none absolute -top-16 -left-16 h-48 w-48 rounded-full bg-amber-300/35 blur-3xl dark:bg-amber-500/15" />
-                <div class="pointer-events-none absolute -right-16 bottom-10 h-40 w-40 rounded-full bg-rose-300/25 blur-3xl dark:bg-rose-500/10" />
+            <aside
+                class="relative border-r border-border bg-[linear-gradient(180deg,hsl(39_66%_92%)_0%,hsl(38_46%_97%)_42%,hsl(38_46%_97%)_100%)] px-5 py-6 dark:bg-[linear-gradient(180deg,hsl(25_15%_13%)_0%,hsl(24_16%_10%)_100%)]"
+            >
+                <div
+                    class="pointer-events-none absolute -top-16 -left-16 h-48 w-48 rounded-full bg-amber-300/35 blur-3xl dark:bg-amber-500/15"
+                />
+                <div
+                    class="pointer-events-none absolute -right-16 bottom-10 h-40 w-40 rounded-full bg-rose-300/25 blur-3xl dark:bg-rose-500/10"
+                />
 
-                <Link :href="dashboard()" class="relative mb-6 flex items-center gap-3 rounded-2xl border border-border bg-card/90 px-4 py-3 shadow-sm backdrop-blur">
-                    <span class="inline-flex size-10 items-center justify-center rounded-xl bg-amber-500 text-xs font-black tracking-wide text-amber-950">
+                <Link
+                    :href="dashboard()"
+                    class="relative mb-6 flex items-center gap-3 rounded-2xl border border-border bg-card/95 px-4 py-3 shadow-sm backdrop-blur"
+                >
+                    <span
+                        class="inline-flex size-10 items-center justify-center rounded-xl bg-primary text-xs font-black tracking-wide text-primary-foreground"
+                    >
                         TM
                     </span>
                     <div>
-                        <p class="text-[11px] font-semibold tracking-[0.2em] text-amber-700 uppercase dark:text-amber-300">Operations</p>
-                        <p class="text-base font-black text-foreground">Tradition Me</p>
+                        <p class="tm-kicker text-primary dark:text-amber-300">
+                            Operations
+                        </p>
+                        <p
+                            class="tm-display text-base font-black text-foreground"
+                        >
+                            Tradition Me
+                        </p>
                     </div>
                 </Link>
 
                 <div class="relative space-y-7">
                     <div>
-                        <p class="mb-2 px-2 text-[11px] font-bold tracking-[0.22em] text-muted-foreground uppercase">Management</p>
+                        <p
+                            class="mb-2 px-2 text-[11px] font-bold tracking-[0.22em] text-muted-foreground uppercase"
+                        >
+                            Management
+                        </p>
                         <nav class="space-y-1.5">
                             <Link
                                 v-for="item in primaryNav"
                                 :key="item.title"
                                 :href="item.href"
-                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:border-amber-200 hover:bg-amber-100/70 hover:text-foreground dark:hover:border-amber-900/70 dark:hover:bg-amber-950/30"
+                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:border-primary/35 hover:bg-orange-50 hover:text-foreground dark:hover:border-primary/60 dark:hover:bg-amber-950/30"
                                 :class="{
-                                    'border-amber-300 bg-amber-100 text-amber-900 shadow-sm dark:border-amber-900/70 dark:bg-amber-950/35 dark:text-amber-200': isCurrentOrParentUrl(item.href),
+                                    'border-primary/45 bg-primary/10 text-primary shadow-sm dark:border-primary/70 dark:bg-amber-950/35 dark:text-amber-200':
+                                        isCurrentOrParentUrl(item.href),
                                 }"
                             >
-                                <span class="inline-flex size-7 items-center justify-center rounded-lg bg-background/80 ring-1 ring-border group-hover:ring-amber-300 dark:bg-zinc-900/40 dark:group-hover:ring-amber-800">
+                                <span
+                                    class="inline-flex size-7 items-center justify-center rounded-lg bg-background/80 ring-1 ring-border group-hover:ring-primary/45 dark:bg-zinc-900/40 dark:group-hover:ring-primary/70"
+                                >
                                     <component :is="item.icon" class="size-4" />
                                 </span>
                                 {{ item.title }}
@@ -116,18 +139,25 @@ const settingsNav: NavEntry[] = [
                     </div>
 
                     <div>
-                        <p class="mb-2 px-2 text-[11px] font-bold tracking-[0.22em] text-muted-foreground uppercase">Account</p>
+                        <p
+                            class="mb-2 px-2 text-[11px] font-bold tracking-[0.22em] text-muted-foreground uppercase"
+                        >
+                            Account
+                        </p>
                         <nav class="space-y-1.5">
                             <Link
                                 v-for="item in settingsNav"
                                 :key="item.title"
                                 :href="item.href"
-                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:border-amber-200 hover:bg-amber-100/70 hover:text-foreground dark:hover:border-amber-900/70 dark:hover:bg-amber-950/30"
+                                class="group flex items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:border-primary/35 hover:bg-orange-50 hover:text-foreground dark:hover:border-primary/60 dark:hover:bg-amber-950/30"
                                 :class="{
-                                    'border-amber-300 bg-amber-100 text-amber-900 shadow-sm dark:border-amber-900/70 dark:bg-amber-950/35 dark:text-amber-200': isCurrentOrParentUrl(item.href),
+                                    'border-primary/45 bg-primary/10 text-primary shadow-sm dark:border-primary/70 dark:bg-amber-950/35 dark:text-amber-200':
+                                        isCurrentOrParentUrl(item.href),
                                 }"
                             >
-                                <span class="inline-flex size-7 items-center justify-center rounded-lg bg-background/80 ring-1 ring-border group-hover:ring-amber-300 dark:bg-zinc-900/40 dark:group-hover:ring-amber-800">
+                                <span
+                                    class="inline-flex size-7 items-center justify-center rounded-lg bg-background/80 ring-1 ring-border group-hover:ring-primary/45 dark:bg-zinc-900/40 dark:group-hover:ring-primary/70"
+                                >
                                     <component :is="item.icon" class="size-4" />
                                 </span>
                                 {{ item.title }}
@@ -136,8 +166,13 @@ const settingsNav: NavEntry[] = [
                     </div>
                 </div>
 
-                <div class="relative mt-8 space-y-2 border-t border-border pt-4">
-                    <Link :href="home()" class="inline-flex w-full items-center justify-center rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-accent hover:text-foreground">
+                <div
+                    class="relative mt-8 space-y-2 border-t border-border pt-4"
+                >
+                    <Link
+                        :href="home()"
+                        class="inline-flex w-full items-center justify-center rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground/80 transition hover:bg-accent hover:text-foreground"
+                    >
                         Go to Storefront
                     </Link>
                     <Link
@@ -152,10 +187,18 @@ const settingsNav: NavEntry[] = [
             </aside>
 
             <div class="relative bg-background">
-                <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.08),transparent_45%)] dark:bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_40%)]" />
-                <header class="relative border-b border-border bg-background/90 px-5 py-4 backdrop-blur lg:px-8">
-                    <p class="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase">Administration</p>
-                    <h1 class="text-xl font-black text-foreground">Control Center</h1>
+                <div
+                    class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(251,146,60,0.16),transparent_45%)] dark:bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.12),transparent_40%)]"
+                />
+                <header
+                    class="relative border-b border-border bg-background/90 px-5 py-4 backdrop-blur lg:px-8"
+                >
+                    <p class="tm-kicker text-muted-foreground">
+                        Administration
+                    </p>
+                    <h1 class="tm-display text-xl font-black text-foreground">
+                        Control Center
+                    </h1>
                 </header>
                 <main class="relative px-4 py-5 lg:px-8">
                     <slot />

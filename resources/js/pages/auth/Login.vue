@@ -22,7 +22,7 @@ defineProps<{
 
 const showPassword = ref<boolean>(false);
 const fieldClass =
-    'h-11 border-zinc-400 bg-white pr-16 pl-10 font-medium text-zinc-900 placeholder:text-zinc-600 focus-visible:ring-amber-500 dark:border-zinc-400 dark:bg-white dark:text-zinc-900 dark:placeholder:text-zinc-600';
+    'h-11 border-border bg-background pr-16 pl-10 font-medium text-foreground placeholder:text-muted-foreground focus-visible:ring-primary';
 </script>
 
 <template>
@@ -45,22 +45,34 @@ const fieldClass =
             v-slot="{ errors, processing }"
             class="space-y-5"
         >
-            <section class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-200 dark:bg-white">
+            <section class="tm-shell p-5">
                 <div class="mb-5 flex items-center gap-3">
-                    <span class="inline-flex size-10 items-center justify-center rounded-xl bg-zinc-900 text-zinc-100">
+                    <span
+                        class="inline-flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground"
+                    >
                         <ShieldCheck class="size-5" />
                     </span>
                     <div>
-                        <h2 class="text-lg font-black text-zinc-900 dark:text-zinc-900">Secure Sign In</h2>
-                        <p class="text-xs font-medium text-zinc-700 dark:text-zinc-700">Protected account access for Tradition Me members.</p>
+                        <h2
+                            class="tm-display text-lg font-black text-foreground"
+                        >
+                            Secure Sign In
+                        </h2>
+                        <p class="text-xs font-medium text-muted-foreground">
+                            Protected account access for Tradition Me members.
+                        </p>
                     </div>
                 </div>
 
                 <div class="space-y-4">
                     <div class="space-y-2">
-                        <Label for="email" class="font-semibold text-zinc-800 dark:text-zinc-800">Email address</Label>
+                        <Label for="email" class="font-semibold text-foreground"
+                            >Email address</Label
+                        >
                         <div class="relative">
-                            <Mail class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
+                            <Mail
+                                class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                            />
                             <Input
                                 id="email"
                                 type="email"
@@ -78,18 +90,24 @@ const fieldClass =
 
                     <div class="space-y-2">
                         <div class="flex items-center justify-between">
-                            <Label for="password" class="font-semibold text-zinc-800 dark:text-zinc-800">Password</Label>
+                            <Label
+                                for="password"
+                                class="font-semibold text-foreground"
+                                >Password</Label
+                            >
                             <TextLink
                                 v-if="canResetPassword"
                                 :href="request()"
-                                class="!text-amber-800 text-sm font-bold hover:!text-amber-700 dark:!text-amber-800 dark:hover:!text-amber-700"
+                                class="text-sm font-bold !text-primary hover:!text-primary/80"
                                 :tabindex="5"
                             >
                                 Forgot password?
                             </TextLink>
                         </div>
                         <div class="relative">
-                            <Lock class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-700 dark:text-zinc-700" />
+                            <Lock
+                                class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                            />
                             <Input
                                 id="password"
                                 :type="showPassword ? 'text' : 'password'"
@@ -102,7 +120,7 @@ const fieldClass =
                             />
                             <button
                                 type="button"
-                                class="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-700 hover:text-zinc-900 dark:text-zinc-700 dark:hover:text-zinc-900"
+                                class="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                 @click="showPassword = !showPassword"
                             >
                                 <EyeOff v-if="showPassword" class="size-4" />
@@ -112,7 +130,10 @@ const fieldClass =
                         <InputError :message="errors.password" />
                     </div>
 
-                    <Label for="remember" class="flex items-center space-x-3 text-sm font-medium text-zinc-800 dark:text-zinc-800">
+                    <Label
+                        for="remember"
+                        class="flex items-center space-x-3 text-sm font-medium text-foreground"
+                    >
                         <Checkbox id="remember" name="remember" :tabindex="3" />
                         <span>Remember me on this device</span>
                     </Label>
@@ -121,7 +142,7 @@ const fieldClass =
 
             <Button
                 type="submit"
-                class="h-11 w-full rounded-xl bg-zinc-900 text-zinc-100 hover:bg-zinc-800"
+                class="h-11 w-full rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
                 :tabindex="4"
                 :disabled="processing"
                 data-test="login-button"
@@ -130,9 +151,17 @@ const fieldClass =
                 Log in
             </Button>
 
-            <div v-if="canRegister" class="rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-center text-sm font-medium text-zinc-900 dark:border-zinc-300 dark:bg-zinc-100 dark:text-zinc-900">
+            <div
+                v-if="canRegister"
+                class="rounded-xl border border-border bg-secondary/60 px-4 py-3 text-center text-sm font-medium text-foreground"
+            >
                 New here?
-                <TextLink :href="register()" :tabindex="5" class="!text-amber-800 font-bold hover:!text-amber-700 dark:!text-amber-800 dark:hover:!text-amber-700">Create your account</TextLink>
+                <TextLink
+                    :href="register()"
+                    :tabindex="5"
+                    class="font-bold !text-primary hover:!text-primary/80"
+                    >Create your account</TextLink
+                >
             </div>
         </Form>
     </AuthBase>
