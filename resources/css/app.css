@@ -458,6 +458,20 @@
         @apply py-4;
     }
 
+    .tm-table-product {
+        @apply min-w-[980px];
+    }
+
+    .tm-table-product .tm-th:nth-child(2),
+    .tm-table-product .tm-td:nth-child(2) {
+        @apply w-[34%];
+    }
+
+    .tm-table-product .tm-th:last-child,
+    .tm-table-product .tm-td:last-child {
+        @apply w-[28%];
+    }
+
     .tm-table-checkbox {
         @apply border-border bg-background h-4 w-4 rounded border;
     }
