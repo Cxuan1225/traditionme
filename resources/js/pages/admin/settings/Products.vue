@@ -405,6 +405,8 @@ onMounted(async () => {
             <section class="tm-admin-toolbar">
                 <div
                     class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                    role="region"
+                    aria-label="Catalog actions toolbar"
                 >
                     <div>
                         <p class="text-foreground text-sm font-semibold">
@@ -447,7 +449,9 @@ onMounted(async () => {
                     <CardContent class="space-y-3">
                         <div
                             v-if="loading"
-                            class="text-muted-foreground flex items-center gap-2 text-sm"
+                            class="tm-state-note tm-state-note-warning flex items-center gap-2"
+                            role="status"
+                            aria-live="polite"
                         >
                             <Spinner />
                             Loading products...
@@ -478,11 +482,22 @@ onMounted(async () => {
                             <table class="tm-table">
                                 <thead>
                                     <tr>
-                                        <th class="tm-th">Product</th>
-                                        <th class="tm-th">Category</th>
-                                        <th class="tm-th">Price (sen)</th>
-                                        <th class="tm-th">Status</th>
-                                        <th class="tm-th text-right">
+                                        <th scope="col" class="tm-th">
+                                            Product
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Category
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Price (sen)
+                                        </th>
+                                        <th scope="col" class="tm-th">
+                                            Status
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="tm-th text-right"
+                                        >
                                             Actions
                                         </th>
                                     </tr>
@@ -531,6 +546,7 @@ onMounted(async () => {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
+                                                    :aria-label="`Edit ${product.name}`"
                                                     :disabled="
                                                         !abilities.canUpdateProducts
                                                     "
@@ -541,6 +557,7 @@ onMounted(async () => {
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"
+                                                    :aria-label="`Delete ${product.name}`"
                                                     :disabled="
                                                         !abilities.canDeleteProducts ||
                                                         deleting === product.id

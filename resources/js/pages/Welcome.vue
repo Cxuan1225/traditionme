@@ -388,6 +388,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         <button
                             type="button"
                             @click="addToCart(product.slug)"
+                            :aria-label="`Add ${product.name} to cart`"
                             class="mt-4 w-full rounded-full border border-zinc-900 bg-zinc-900 px-4 py-2 text-sm font-bold uppercase tracking-wide text-white transition hover:-translate-y-0.5 hover:bg-zinc-700"
                         >
                             Add to Cart
@@ -632,7 +633,8 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     </Form>
                     <p
                         v-if="flashStatus"
-                        class="mt-3 text-sm font-semibold text-emerald-700"
+                        class="tm-state-note tm-state-note-success mt-3"
+                        aria-live="polite"
                     >
                         {{ flashStatus }}
                     </p>

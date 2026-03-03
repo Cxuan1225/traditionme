@@ -125,6 +125,8 @@
     --sidebar-border: hsl(29 12% 28%);
     --sidebar-ring: hsl(40 87% 65%);
     --sidebar: hsl(30 24% 13%);
+    --focus-ring-strong: hsl(10 70% 34%);
+    --focus-ring-soft: hsl(10 70% 34% / 0.2);
 }
 
 .dark {
@@ -161,6 +163,8 @@
     --sidebar-border: hsl(28 14% 28%);
     --sidebar-ring: hsl(40 86% 65%);
     --sidebar: hsl(22 23% 8%);
+    --focus-ring-strong: hsl(40 86% 65%);
+    --focus-ring-soft: hsl(40 86% 65% / 0.25);
 }
 
 @layer base {
@@ -335,12 +339,22 @@
         @apply border-border/85 bg-card/95 sticky top-4 z-20 rounded-2xl border p-3 shadow-sm backdrop-blur;
     }
 
+    .tm-admin-toolbar:focus-within {
+        border-color: var(--focus-ring-strong);
+        box-shadow: 0 0 0 3px var(--focus-ring-soft);
+    }
+
     .tm-empty-state {
         @apply text-muted-foreground border-border rounded-xl border border-dashed p-4 text-center text-sm;
     }
 
     .tm-sticky-actions {
         @apply border-border bg-card/96 sticky bottom-0 z-10 flex flex-wrap items-center gap-2 border-t px-6 py-4 backdrop-blur;
+    }
+
+    .tm-sticky-actions:focus-within {
+        border-top-color: var(--focus-ring-strong);
+        box-shadow: 0 -2px 0 0 var(--focus-ring-soft);
     }
 
     .tm-table-wrap {
@@ -365,6 +379,26 @@
 
     .tm-tr:hover .tm-td {
         @apply bg-secondary/35;
+    }
+
+    .tm-tr:focus-within .tm-td {
+        @apply bg-primary/10;
+    }
+
+    .tm-state-note {
+        @apply rounded-xl border px-3 py-2 text-sm;
+    }
+
+    .tm-state-note-success {
+        @apply border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700/60 dark:bg-emerald-900/20 dark:text-emerald-300;
+    }
+
+    .tm-state-note-warning {
+        @apply border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-700/60 dark:bg-amber-900/20 dark:text-amber-300;
+    }
+
+    .tm-state-note-danger {
+        @apply border-red-300 bg-red-50 text-red-800 dark:border-red-700/60 dark:bg-red-900/20 dark:text-red-300;
     }
 
     .tm-shell {
@@ -481,6 +515,20 @@
 }
 
 @layer base {
+    :where(
+        a,
+        button,
+        input,
+        select,
+        textarea,
+        [role='button'],
+        [tabindex]:not([tabindex='-1'])
+    ):focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--focus-ring-soft);
+        border-color: var(--focus-ring-strong) !important;
+    }
+
     a,
     button {
         transition:
@@ -489,6 +537,15 @@
             border-color 180ms ease,
             transform 180ms ease,
             box-shadow 220ms ease;
+    }
+
+    input,
+    select,
+    textarea {
+        transition:
+            border-color 160ms ease,
+            box-shadow 180ms ease,
+            background-color 180ms ease;
     }
 
     button:active,
@@ -505,11 +562,22 @@
         animation: none !important;
     }
 
+    [data-aos],
+    [data-aos] * {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
+
     a,
     button,
     .tm-subtle-card {
         transition: none !important;
         transform: none !important;
+    }
+
+    html:focus-within {
+        scroll-behavior: auto;
     }
 }
 

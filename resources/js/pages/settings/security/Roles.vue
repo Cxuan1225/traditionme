@@ -447,6 +447,8 @@ onMounted(async () => {
             <section class="tm-admin-toolbar">
                 <div
                     class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                    role="region"
+                    aria-label="Role actions toolbar"
                 >
                     <div>
                         <p class="text-foreground text-sm font-semibold">
@@ -486,7 +488,9 @@ onMounted(async () => {
                     <CardContent class="space-y-3">
                         <div
                             v-if="loading"
-                            class="flex items-center gap-2 text-sm"
+                            class="tm-state-note tm-state-note-warning flex items-center gap-2"
+                            role="status"
+                            aria-live="polite"
                         >
                             <Spinner />
                             Loading roles...
@@ -517,10 +521,15 @@ onMounted(async () => {
                             <table class="tm-table">
                                 <thead>
                                     <tr>
-                                        <th class="tm-th">Role</th>
-                                        <th class="tm-th">Guard</th>
-                                        <th class="tm-th">Permissions</th>
-                                        <th class="tm-th text-right">
+                                        <th scope="col" class="tm-th">Role</th>
+                                        <th scope="col" class="tm-th">Guard</th>
+                                        <th scope="col" class="tm-th">
+                                            Permissions
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="tm-th text-right"
+                                        >
                                             Actions
                                         </th>
                                     </tr>
@@ -530,6 +539,13 @@ onMounted(async () => {
                                         v-for="role in visibleRoles"
                                         :key="role.id"
                                         class="tm-tr"
+                                        :class="{
+                                            'bg-primary/5':
+                                                selectedRoleId === role.id,
+                                        }"
+                                        :aria-selected="
+                                            selectedRoleId === role.id
+                                        "
                                     >
                                         <td class="tm-td">
                                             <p class="font-medium">
@@ -548,6 +564,7 @@ onMounted(async () => {
                                         <td class="tm-td text-right">
                                             <Button
                                                 size="sm"
+                                                :aria-label="`Select ${role.name} role`"
                                                 :variant="
                                                     selectedRoleId === role.id
                                                         ? 'default'

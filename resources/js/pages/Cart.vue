@@ -52,6 +52,7 @@ const cartLines = ref<CartLine[]>([
 const couponInput = ref<string>('');
 const couponMessage = ref<string>('');
 const appliedCoupon = ref<string | null>(null);
+const couponState = ref<'warning' | 'success' | 'danger'>('warning');
 
 const itemCount = computed<number>(() =>
     cartLines.value.reduce((sum, line) => sum + line.quantity, 0),
@@ -109,16 +110,19 @@ const applyCoupon = (): void => {
     if (code === '') {
         couponMessage.value = 'Enter a promo code first.';
         appliedCoupon.value = null;
+        couponState.value = 'warning';
         return;
     }
     if (code === 'HERITAGE10') {
         appliedCoupon.value = code;
         couponMessage.value = 'Promo applied: 10% off selected cart value.';
+        couponState.value = 'success';
         return;
     }
 
     appliedCoupon.value = null;
     couponMessage.value = 'Promo code not recognized.';
+    couponState.value = 'danger';
 };
 </script>
 
@@ -166,6 +170,7 @@ const applyCoupon = (): void => {
                     <article
                         v-if="cartLines.length === 0"
                         class="tm-section text-center"
+                        aria-live="polite"
                     >
                         <h2 class="tm-title">Your cart is empty</h2>
                         <p class="tm-body mt-2">
@@ -213,6 +218,7 @@ const applyCoupon = (): void => {
                                         <button
                                             type="button"
                                             class="rounded-full px-2 py-1 text-sm font-bold"
+                                            :aria-label="`Decrease quantity for ${line.name}`"
                                             @click="decreaseQty(line.id)"
                                         >
                                             -
@@ -225,6 +231,7 @@ const applyCoupon = (): void => {
                                         <button
                                             type="button"
                                             class="rounded-full px-2 py-1 text-sm font-bold"
+                                            :aria-label="`Increase quantity for ${line.name}`"
                                             @click="increaseQty(line.id)"
                                         >
                                             +
@@ -233,6 +240,7 @@ const applyCoupon = (): void => {
                                     <button
                                         type="button"
                                         class="text-xs font-semibold text-red-600 transition hover:text-red-500"
+                                        :aria-label="`Remove ${line.name} from cart`"
                                         @click="removeLine(line.id)"
                                     >
                                         Remove
@@ -257,7 +265,19 @@ const applyCoupon = (): void => {
                                 >Apply</Button
                             >
                         </div>
-                        <p v-if="couponMessage" class="tm-body-sm mt-2">
+                        <p
+                            v-if="couponMessage"
+                            class="tm-state-note mt-2"
+                            :class="{
+                                'tm-state-note-warning':
+                                    couponState === 'warning',
+                                'tm-state-note-success':
+                                    couponState === 'success',
+                                'tm-state-note-danger':
+                                    couponState === 'danger',
+                            }"
+                            aria-live="polite"
+                        >
                             {{ couponMessage }}
                         </p>
                     </article>

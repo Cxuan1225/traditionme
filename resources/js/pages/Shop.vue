@@ -304,6 +304,7 @@ onBeforeUnmount(() => {
                                         'tm-filter-pill-active':
                                             selectedCategory === option,
                                     }"
+                                    :aria-pressed="selectedCategory === option"
                                     @click="selectedCategory = option"
                                 >
                                     {{
@@ -327,6 +328,7 @@ onBeforeUnmount(() => {
                                         'tm-filter-pill-active':
                                             selectedOccasion === option,
                                     }"
+                                    :aria-pressed="selectedOccasion === option"
                                     @click="selectedOccasion = option"
                                 >
                                     {{
@@ -375,6 +377,7 @@ onBeforeUnmount(() => {
                         variant="outline"
                         size="sm"
                         class="mt-5 w-full"
+                        aria-label="Reset all filters"
                         @click="clearFilters"
                     >
                         Reset filters
@@ -386,7 +389,7 @@ onBeforeUnmount(() => {
                         <div
                             class="flex flex-wrap items-center justify-between gap-3"
                         >
-                            <div>
+                            <div aria-live="polite">
                                 <p class="tm-subtitle">Product discovery</p>
                                 <p class="tm-body-sm mt-1">
                                     {{ sortedProducts.length }} item(s) matched
@@ -427,6 +430,8 @@ onBeforeUnmount(() => {
                     <div
                         v-if="loadingPreview"
                         class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                        role="status"
+                        aria-live="polite"
                     >
                         <article
                             v-for="index in 6"
@@ -448,11 +453,13 @@ onBeforeUnmount(() => {
                                 />
                             </div>
                         </article>
+                        <span class="sr-only">Loading catalog results</span>
                     </div>
 
                     <article
                         v-else-if="sortedProducts.length === 0"
                         class="tm-section text-center"
+                        aria-live="polite"
                     >
                         <Sparkles class="text-primary mx-auto size-9" />
                         <h2 class="tm-title mt-3">No products found</h2>
@@ -518,7 +525,10 @@ onBeforeUnmount(() => {
                             <p class="tm-body-sm mt-1">
                                 {{ stockLabelMap[product.stock] }}
                             </p>
-                            <Button class="mt-4 w-full">
+                            <Button
+                                class="mt-4 w-full"
+                                :aria-label="`Add ${product.name} to cart`"
+                            >
                                 {{
                                     product.stock === 'preorder'
                                         ? 'Pre-order now'
