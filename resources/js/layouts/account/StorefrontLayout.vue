@@ -110,11 +110,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             <DropdownMenuContent align="end" class="w-52">
                                 <div class="px-2 py-1">
                                     <p
-                                        class="truncate text-sm font-semibold text-zinc-900"
+                                        class="truncate text-sm font-semibold text-foreground"
                                     >
                                         {{ user?.name }}
                                     </p>
-                                    <p class="truncate text-xs text-zinc-500">
+                                    <p
+                                        class="truncate text-xs text-muted-foreground"
+                                    >
                                         {{ user?.email }}
                                     </p>
                                 </div>

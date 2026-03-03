@@ -65,7 +65,11 @@ const footerNavItems: NavItem[] = [
 </script>
 
 <template>
-    <Sidebar collapsible="icon" variant="inset">
+    <Sidebar
+        collapsible="icon"
+        variant="inset"
+        class="bg-[linear-gradient(180deg,hsl(36_20%_16%)_0%,hsl(28_18%_12%)_100%)] dark:bg-[linear-gradient(180deg,hsl(24_24%_10%)_0%,hsl(22_22%_8%)_100%)]"
+    >
         <SidebarHeader>
             <SidebarMenu>
                 <SidebarMenuItem>

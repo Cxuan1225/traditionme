@@ -163,11 +163,13 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             <DropdownMenuContent align="end" class="w-52">
                                 <div class="px-2 py-1">
                                     <p
-                                        class="truncate text-sm font-semibold text-zinc-900"
+                                        class="truncate text-sm font-semibold text-foreground"
                                     >
                                         {{ user?.name }}
                                     </p>
-                                    <p class="truncate text-xs text-zinc-500">
+                                    <p
+                                        class="truncate text-xs text-muted-foreground"
+                                    >
                                         {{ user?.email }}
                                     </p>
                                 </div>
@@ -247,7 +249,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
         >
             <section class="tm-stagger grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
                 <article
-                    class="tm-shell overflow-hidden bg-[linear-gradient(140deg,hsl(37_67%_94%)_0%,hsl(30_66%_92%)_45%,hsl(5_63%_91%)_100%)] p-6 lg:p-10"
+                    class="tm-shell overflow-hidden bg-[linear-gradient(140deg,hsl(37_67%_94%)_0%,hsl(30_66%_92%)_45%,hsl(5_63%_91%)_100%)] p-6 lg:p-10 dark:bg-[linear-gradient(140deg,hsl(26_22%_15%)_0%,hsl(22_20%_13%)_45%,hsl(12_28%_16%)_100%)]"
                     data-aos="fade-up"
                 >
                     <p class="tm-kicker text-primary">Mega Raya Sale 2026</p>
@@ -401,9 +403,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 data-aos="fade-up"
                 data-aos-delay="120"
             >
-                <article
-                    class="rounded-2xl border border-zinc-200 bg-white p-5"
-                >
+                <article class="tm-night-panel p-5">
                     <p class="text-sm font-bold text-zinc-900">
                         Trusted by 10,000+ shoppers
                     </p>
@@ -411,9 +411,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         Verified reviews from families across Malaysia.
                     </p>
                 </article>
-                <article
-                    class="rounded-2xl border border-zinc-200 bg-white p-5"
-                >
+                <article class="tm-night-panel p-5">
                     <p class="text-sm font-bold text-zinc-900">
                         Secure payment options
                     </p>
@@ -421,9 +419,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                         FPX, cards, and e-wallets supported.
                     </p>
                 </article>
-                <article
-                    class="rounded-2xl border border-zinc-200 bg-white p-5"
-                >
+                <article class="tm-night-panel p-5">
                     <p class="text-sm font-bold text-zinc-900">
                         Easy size exchange
                     </p>
@@ -446,7 +442,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                     <article
                         v-for="occasion in occasions"
                         :key="occasion.name"
-                        class="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                        class="tm-night-panel p-5 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                     >
                         <span
                             class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold tracking-wide text-amber-800 uppercase"
@@ -475,7 +471,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 data-aos-delay="200"
             >
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg lg:p-8"
+                    class="tm-night-panel p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg lg:p-8"
                 >
                     <h2 class="text-2xl font-black text-zinc-900">
                         Customer Reviews
@@ -552,7 +548,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 data-aos-delay="240"
             >
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    class="tm-night-panel p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
                     <h2 class="text-2xl font-black text-zinc-900">
                         Frequently Asked Questions
@@ -589,7 +585,7 @@ const isAuthenticated = computed(() => Boolean(user.value));
                 </article>
 
                 <article
-                    class="rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-orange-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    class="rounded-3xl border border-zinc-200 bg-gradient-to-br from-amber-50 to-orange-100 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-border dark:from-zinc-900 dark:to-zinc-800"
                 >
                     <p
                         class="text-xs font-bold tracking-[0.2em] text-red-700 uppercase"
