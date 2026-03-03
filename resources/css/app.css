@@ -398,6 +398,35 @@
         @apply border-border bg-card/95 shadow-[0_26px_56px_-44px_rgba(0,0,0,0.9)];
     }
 
+    .tm-product-card {
+        @apply tm-card relative overflow-hidden p-4;
+    }
+
+    .tm-product-media {
+        @apply border-border/70 relative h-40 rounded-2xl border bg-gradient-to-br;
+    }
+
+    .tm-filter-pill {
+        @apply border-border bg-background text-foreground/80 inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold tracking-wide transition;
+    }
+
+    .tm-filter-pill:hover {
+        @apply border-primary/45 text-foreground;
+        transform: translateY(-1px);
+    }
+
+    .tm-filter-pill-active {
+        @apply border-primary/50 bg-primary/10 text-primary;
+    }
+
+    .tm-summary-row {
+        @apply text-foreground flex items-center justify-between text-sm;
+    }
+
+    .tm-qty-control {
+        @apply border-border bg-background inline-flex items-center rounded-full border p-1;
+    }
+
     .tm-fade-up {
         animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
     }
