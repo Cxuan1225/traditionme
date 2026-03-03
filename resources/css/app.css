@@ -319,12 +319,28 @@
         @apply grid gap-2;
     }
 
+    .tm-form-hint {
+        @apply text-muted-foreground text-xs leading-relaxed;
+    }
+
     .tm-label {
         @apply text-foreground text-sm font-semibold;
     }
 
     .tm-input-surface {
         @apply border-border bg-card h-11 rounded-xl;
+    }
+
+    .tm-admin-toolbar {
+        @apply border-border/85 bg-card/95 sticky top-4 z-20 rounded-2xl border p-3 shadow-sm backdrop-blur;
+    }
+
+    .tm-empty-state {
+        @apply text-muted-foreground border-border rounded-xl border border-dashed p-4 text-center text-sm;
+    }
+
+    .tm-sticky-actions {
+        @apply border-border bg-card/96 sticky bottom-0 z-10 flex flex-wrap items-center gap-2 border-t px-6 py-4 backdrop-blur;
     }
 
     .tm-table-wrap {

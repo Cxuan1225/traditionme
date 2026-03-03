@@ -60,6 +60,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
 const loading = ref<boolean>(false);
 const submitting = ref<boolean>(false);
 const deleting = ref<number | null>(null);
+const searchQuery = ref<string>('');
 const pageError = ref<string | null>(null);
 const pageSuccess = ref<string | null>(null);
 const products = ref<ProductResource[]>(props.initialProducts);
@@ -91,6 +92,20 @@ const abilities = computed<Required<Capabilities>>(() => ({
     canUpdateProducts: props.capabilities.canUpdateProducts ?? true,
     canDeleteProducts: props.capabilities.canDeleteProducts ?? true,
 }));
+
+const visibleProducts = computed<ProductResource[]>(() => {
+    const query = searchQuery.value.trim().toLowerCase();
+    if (query === '') {
+        return products.value;
+    }
+
+    return products.value.filter((product) =>
+        [product.name, product.slug, product.category]
+            .join(' ')
+            .toLowerCase()
+            .includes(query),
+    );
+});
 
 const readCookie = (name: string): string | null => {
     const encodedName = `${encodeURIComponent(name)}=`;
@@ -357,6 +372,39 @@ onMounted(async () => {
                 <AlertDescription>{{ pageSuccess }}</AlertDescription>
             </Alert>
 
+            <section class="tm-admin-toolbar">
+                <div
+                    class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                >
+                    <div>
+                        <p class="text-foreground text-sm font-semibold">
+                            Catalog actions
+                        </p>
+                        <p class="text-muted-foreground text-xs">
+                            Search and maintain product records faster.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <Input
+                            v-model="searchQuery"
+                            class="tm-input-surface w-full min-w-52 lg:w-64"
+                            placeholder="Search name, slug, category..."
+                        />
+                        <Button
+                            variant="outline"
+                            :disabled="loading || !abilities.canViewProducts"
+                            @click="loadProducts"
+                        >
+                            <Spinner v-if="loading" />
+                            Refresh
+                        </Button>
+                        <Button variant="outline" @click="resetForm">
+                            New product
+                        </Button>
+                    </div>
+                </div>
+            </section>
+
             <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
                 <Card class="tm-panel h-full">
                     <CardHeader>
@@ -383,9 +431,16 @@ onMounted(async () => {
 
                         <p
                             v-else-if="products.length === 0"
-                            class="text-muted-foreground text-sm"
+                            class="tm-empty-state"
                         >
                             No products available yet.
+                        </p>
+
+                        <p
+                            v-else-if="visibleProducts.length === 0"
+                            class="tm-empty-state"
+                        >
+                            No products match your search.
                         </p>
 
                         <div v-else class="tm-table-wrap">
@@ -403,7 +458,7 @@ onMounted(async () => {
                                 </thead>
                                 <tbody>
                                     <tr
-                                        v-for="product in products"
+                                        v-for="product in visibleProducts"
                                         :key="product.id"
                                         class="tm-tr"
                                     >
@@ -438,7 +493,7 @@ onMounted(async () => {
                                                 }}
                                             </Badge>
                                         </td>
-                                        <td class="tm-td">
+                                        <td class="tm-td text-right">
                                             <div class="flex justify-end gap-2">
                                                 <Button
                                                     variant="outline"
@@ -478,7 +533,7 @@ onMounted(async () => {
                             </table>
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter class="tm-sticky-actions">
                         <Button
                             variant="outline"
                             :disabled="loading || !abilities.canViewProducts"
@@ -499,80 +554,128 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
-                        <div class="tm-form-field">
-                            <Label for="name" class="tm-label">Name</Label>
-                            <Input id="name" v-model="form.name" />
-                        </div>
+                        <section class="tm-card p-4">
+                            <p class="tm-subtitle">Identity</p>
+                            <p class="tm-form-hint">
+                                Product naming and grouping details used in
+                                listing and search.
+                            </p>
+                            <div class="mt-3 space-y-3">
+                                <div class="tm-form-field">
+                                    <Label for="name" class="tm-label"
+                                        >Name</Label
+                                    >
+                                    <Input
+                                        id="name"
+                                        v-model="form.name"
+                                        class="tm-input-surface"
+                                    />
+                                </div>
 
-                        <div class="tm-form-field">
-                            <Label for="slug" class="tm-label">Slug</Label>
-                            <Input
-                                id="slug"
-                                v-model="form.slug"
-                                placeholder="songket-luxe-kurung-set"
-                            />
-                        </div>
+                                <div class="tm-form-field">
+                                    <Label for="slug" class="tm-label"
+                                        >Slug</Label
+                                    >
+                                    <Input
+                                        id="slug"
+                                        v-model="form.slug"
+                                        class="tm-input-surface"
+                                        placeholder="songket-luxe-kurung-set"
+                                    />
+                                </div>
 
-                        <div class="tm-form-field">
-                            <Label for="category" class="tm-label"
-                                >Category</Label
-                            >
-                            <Input id="category" v-model="form.category" />
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="tm-form-field">
-                                <Label for="price" class="tm-label"
-                                    >Price (sen)</Label
-                                >
-                                <Input
-                                    id="price"
-                                    v-model="form.price_in_sen"
-                                    inputmode="numeric"
-                                />
+                                <div class="tm-form-field">
+                                    <Label for="category" class="tm-label"
+                                        >Category</Label
+                                    >
+                                    <Input
+                                        id="category"
+                                        v-model="form.category"
+                                        class="tm-input-surface"
+                                    />
+                                </div>
                             </div>
-                            <div class="tm-form-field">
-                                <Label for="original-price" class="tm-label"
-                                    >Original price (sen)</Label
-                                >
-                                <Input
-                                    id="original-price"
-                                    v-model="form.original_price_in_sen"
-                                    inputmode="numeric"
-                                />
+                        </section>
+
+                        <section class="tm-card p-4">
+                            <p class="tm-subtitle">Commercial details</p>
+                            <p class="tm-form-hint">
+                                Keep price values in sen and optional
+                                merchandising badge info.
+                            </p>
+                            <div class="mt-3 space-y-3">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="tm-form-field">
+                                        <Label for="price" class="tm-label"
+                                            >Price (sen)</Label
+                                        >
+                                        <Input
+                                            id="price"
+                                            v-model="form.price_in_sen"
+                                            class="tm-input-surface"
+                                            inputmode="numeric"
+                                        />
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <Label
+                                            for="original-price"
+                                            class="tm-label"
+                                            >Original price (sen)</Label
+                                        >
+                                        <Input
+                                            id="original-price"
+                                            v-model="form.original_price_in_sen"
+                                            class="tm-input-surface"
+                                            inputmode="numeric"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="tm-form-field">
+                                    <Label for="badge" class="tm-label"
+                                        >Badge</Label
+                                    >
+                                    <Input
+                                        id="badge"
+                                        v-model="form.badge"
+                                        class="tm-input-surface"
+                                        placeholder="Best Seller"
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        </section>
 
-                        <div class="tm-form-field">
-                            <Label for="badge" class="tm-label">Badge</Label>
-                            <Input
-                                id="badge"
-                                v-model="form.badge"
-                                placeholder="Best Seller"
-                            />
-                        </div>
+                        <section class="tm-card p-4">
+                            <p class="tm-subtitle">Publish settings</p>
+                            <p class="tm-form-hint">
+                                Use gradient classes for storefront card media
+                                styling.
+                            </p>
+                            <div class="mt-3 space-y-3">
+                                <div class="tm-form-field">
+                                    <Label for="gradient" class="tm-label"
+                                        >Gradient classes</Label
+                                    >
+                                    <Input
+                                        id="gradient"
+                                        v-model="form.gradient"
+                                        class="tm-input-surface"
+                                        placeholder="from-rose-100 via-orange-50 to-amber-100"
+                                    />
+                                </div>
 
-                        <div class="tm-form-field">
-                            <Label for="gradient" class="tm-label"
-                                >Gradient classes</Label
-                            >
-                            <Input
-                                id="gradient"
-                                v-model="form.gradient"
-                                placeholder="from-rose-100 via-orange-50 to-amber-100"
-                            />
-                        </div>
-
-                        <Label class="flex items-center gap-2 text-sm">
-                            <input
-                                v-model="form.is_active"
-                                type="checkbox"
-                                class="h-4 w-4 rounded border-zinc-300"
-                            />
-                            Product is active
-                        </Label>
+                                <Label class="flex items-center gap-2 text-sm">
+                                    <input
+                                        v-model="form.is_active"
+                                        type="checkbox"
+                                        class="h-4 w-4 rounded border-zinc-300"
+                                    />
+                                    Product is active
+                                </Label>
+                            </div>
+                        </section>
                     </CardContent>
-                    <CardFooter class="flex gap-2">
+                    <CardFooter class="tm-sticky-actions">
                         <Button
                             :disabled="
                                 submitting ||

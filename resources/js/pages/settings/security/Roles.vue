@@ -71,6 +71,7 @@ const submittingSyncPermissions = ref<boolean>(false);
 const submittingAssignUserRoles = ref<boolean>(false);
 const roles = ref<RoleResource[]>(props.initialRoles ?? []);
 const permissions = ref<PermissionResource[]>(props.initialPermissions ?? []);
+const roleSearch = ref<string>('');
 const pageError = ref<string | null>(null);
 const pageSuccess = ref<string | null>(null);
 const selectedRoleId = ref<number | null>(roles.value[0]?.id ?? null);
@@ -93,6 +94,17 @@ const abilities = computed<Required<Capabilities>>(() => ({
 const selectedRole = computed<RoleResource | null>(
     () => roles.value.find((role) => role.id === selectedRoleId.value) ?? null,
 );
+
+const visibleRoles = computed<RoleResource[]>(() => {
+    const query = roleSearch.value.trim().toLowerCase();
+    if (query === '') {
+        return roles.value;
+    }
+
+    return roles.value.filter((role) =>
+        [role.name, role.guard_name].join(' ').toLowerCase().includes(query),
+    );
+});
 
 const availableRoleNames = computed<string[]>(() =>
     roles.value.map((role) => role.name),
@@ -432,6 +444,37 @@ onMounted(async () => {
                 <AlertDescription>{{ pageSuccess }}</AlertDescription>
             </Alert>
 
+            <section class="tm-admin-toolbar">
+                <div
+                    class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+                >
+                    <div>
+                        <p class="text-foreground text-sm font-semibold">
+                            Role actions
+                        </p>
+                        <p class="text-muted-foreground text-xs">
+                            Search roles and switch context quickly for sync and
+                            assignment tasks.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <Input
+                            v-model="roleSearch"
+                            class="tm-input-surface w-full min-w-52 lg:w-64"
+                            placeholder="Search role name or guard..."
+                        />
+                        <Button
+                            variant="outline"
+                            :disabled="loading || !abilities.canViewRoles"
+                            @click="loadRoleData"
+                        >
+                            <Spinner v-if="loading" />
+                            Refresh
+                        </Button>
+                    </div>
+                </div>
+            </section>
+
             <div class="grid gap-4 lg:grid-cols-2">
                 <Card class="tm-panel h-full">
                     <CardHeader>
@@ -458,39 +501,75 @@ onMounted(async () => {
 
                         <p
                             v-else-if="roles.length === 0"
-                            class="text-muted-foreground text-sm"
+                            class="tm-empty-state"
                         >
                             No roles available yet.
                         </p>
 
-                        <div v-else class="space-y-3">
-                            <button
-                                v-for="role in roles"
-                                :key="role.id"
-                                type="button"
-                                class="tm-list-item hover:bg-muted/50 w-full text-left"
-                                :class="{
-                                    'border-primary bg-muted/60':
-                                        selectedRoleId === role.id,
-                                }"
-                                @click="selectedRoleId = role.id"
-                            >
-                                <div
-                                    class="flex flex-wrap items-center justify-between gap-2"
-                                >
-                                    <p class="font-medium">{{ role.name }}</p>
-                                    <Badge variant="secondary">
-                                        {{ role.permissions.length }}
-                                        permissions
-                                    </Badge>
-                                </div>
-                                <p class="text-muted-foreground mt-1 text-xs">
-                                    Guard: {{ role.guard_name }}
-                                </p>
-                            </button>
+                        <p
+                            v-else-if="visibleRoles.length === 0"
+                            class="tm-empty-state"
+                        >
+                            No roles match your search.
+                        </p>
+
+                        <div v-else class="tm-table-wrap">
+                            <table class="tm-table">
+                                <thead>
+                                    <tr>
+                                        <th class="tm-th">Role</th>
+                                        <th class="tm-th">Guard</th>
+                                        <th class="tm-th">Permissions</th>
+                                        <th class="tm-th text-right">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="role in visibleRoles"
+                                        :key="role.id"
+                                        class="tm-tr"
+                                    >
+                                        <td class="tm-td">
+                                            <p class="font-medium">
+                                                {{ role.name }}
+                                            </p>
+                                        </td>
+                                        <td class="tm-td">
+                                            {{ role.guard_name }}
+                                        </td>
+                                        <td class="tm-td">
+                                            <Badge variant="secondary">
+                                                {{ role.permissions.length }}
+                                                permissions
+                                            </Badge>
+                                        </td>
+                                        <td class="tm-td text-right">
+                                            <Button
+                                                size="sm"
+                                                :variant="
+                                                    selectedRoleId === role.id
+                                                        ? 'default'
+                                                        : 'outline'
+                                                "
+                                                @click="
+                                                    selectedRoleId = role.id
+                                                "
+                                            >
+                                                {{
+                                                    selectedRoleId === role.id
+                                                        ? 'Selected'
+                                                        : 'Select'
+                                                }}
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter class="tm-sticky-actions">
                         <Button
                             variant="outline"
                             :disabled="loading || !abilities.canViewRoles"
@@ -510,6 +589,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
+                        <p class="tm-form-hint">
+                            Role keys should be stable and descriptive for
+                            permission grouping.
+                        </p>
                         <div class="tm-form-field">
                             <Label for="role-name" class="tm-label"
                                 >Role name</Label
@@ -517,6 +600,7 @@ onMounted(async () => {
                             <Input
                                 id="role-name"
                                 v-model="createRoleName"
+                                class="tm-input-surface"
                                 placeholder="seller"
                                 :disabled="
                                     !abilities.canCreateRoles ||
@@ -532,7 +616,7 @@ onMounted(async () => {
                             >
                                 <p
                                     v-if="permissions.length === 0"
-                                    class="text-muted-foreground text-sm"
+                                    class="tm-empty-state"
                                 >
                                     No permissions available.
                                 </p>
@@ -570,7 +654,7 @@ onMounted(async () => {
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter class="tm-sticky-actions">
                         <Button
                             :disabled="
                                 !abilities.canCreateRoles ||
@@ -595,12 +679,17 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
+                        <p class="tm-form-hint">
+                            Select a role first, then update its permission
+                            bundle.
+                        </p>
                         <div class="tm-form-field">
                             <Label for="selected-role" class="tm-label"
                                 >Selected role</Label
                             >
                             <Input
                                 id="selected-role"
+                                class="tm-input-surface"
                                 :model-value="
                                     selectedRole?.name ?? 'No role selected'
                                 "
@@ -615,7 +704,7 @@ onMounted(async () => {
                             >
                                 <p
                                     v-if="permissions.length === 0"
-                                    class="text-muted-foreground text-sm"
+                                    class="tm-empty-state"
                                 >
                                     No permissions available.
                                 </p>
@@ -654,7 +743,7 @@ onMounted(async () => {
                             </div>
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter class="tm-sticky-actions">
                         <Button
                             :disabled="
                                 !abilities.canManageRolePermissions ||
@@ -677,6 +766,10 @@ onMounted(async () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
+                        <p class="tm-form-hint">
+                            Assign multiple roles in one operation using user
+                            ID.
+                        </p>
                         <div class="tm-form-field">
                             <Label for="assign-user-id" class="tm-label"
                                 >User ID</Label
@@ -684,6 +777,7 @@ onMounted(async () => {
                             <Input
                                 id="assign-user-id"
                                 v-model="assignUserId"
+                                class="tm-input-surface"
                                 inputmode="numeric"
                                 placeholder="1"
                                 :disabled="
@@ -700,7 +794,7 @@ onMounted(async () => {
                             >
                                 <p
                                     v-if="availableRoleNames.length === 0"
-                                    class="text-muted-foreground text-sm"
+                                    class="tm-empty-state"
                                 >
                                     No roles available for assignment.
                                 </p>
@@ -751,7 +845,7 @@ onMounted(async () => {
                             role(s).
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter class="tm-sticky-actions">
                         <Button
                             :disabled="
                                 !abilities.canAssignUserRoles ||
