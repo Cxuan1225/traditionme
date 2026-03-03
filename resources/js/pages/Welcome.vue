@@ -369,9 +369,19 @@ const isAuthenticated = computed(() => Boolean(user.value));
                             }}</span>
                         </div>
                         <div
-                            class="h-36 rounded-2xl bg-gradient-to-br"
-                            :class="product.gradient"
-                        />
+                            class="h-36 overflow-hidden rounded-2xl bg-gradient-to-br"
+                            :class="{
+                                [product.gradient]: !product.imageUrl,
+                            }"
+                        >
+                            <img
+                                v-if="product.imageUrl"
+                                :src="product.imageUrl"
+                                :alt="product.name"
+                                class="h-full w-full object-cover"
+                                loading="lazy"
+                            />
+                        </div>
                         <h3 class="mt-4 text-lg font-extrabold text-zinc-900">
                             {{ product.name }}
                         </h3>

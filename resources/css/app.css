@@ -311,6 +311,10 @@
         @apply border-border bg-background/70 rounded-xl border px-4 py-3;
     }
 
+    .tm-stat-warning {
+        @apply border-amber-300/80 bg-amber-50/70 dark:border-amber-700/60 dark:bg-amber-950/20;
+    }
+
     .tm-chip {
         @apply border-border bg-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
     }
@@ -335,6 +339,10 @@
         @apply border-border bg-card h-11 rounded-xl;
     }
 
+    .tm-select-surface {
+        @apply border-border bg-card text-foreground h-11 rounded-xl border px-3 text-sm;
+    }
+
     .tm-admin-toolbar {
         @apply border-border/85 bg-card/95 sticky top-4 z-20 rounded-2xl border p-3 shadow-sm backdrop-blur;
     }
@@ -342,6 +350,47 @@
     .tm-admin-toolbar:focus-within {
         border-color: var(--focus-ring-strong);
         box-shadow: 0 0 0 3px var(--focus-ring-soft);
+    }
+
+    .tm-filter-row {
+        @apply flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between;
+    }
+
+    .tm-chip-row {
+        @apply flex flex-wrap items-center gap-1.5;
+    }
+
+    .tm-filter-chip {
+        @apply border-border bg-background text-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition;
+    }
+
+    .tm-filter-chip span {
+        @apply text-muted-foreground font-bold;
+    }
+
+    .tm-filter-chip:hover {
+        @apply border-primary/45;
+        transform: translateY(-1px);
+    }
+
+    .tm-filter-chip-active {
+        @apply border-primary/50 bg-primary/10 text-primary;
+    }
+
+    .tm-filter-chip-warning {
+        @apply border-amber-300/80 dark:border-amber-700/70;
+    }
+
+    .tm-density-switch {
+        @apply border-border bg-background inline-flex items-center rounded-full border p-1;
+    }
+
+    .tm-density-button {
+        @apply text-muted-foreground rounded-full px-3 py-1 text-xs font-semibold transition;
+    }
+
+    .tm-density-button-active {
+        @apply bg-primary text-primary-foreground;
     }
 
     .tm-empty-state {
@@ -365,6 +414,22 @@
         @apply w-full min-w-[640px] border-collapse text-left;
     }
 
+    .tm-table-comfortable .tm-th {
+        @apply py-3;
+    }
+
+    .tm-table-comfortable .tm-td {
+        @apply py-3;
+    }
+
+    .tm-table-compact .tm-th {
+        @apply py-2;
+    }
+
+    .tm-table-compact .tm-td {
+        @apply py-2;
+    }
+
     .tm-th {
         @apply border-border bg-secondary/55 text-muted-foreground border-b px-4 py-3 text-xs font-bold uppercase tracking-[0.14em];
     }
@@ -383,6 +448,10 @@
 
     .tm-tr:focus-within .tm-td {
         @apply bg-primary/10;
+    }
+
+    .tm-table-checkbox {
+        @apply border-border bg-background h-4 w-4 rounded border;
     }
 
     .tm-state-note {
@@ -456,6 +525,26 @@
         @apply border-border/70 relative h-40 rounded-2xl border bg-gradient-to-br;
     }
 
+    .tm-media-thumb {
+        @apply border-border relative h-14 w-12 overflow-hidden rounded-lg border bg-gradient-to-br;
+    }
+
+    .tm-media-fallback {
+        @apply text-foreground/80 flex h-full items-center justify-center text-[10px] font-semibold uppercase tracking-wide;
+    }
+
+    .tm-warning-chip {
+        @apply inline-flex items-center rounded-full border border-amber-300/80 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-900 dark:border-amber-700/70 dark:bg-amber-950/30 dark:text-amber-300;
+    }
+
+    .tm-media-preview-panel {
+        @apply space-y-2;
+    }
+
+    .tm-media-preview {
+        @apply border-border relative h-40 overflow-hidden rounded-2xl border bg-gradient-to-br;
+    }
+
     .tm-filter-pill {
         @apply border-border bg-background text-foreground/80 inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold tracking-wide transition;
     }
@@ -467,6 +556,26 @@
 
     .tm-filter-pill-active {
         @apply border-primary/50 bg-primary/10 text-primary;
+    }
+
+    .tm-permission-group {
+        @apply border-border/70 rounded-xl border p-2;
+    }
+
+    .tm-mini-chip {
+        @apply border-border bg-background text-foreground rounded-full border px-2 py-0.5 text-[11px] font-semibold transition;
+    }
+
+    .tm-mini-chip:hover {
+        @apply border-primary/45;
+    }
+
+    .tm-mini-chip-success {
+        @apply border-emerald-300/80 bg-emerald-50 text-emerald-900 dark:border-emerald-700/70 dark:bg-emerald-950/30 dark:text-emerald-300;
+    }
+
+    .tm-mini-chip-warning {
+        @apply border-amber-300/80 bg-amber-50 text-amber-900 dark:border-amber-700/70 dark:bg-amber-950/30 dark:text-amber-300;
     }
 
     .tm-summary-row {

@@ -20,6 +20,7 @@ type CartLine = {
     size: string;
     unitPriceInSen: number;
     quantity: number;
+    imageUrl: string;
     tone: string;
 };
 
@@ -35,6 +36,8 @@ const cartLines = ref<CartLine[]>([
         size: 'M',
         unitPriceInSen: 28900,
         quantity: 1,
+        imageUrl:
+            'https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80',
         tone: 'from-rose-100 via-amber-50 to-orange-100',
     },
     {
@@ -45,6 +48,8 @@ const cartLines = ref<CartLine[]>([
         size: 'S',
         unitPriceInSen: 25900,
         quantity: 1,
+        imageUrl:
+            'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=900&q=80',
         tone: 'from-fuchsia-100 via-rose-50 to-orange-100',
     },
 ]);
@@ -200,7 +205,14 @@ const applyCoupon = (): void => {
                                 <div
                                     class="tm-product-media h-[86px]"
                                     :class="line.tone"
-                                />
+                                >
+                                    <img
+                                        :src="line.imageUrl"
+                                        :alt="line.name"
+                                        class="h-full w-full object-cover"
+                                        loading="lazy"
+                                    />
+                                </div>
                                 <div class="min-w-0">
                                     <p class="tm-subtitle truncate">
                                         {{ line.name }}

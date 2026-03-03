@@ -43,6 +43,14 @@ type UserSecurityResource = {
     roles: RoleResource[];
 };
 
+type PermissionGroup = {
+    key: string;
+    label: string;
+    permissions: PermissionResource[];
+};
+
+type PermissionPreset = 'all' | 'read' | 'write' | 'manage';
+
 type Capabilities = {
     canViewRoles?: boolean;
     canCreateRoles?: boolean;
@@ -82,6 +90,8 @@ const rolePermissionNames = ref<string[]>([]);
 const assignUserId = ref<string>('');
 const assignUserRoleNames = ref<string[]>([]);
 const assignedUser = ref<UserSecurityResource | null>(null);
+const syncRiskConfirmed = ref<boolean>(false);
+const assignRiskConfirmed = ref<boolean>(false);
 
 const abilities = computed<Required<Capabilities>>(() => ({
     canViewRoles: props.capabilities?.canViewRoles ?? true,
@@ -108,6 +118,151 @@ const visibleRoles = computed<RoleResource[]>(() => {
 
 const availableRoleNames = computed<string[]>(() =>
     roles.value.map((role) => role.name),
+);
+
+const normalizePermissionDomain = (permissionName: string): string => {
+    const [segment] = permissionName.split(/[:._\s-]/);
+    const normalized = segment?.trim().toLowerCase() ?? '';
+
+    return normalized === '' ? 'general' : normalized;
+};
+
+const formatDomainLabel = (domain: string): string =>
+    domain
+        .split(/[-_]/)
+        .filter((part) => part !== '')
+        .map((part) => part[0]?.toUpperCase() + part.slice(1))
+        .join(' ');
+
+const permissionGroups = computed<PermissionGroup[]>(() => {
+    const buckets = new Map<string, PermissionResource[]>();
+
+    permissions.value.forEach((permission) => {
+        const key = normalizePermissionDomain(permission.name);
+        const group = buckets.get(key) ?? [];
+        group.push(permission);
+        buckets.set(key, group);
+    });
+
+    return Array.from(buckets.entries())
+        .map(([key, groupPermissions]) => ({
+            key,
+            label: formatDomainLabel(key),
+            permissions: groupPermissions.sort((left, right) =>
+                left.name.localeCompare(right.name),
+            ),
+        }))
+        .sort((left, right) => left.label.localeCompare(right.label));
+});
+
+const roleDomainCount = (role: RoleResource): number =>
+    new Set(
+        role.permissions.map((permission) =>
+            normalizePermissionDomain(permission.name),
+        ),
+    ).size;
+
+const permissionPresetKeywords: Record<
+    Exclude<PermissionPreset, 'all'>,
+    string[]
+> = {
+    read: ['view', 'read', 'list', 'index', 'show', 'browse'],
+    write: ['create', 'store', 'update', 'edit'],
+    manage: ['delete', 'manage', 'assign', 'sync', 'publish', 'approve'],
+};
+
+const matchesPreset = (
+    permissionName: string,
+    preset: PermissionPreset,
+): boolean => {
+    if (preset === 'all') {
+        return true;
+    }
+
+    const lowered = permissionName.toLowerCase();
+    return permissionPresetKeywords[preset].some((keyword) =>
+        lowered.includes(keyword),
+    );
+};
+
+const selectedRolePermissionSet = computed<string[]>(() =>
+    selectedRole.value
+        ? selectedRole.value.permissions
+              .map((permission) => permission.name)
+              .sort((left, right) => left.localeCompare(right))
+        : [],
+);
+
+const syncSummary = computed<{ added: string[]; removed: string[] }>(() => {
+    const original = new Set(selectedRolePermissionSet.value);
+    const staged = new Set(rolePermissionNames.value);
+
+    const added = Array.from(staged).filter((name) => !original.has(name));
+    const removed = Array.from(original).filter((name) => !staged.has(name));
+
+    return {
+        added: added.sort((left, right) => left.localeCompare(right)),
+        removed: removed.sort((left, right) => left.localeCompare(right)),
+    };
+});
+
+const syncHasChanges = computed<boolean>(
+    () =>
+        syncSummary.value.added.length > 0 ||
+        syncSummary.value.removed.length > 0,
+);
+
+const syncNeedsRiskConfirm = computed<boolean>(
+    () => syncSummary.value.removed.length > 0,
+);
+
+const assignTargetUserId = computed<number | null>(() => {
+    const trimmed = assignUserId.value.trim();
+    if (trimmed === '') {
+        return null;
+    }
+
+    const parsed = Number.parseInt(trimmed, 10);
+    return Number.isNaN(parsed) || parsed < 1 ? null : parsed;
+});
+
+const knownAssignedRoleNames = computed<string[]>(() => {
+    if (
+        assignedUser.value === null ||
+        assignTargetUserId.value === null ||
+        assignedUser.value.id !== assignTargetUserId.value
+    ) {
+        return [];
+    }
+
+    return assignedUser.value.roles.map((role) => role.name);
+});
+
+const assignSummary = computed<{ added: string[]; removed: string[] }>(() => {
+    const current = new Set(knownAssignedRoleNames.value);
+    const staged = new Set(assignUserRoleNames.value);
+
+    const added = Array.from(staged).filter((name) => !current.has(name));
+    const removed = Array.from(current).filter((name) => !staged.has(name));
+
+    return {
+        added: added.sort((left, right) => left.localeCompare(right)),
+        removed: removed.sort((left, right) => left.localeCompare(right)),
+    };
+});
+
+const assignIncludesAdmin = computed<boolean>(() =>
+    assignUserRoleNames.value.some(
+        (roleName) => roleName.toLowerCase() === 'admin',
+    ),
+);
+
+const assignNeedsRiskConfirm = computed<boolean>(
+    () =>
+        assignIncludesAdmin.value ||
+        assignSummary.value.removed.some(
+            (roleName) => roleName.toLowerCase() === 'admin',
+        ),
 );
 
 const isChecked = (name: string, list: string[]): boolean =>
@@ -277,6 +432,7 @@ const loadRoleData = async (): Promise<void> => {
         }
 
         syncRolePermissionSelection();
+        syncRiskConfirmed.value = false;
     } catch (error) {
         pageError.value =
             error instanceof Error
@@ -297,6 +453,52 @@ const toggleArrayItem = (
     }
 
     return list.filter((value) => value !== item);
+};
+
+const applyPresetToSelection = (
+    baseList: string[],
+    group: PermissionGroup,
+    preset: PermissionPreset,
+    checked: boolean,
+): string[] => {
+    const scopedNames = group.permissions
+        .filter((permission) => matchesPreset(permission.name, preset))
+        .map((permission) => permission.name);
+
+    const set = new Set(baseList);
+    if (checked) {
+        scopedNames.forEach((name) => set.add(name));
+    } else {
+        scopedNames.forEach((name) => set.delete(name));
+    }
+
+    return Array.from(set).sort((left, right) => left.localeCompare(right));
+};
+
+const applyCreatePreset = (
+    group: PermissionGroup,
+    preset: PermissionPreset,
+    checked: boolean,
+): void => {
+    createRolePermissionNames.value = applyPresetToSelection(
+        createRolePermissionNames.value,
+        group,
+        preset,
+        checked,
+    );
+};
+
+const applySyncPreset = (
+    group: PermissionGroup,
+    preset: PermissionPreset,
+    checked: boolean,
+): void => {
+    rolePermissionNames.value = applyPresetToSelection(
+        rolePermissionNames.value,
+        group,
+        preset,
+        checked,
+    );
 };
 
 const createRole = async (): Promise<void> => {
@@ -337,6 +539,17 @@ const syncRolePermissions = async (): Promise<void> => {
         return;
     }
 
+    if (!syncHasChanges.value) {
+        pageError.value = 'No permission changes to sync.';
+        return;
+    }
+
+    if (syncNeedsRiskConfirm.value && !syncRiskConfirmed.value) {
+        pageError.value =
+            'Confirm permission removals before syncing this role.';
+        return;
+    }
+
     submittingSyncPermissions.value = true;
     pageError.value = null;
     pageSuccess.value = null;
@@ -353,6 +566,7 @@ const syncRolePermissions = async (): Promise<void> => {
         );
 
         pageSuccess.value = 'Role permissions updated.';
+        syncRiskConfirmed.value = false;
         await loadRoleData();
     } catch (error) {
         pageError.value =
@@ -369,6 +583,11 @@ const assignRolesToUser = async (): Promise<void> => {
         !abilities.value.canAssignUserRoles ||
         assignUserId.value.trim() === ''
     ) {
+        return;
+    }
+
+    if (assignNeedsRiskConfirm.value && !assignRiskConfirmed.value) {
+        pageError.value = 'Confirm high-privilege role assignment first.';
         return;
     }
 
@@ -394,6 +613,7 @@ const assignRolesToUser = async (): Promise<void> => {
 
         assignedUser.value = parseUserResource(payload);
         pageSuccess.value = 'User roles updated.';
+        assignRiskConfirmed.value = false;
     } catch (error) {
         pageError.value =
             error instanceof Error
@@ -406,6 +626,15 @@ const assignRolesToUser = async (): Promise<void> => {
 
 watch(selectedRoleId, () => {
     syncRolePermissionSelection();
+    syncRiskConfirmed.value = false;
+});
+
+watch(rolePermissionNames, () => {
+    syncRiskConfirmed.value = false;
+});
+
+watch([assignUserId, assignUserRoleNames], () => {
+    assignRiskConfirmed.value = false;
 });
 
 onMounted(async () => {
@@ -444,7 +673,7 @@ onMounted(async () => {
                 <AlertDescription>{{ pageSuccess }}</AlertDescription>
             </Alert>
 
-            <section class="tm-admin-toolbar">
+            <section class="tm-admin-toolbar space-y-3">
                 <div
                     class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
                     role="region"
@@ -452,11 +681,11 @@ onMounted(async () => {
                 >
                     <div>
                         <p class="text-foreground text-sm font-semibold">
-                            Role actions
+                            Roles and access controls
                         </p>
                         <p class="text-muted-foreground text-xs">
-                            Search roles and switch context quickly for sync and
-                            assignment tasks.
+                            Use grouped permission views and change summaries to
+                            avoid accidental access drift.
                         </p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
@@ -475,6 +704,29 @@ onMounted(async () => {
                         </Button>
                     </div>
                 </div>
+                <div class="tm-card p-3">
+                    <p class="tm-form-hint">Active role context</p>
+                    <div
+                        class="mt-2 flex flex-col gap-2 text-sm lg:flex-row lg:items-center lg:justify-between"
+                    >
+                        <p class="text-foreground font-semibold">
+                            {{
+                                selectedRole
+                                    ? `${selectedRole.name} (${selectedRole.guard_name})`
+                                    : 'No role selected'
+                            }}
+                        </p>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <Badge v-if="selectedRole" variant="secondary">
+                                {{ selectedRole.permissions.length }}
+                                permissions
+                            </Badge>
+                            <Badge v-if="selectedRole" variant="secondary">
+                                {{ roleDomainCount(selectedRole) }} domains
+                            </Badge>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <div class="grid gap-4 lg:grid-cols-2">
@@ -482,7 +734,8 @@ onMounted(async () => {
                     <CardHeader>
                         <CardTitle>Role catalog</CardTitle>
                         <CardDescription>
-                            View roles and current permission bundles.
+                            Review role bundles before syncing permission
+                            changes.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
@@ -526,11 +779,14 @@ onMounted(async () => {
                                         <th scope="col" class="tm-th">
                                             Permissions
                                         </th>
+                                        <th scope="col" class="tm-th">
+                                            Domains
+                                        </th>
                                         <th
                                             scope="col"
                                             class="tm-th text-right"
                                         >
-                                            Actions
+                                            Context
                                         </th>
                                     </tr>
                                 </thead>
@@ -561,6 +817,12 @@ onMounted(async () => {
                                                 permissions
                                             </Badge>
                                         </td>
+                                        <td class="tm-td">
+                                            <Badge variant="secondary">
+                                                {{ roleDomainCount(role) }}
+                                                groups
+                                            </Badge>
+                                        </td>
                                         <td class="tm-td text-right">
                                             <Button
                                                 size="sm"
@@ -576,8 +838,8 @@ onMounted(async () => {
                                             >
                                                 {{
                                                     selectedRoleId === role.id
-                                                        ? 'Selected'
-                                                        : 'Select'
+                                                        ? 'In context'
+                                                        : 'Set context'
                                                 }}
                                             </Button>
                                         </td>
@@ -629,45 +891,148 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Initial permissions</Label>
                             <div
-                                class="tm-card max-h-56 space-y-2 overflow-y-auto p-3"
+                                class="tm-card max-h-72 space-y-3 overflow-y-auto p-3"
                             >
                                 <p
-                                    v-if="permissions.length === 0"
+                                    v-if="permissionGroups.length === 0"
                                     class="tm-empty-state"
                                 >
                                     No permissions available.
                                 </p>
 
-                                <Label
-                                    v-for="permission in permissions"
-                                    :key="permission.id"
-                                    class="flex items-center gap-3"
+                                <section
+                                    v-for="group in permissionGroups"
+                                    :key="group.key"
+                                    class="tm-permission-group"
                                 >
-                                    <Checkbox
-                                        :model-value="
-                                            isChecked(
-                                                permission.name,
-                                                createRolePermissionNames,
-                                            )
-                                        "
-                                        :disabled="
-                                            !abilities.canCreateRoles ||
-                                            submittingCreateRole
-                                        "
-                                        @update:model-value="
-                                            (value) =>
-                                                (createRolePermissionNames =
-                                                    toggleArrayItem(
-                                                        createRolePermissionNames,
+                                    <div
+                                        class="flex flex-wrap items-center justify-between gap-2"
+                                    >
+                                        <p class="text-sm font-semibold">
+                                            {{ group.label }}
+                                        </p>
+                                        <div class="flex flex-wrap gap-1">
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canCreateRoles ||
+                                                    submittingCreateRole
+                                                "
+                                                @click="
+                                                    applyCreatePreset(
+                                                        group,
+                                                        'all',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                All
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canCreateRoles ||
+                                                    submittingCreateRole
+                                                "
+                                                @click="
+                                                    applyCreatePreset(
+                                                        group,
+                                                        'read',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                Read
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canCreateRoles ||
+                                                    submittingCreateRole
+                                                "
+                                                @click="
+                                                    applyCreatePreset(
+                                                        group,
+                                                        'write',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                Write
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canCreateRoles ||
+                                                    submittingCreateRole
+                                                "
+                                                @click="
+                                                    applyCreatePreset(
+                                                        group,
+                                                        'manage',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                Manage
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canCreateRoles ||
+                                                    submittingCreateRole
+                                                "
+                                                @click="
+                                                    applyCreatePreset(
+                                                        group,
+                                                        'all',
+                                                        false,
+                                                    )
+                                                "
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-2 space-y-2">
+                                        <Label
+                                            v-for="permission in group.permissions"
+                                            :key="permission.id"
+                                            class="flex items-center gap-3"
+                                        >
+                                            <Checkbox
+                                                :model-value="
+                                                    isChecked(
                                                         permission.name,
-                                                        value === true,
-                                                    ))
-                                        "
-                                    />
-                                    <span class="text-sm">{{
-                                        permission.name
-                                    }}</span>
-                                </Label>
+                                                        createRolePermissionNames,
+                                                    )
+                                                "
+                                                :disabled="
+                                                    !abilities.canCreateRoles ||
+                                                    submittingCreateRole
+                                                "
+                                                @update:model-value="
+                                                    (value) =>
+                                                        (createRolePermissionNames =
+                                                            toggleArrayItem(
+                                                                createRolePermissionNames,
+                                                                permission.name,
+                                                                value === true,
+                                                            ))
+                                                "
+                                            />
+                                            <span class="text-sm">{{
+                                                permission.name
+                                            }}</span>
+                                        </Label>
+                                    </div>
+                                </section>
                             </div>
                         </div>
                     </CardContent>
@@ -692,13 +1057,13 @@ onMounted(async () => {
                     <CardHeader>
                         <CardTitle>Sync role permissions</CardTitle>
                         <CardDescription>
-                            Update the permission bundle for the selected role.
+                            Grouped permission matrix with staged sync summary.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
                         <p class="tm-form-hint">
-                            Select a role first, then update its permission
-                            bundle.
+                            Select a role context first, apply grouped presets,
+                            then review additions/removals before sync.
                         </p>
                         <div class="tm-form-field">
                             <Label for="selected-role" class="tm-label"
@@ -714,49 +1079,222 @@ onMounted(async () => {
                             />
                         </div>
 
-                        <div class="space-y-2">
-                            <Label>Permissions</Label>
+                        <div class="tm-card p-3">
+                            <p class="text-sm font-semibold">
+                                Pending sync summary
+                            </p>
+                            <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                                <div
+                                    class="tm-state-note tm-state-note-success"
+                                >
+                                    Additions:
+                                    <strong>{{
+                                        syncSummary.added.length
+                                    }}</strong>
+                                </div>
+                                <div
+                                    class="tm-state-note tm-state-note-warning"
+                                >
+                                    Removals:
+                                    <strong>{{
+                                        syncSummary.removed.length
+                                    }}</strong>
+                                </div>
+                            </div>
                             <div
-                                class="tm-card max-h-56 space-y-2 overflow-y-auto p-3"
+                                v-if="syncSummary.added.length > 0"
+                                class="mt-2 flex flex-wrap gap-1"
+                            >
+                                <span
+                                    v-for="name in syncSummary.added.slice(
+                                        0,
+                                        8,
+                                    )"
+                                    :key="`add-${name}`"
+                                    class="tm-mini-chip tm-mini-chip-success"
+                                >
+                                    + {{ name }}
+                                </span>
+                            </div>
+                            <div
+                                v-if="syncSummary.removed.length > 0"
+                                class="mt-2 flex flex-wrap gap-1"
+                            >
+                                <span
+                                    v-for="name in syncSummary.removed.slice(
+                                        0,
+                                        8,
+                                    )"
+                                    :key="`remove-${name}`"
+                                    class="tm-mini-chip tm-mini-chip-warning"
+                                >
+                                    - {{ name }}
+                                </span>
+                            </div>
+                            <Label
+                                v-if="syncNeedsRiskConfirm"
+                                class="mt-3 flex items-center gap-2 text-sm"
+                            >
+                                <input
+                                    v-model="syncRiskConfirmed"
+                                    type="checkbox"
+                                    class="h-4 w-4 rounded border-zinc-300"
+                                />
+                                I confirm the permission removals above.
+                            </Label>
+                        </div>
+
+                        <div class="space-y-2">
+                            <Label>Permissions by domain</Label>
+                            <div
+                                class="tm-card max-h-80 space-y-3 overflow-y-auto p-3"
                             >
                                 <p
-                                    v-if="permissions.length === 0"
+                                    v-if="permissionGroups.length === 0"
                                     class="tm-empty-state"
                                 >
                                     No permissions available.
                                 </p>
 
-                                <Label
-                                    v-for="permission in permissions"
-                                    :key="permission.id"
-                                    class="flex items-center gap-3"
+                                <section
+                                    v-for="group in permissionGroups"
+                                    :key="group.key"
+                                    class="tm-permission-group"
                                 >
-                                    <Checkbox
-                                        :model-value="
-                                            isChecked(
-                                                permission.name,
-                                                rolePermissionNames,
-                                            )
-                                        "
-                                        :disabled="
-                                            !abilities.canManageRolePermissions ||
-                                            submittingSyncPermissions ||
-                                            selectedRoleId === null
-                                        "
-                                        @update:model-value="
-                                            (value) =>
-                                                (rolePermissionNames =
-                                                    toggleArrayItem(
-                                                        rolePermissionNames,
+                                    <div
+                                        class="flex flex-wrap items-center justify-between gap-2"
+                                    >
+                                        <p class="text-sm font-semibold">
+                                            {{ group.label }}
+                                        </p>
+                                        <div class="flex flex-wrap gap-1">
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canManageRolePermissions ||
+                                                    submittingSyncPermissions ||
+                                                    selectedRoleId === null
+                                                "
+                                                @click="
+                                                    applySyncPreset(
+                                                        group,
+                                                        'all',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                All
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canManageRolePermissions ||
+                                                    submittingSyncPermissions ||
+                                                    selectedRoleId === null
+                                                "
+                                                @click="
+                                                    applySyncPreset(
+                                                        group,
+                                                        'read',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                Read
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canManageRolePermissions ||
+                                                    submittingSyncPermissions ||
+                                                    selectedRoleId === null
+                                                "
+                                                @click="
+                                                    applySyncPreset(
+                                                        group,
+                                                        'write',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                Write
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canManageRolePermissions ||
+                                                    submittingSyncPermissions ||
+                                                    selectedRoleId === null
+                                                "
+                                                @click="
+                                                    applySyncPreset(
+                                                        group,
+                                                        'manage',
+                                                        true,
+                                                    )
+                                                "
+                                            >
+                                                Manage
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="tm-mini-chip"
+                                                :disabled="
+                                                    !abilities.canManageRolePermissions ||
+                                                    submittingSyncPermissions ||
+                                                    selectedRoleId === null
+                                                "
+                                                @click="
+                                                    applySyncPreset(
+                                                        group,
+                                                        'all',
+                                                        false,
+                                                    )
+                                                "
+                                            >
+                                                Clear
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-2 space-y-2">
+                                        <Label
+                                            v-for="permission in group.permissions"
+                                            :key="permission.id"
+                                            class="flex items-center gap-3"
+                                        >
+                                            <Checkbox
+                                                :model-value="
+                                                    isChecked(
                                                         permission.name,
-                                                        value === true,
-                                                    ))
-                                        "
-                                    />
-                                    <span class="text-sm">{{
-                                        permission.name
-                                    }}</span>
-                                </Label>
+                                                        rolePermissionNames,
+                                                    )
+                                                "
+                                                :disabled="
+                                                    !abilities.canManageRolePermissions ||
+                                                    submittingSyncPermissions ||
+                                                    selectedRoleId === null
+                                                "
+                                                @update:model-value="
+                                                    (value) =>
+                                                        (rolePermissionNames =
+                                                            toggleArrayItem(
+                                                                rolePermissionNames,
+                                                                permission.name,
+                                                                value === true,
+                                                            ))
+                                                "
+                                            />
+                                            <span class="text-sm">{{
+                                                permission.name
+                                            }}</span>
+                                        </Label>
+                                    </div>
+                                </section>
                             </div>
                         </div>
                     </CardContent>
@@ -765,7 +1303,9 @@ onMounted(async () => {
                             :disabled="
                                 !abilities.canManageRolePermissions ||
                                 submittingSyncPermissions ||
-                                selectedRoleId === null
+                                selectedRoleId === null ||
+                                !syncHasChanges ||
+                                (syncNeedsRiskConfirm && !syncRiskConfirmed)
                             "
                             @click="syncRolePermissions"
                         >
@@ -779,13 +1319,13 @@ onMounted(async () => {
                     <CardHeader>
                         <CardTitle>Assign roles to user</CardTitle>
                         <CardDescription>
-                            Assign one or more roles to a user by user ID.
+                            Assign role bundles with high-privilege safety cues.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-4">
                         <p class="tm-form-hint">
-                            Assign multiple roles in one operation using user
-                            ID.
+                            Use user ID as target context, then review summary
+                            before applying role changes.
                         </p>
                         <div class="tm-form-field">
                             <Label for="assign-user-id" class="tm-label"
@@ -802,6 +1342,55 @@ onMounted(async () => {
                                     submittingAssignUserRoles
                                 "
                             />
+                        </div>
+
+                        <div class="tm-card p-3">
+                            <p class="text-sm font-semibold">
+                                Assignment summary
+                            </p>
+                            <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                                <div
+                                    class="tm-state-note tm-state-note-success"
+                                >
+                                    Additions:
+                                    <strong>{{
+                                        assignSummary.added.length
+                                    }}</strong>
+                                </div>
+                                <div
+                                    class="tm-state-note tm-state-note-warning"
+                                >
+                                    Removals:
+                                    <strong>{{
+                                        assignSummary.removed.length
+                                    }}</strong>
+                                </div>
+                            </div>
+                            <p
+                                v-if="knownAssignedRoleNames.length === 0"
+                                class="tm-form-hint mt-2"
+                            >
+                                Baseline roles are unavailable until this target
+                                user has been updated in this session.
+                            </p>
+                            <p
+                                v-if="assignIncludesAdmin"
+                                class="tm-state-note tm-state-note-warning mt-2"
+                            >
+                                High privilege detected: <strong>admin</strong>
+                                role is included in staged assignment.
+                            </p>
+                            <Label
+                                v-if="assignNeedsRiskConfirm"
+                                class="mt-3 flex items-center gap-2 text-sm"
+                            >
+                                <input
+                                    v-model="assignRiskConfirmed"
+                                    type="checkbox"
+                                    class="h-4 w-4 rounded border-zinc-300"
+                                />
+                                I confirm high-privilege role assignment.
+                            </Label>
                         </div>
 
                         <div class="space-y-2">
@@ -849,7 +1438,7 @@ onMounted(async () => {
 
                         <div
                             v-if="assignedUser"
-                            class="tm-card text-muted-foreground p-3 text-sm"
+                            class="tm-state-note tm-state-note-success"
                         >
                             Updated user:
                             <span class="text-foreground font-medium">
@@ -867,7 +1456,8 @@ onMounted(async () => {
                             :disabled="
                                 !abilities.canAssignUserRoles ||
                                 submittingAssignUserRoles ||
-                                assignUserId.trim() === ''
+                                assignUserId.trim() === '' ||
+                                (assignNeedsRiskConfirm && !assignRiskConfirmed)
                             "
                             @click="assignRolesToUser"
                         >

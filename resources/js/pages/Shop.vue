@@ -19,6 +19,7 @@ type CatalogProduct = {
     rating: number;
     priceInSen: number;
     originalPriceInSen: number | null;
+    imageUrl: string;
     tone: string;
     stock: 'ready' | 'low' | 'preorder';
 };
@@ -34,6 +35,8 @@ const catalog: CatalogProduct[] = [
         rating: 4.9,
         priceInSen: 28900,
         originalPriceInSen: 34900,
+        imageUrl:
+            'https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80',
         tone: 'from-rose-100 via-amber-50 to-orange-100',
         stock: 'ready',
     },
@@ -47,6 +50,8 @@ const catalog: CatalogProduct[] = [
         rating: 4.8,
         priceInSen: 31900,
         originalPriceInSen: null,
+        imageUrl:
+            'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80',
         tone: 'from-red-100 via-pink-50 to-amber-100',
         stock: 'low',
     },
@@ -60,6 +65,8 @@ const catalog: CatalogProduct[] = [
         rating: 4.7,
         priceInSen: 25900,
         originalPriceInSen: 29900,
+        imageUrl:
+            'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=900&q=80',
         tone: 'from-fuchsia-100 via-rose-50 to-orange-100',
         stock: 'ready',
     },
@@ -73,6 +80,8 @@ const catalog: CatalogProduct[] = [
         rating: 4.9,
         priceInSen: 39900,
         originalPriceInSen: 45900,
+        imageUrl:
+            'https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=900&q=80',
         tone: 'from-violet-100 via-indigo-50 to-purple-100',
         stock: 'preorder',
     },
@@ -86,6 +95,8 @@ const catalog: CatalogProduct[] = [
         rating: 4.8,
         priceInSen: 22900,
         originalPriceInSen: null,
+        imageUrl:
+            'https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=900&q=80',
         tone: 'from-emerald-100 via-teal-50 to-cyan-100',
         stock: 'ready',
     },
@@ -99,6 +110,8 @@ const catalog: CatalogProduct[] = [
         rating: 5,
         priceInSen: 55900,
         originalPriceInSen: 63900,
+        imageUrl:
+            'https://images.unsplash.com/photo-1543087903-1ac2ec7aa8ac?auto=format&fit=crop&w=900&q=80',
         tone: 'from-amber-100 via-yellow-50 to-orange-100',
         stock: 'low',
     },
@@ -496,10 +509,14 @@ onBeforeUnmount(() => {
                                     >★ {{ product.rating.toFixed(1) }}</span
                                 >
                             </div>
-                            <div
-                                class="tm-product-media"
-                                :class="product.tone"
-                            />
+                            <div class="tm-product-media" :class="product.tone">
+                                <img
+                                    :src="product.imageUrl"
+                                    :alt="product.name"
+                                    class="h-full w-full object-cover"
+                                    loading="lazy"
+                                />
+                            </div>
                             <h3 class="tm-title mt-4 text-xl">
                                 {{ product.name }}
                             </h3>
