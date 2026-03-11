@@ -87,7 +87,8 @@ onBeforeUnmount(() => {
 
                 <div class="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
                     <Form
-                        v-bind="ProfileController.update.form()"
+                        :action="ProfileController.update().url"
+                        :method="ProfileController.update().method"
                         class="space-y-6 rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-700 dark:bg-zinc-800"
                         v-slot="{ errors, processing, recentlySuccessful }"
                     >

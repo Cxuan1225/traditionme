@@ -36,7 +36,8 @@ const isAdminMode = computed(
         description="This is a secure area of the application. Please confirm your password before continuing."
     >
         <Form
-            v-bind="store.form()"
+            :action="store().url"
+            :method="store().method"
             reset-on-success
             v-slot="{ errors, processing }"
             class="tm-shell p-5"
@@ -82,7 +83,8 @@ const isAdminMode = computed(
                 </CardHeader>
                 <CardContent>
                     <Form
-                        v-bind="store.form()"
+                        :action="store().url"
+                        :method="store().method"
                         reset-on-success
                         v-slot="{ errors, processing }"
                         class="space-y-6"
@@ -126,7 +128,8 @@ const isAdminMode = computed(
                 </CardHeader>
                 <CardContent>
                     <Form
-                        v-bind="store.form()"
+                        :action="store().url"
+                        :method="store().method"
                         reset-on-success
                         v-slot="{ errors, processing }"
                         class="space-y-6"

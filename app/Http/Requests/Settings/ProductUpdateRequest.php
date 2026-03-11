@@ -31,6 +31,7 @@ class ProductUpdateRequest extends FormRequest
             'original_price_in_sen' => ['nullable', 'integer', 'min:1', 'max:99999999'],
             'badge' => ['nullable', 'string', 'max:80'],
             'gradient' => ['nullable', 'string', 'max:120'],
+            'image_url' => ['nullable', 'url', 'max:2048'],
             'is_active' => ['required', 'boolean'],
         ];
     }

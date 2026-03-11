@@ -834,7 +834,12 @@ onMounted(async () => {
                         </p>
 
                         <div v-else class="tm-table-wrap tm-table-roomy">
-                            <table :class="['tm-table', tableDensityClass]">
+                            <table
+                                :class="[
+                                    'tm-table tm-table-product',
+                                    tableDensityClass,
+                                ]"
+                            >
                                 <thead>
                                     <tr>
                                         <th scope="col" class="tm-th w-12">

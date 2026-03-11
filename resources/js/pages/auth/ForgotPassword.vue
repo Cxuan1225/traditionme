@@ -31,7 +31,8 @@ defineProps<{
 
         <div class="space-y-6">
             <Form
-                v-bind="email.form()"
+                :action="email().url"
+                :method="email().method"
                 v-slot="{ errors, processing }"
                 class="tm-shell p-5"
             >

@@ -18,6 +18,7 @@ readonly class ProductPayloadData
         public ?int $originalPriceInSen,
         public ?string $badge,
         public ?string $gradient,
+        public ?string $imageUrl,
         public bool $isActive,
     ) {}
 
@@ -43,6 +44,7 @@ readonly class ProductPayloadData
         $originalPriceInSen = $validated['original_price_in_sen'] ?? null;
         $badge = $validated['badge'] ?? null;
         $gradient = $validated['gradient'] ?? null;
+        $imageUrl = $validated['image_url'] ?? null;
         $isActive = $validated['is_active'] ?? null;
 
         if (! is_string($name) || ! is_string($slug) || ! is_string($category) || ! is_int($priceInSen) || ! is_bool($isActive)) {
@@ -57,6 +59,7 @@ readonly class ProductPayloadData
             originalPriceInSen: is_int($originalPriceInSen) ? $originalPriceInSen : null,
             badge: is_string($badge) ? $badge : null,
             gradient: is_string($gradient) ? $gradient : null,
+            imageUrl: is_string($imageUrl) ? $imageUrl : null,
             isActive: $isActive,
         );
     }

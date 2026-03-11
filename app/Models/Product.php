@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $original_price_in_sen
  * @property string|null $badge
  * @property string|null $gradient
+ * @property string|null $image_url
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -35,6 +36,7 @@ class Product extends Model
         'original_price_in_sen',
         'badge',
         'gradient',
+        'image_url',
         'is_active',
     ];
 

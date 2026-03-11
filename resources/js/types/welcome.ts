@@ -11,6 +11,7 @@ export interface WelcomeProduct {
     originalPrice: string;
     badge: string;
     gradient: string;
+    imageUrl?: string | null;
 }
 
 export interface WelcomeOccasion {
