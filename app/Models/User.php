@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -73,6 +72,9 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * @return Attribute<string|null, never>
+     */
     protected function avatar(): Attribute
     {
         return Attribute::get(function (): ?string {
@@ -80,7 +82,7 @@ class User extends Authenticatable
                 return null;
             }
 
-            return Storage::disk('public')->url($this->avatar_path);
+            return asset('storage/'.$this->avatar_path);
         });
     }
 }

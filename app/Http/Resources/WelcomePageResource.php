@@ -33,12 +33,20 @@ class WelcomePageResource extends JsonResource
     {
         /** @var WelcomePageData $welcome */
         $welcome = $this->resource;
+        /** @var array<int, array{name: string, slug: string}> $categories */
+        $categories = WelcomeCategoryResource::collection($welcome->categories)->resolve($request);
+        /** @var array<int, array{name: string, slug: string, category: string, price: string, originalPrice: string, badge: string, gradient: string, imageUrl: string|null}> $products */
+        $products = WelcomeProductResource::collection($welcome->products)->resolve($request);
+        /** @var array<int, array{name: string, slug: string, description: string, badge: string}> $occasions */
+        $occasions = WelcomeOccasionResource::collection($welcome->occasions)->resolve($request);
+        /** @var array<int, array{name: string, location: string, comment: string}> $reviews */
+        $reviews = WelcomeReviewResource::collection($welcome->reviews)->resolve($request);
 
         return [
-            'categories' => WelcomeCategoryResource::collection($welcome->categories)->resolve($request),
-            'products' => WelcomeProductResource::collection($welcome->products)->resolve($request),
-            'occasions' => WelcomeOccasionResource::collection($welcome->occasions)->resolve($request),
-            'reviews' => WelcomeReviewResource::collection($welcome->reviews)->resolve($request),
+            'categories' => $categories,
+            'products' => $products,
+            'occasions' => $occasions,
+            'reviews' => $reviews,
             'totalProducts' => $welcome->totalProducts,
         ];
     }

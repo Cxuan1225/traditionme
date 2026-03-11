@@ -48,7 +48,7 @@ The storefront (Shop + Welcome) showed **hardcoded static data** instead of real
 
 ---
 
-## Phase 2: Checkout & Order Flow ⬅️ IMPLEMENTED, VERIFYING
+## Phase 2: Checkout & Order Flow ✅
 
 ### 2.1 Create Order/OrderItem models + migrations
 - [x] Create migration `create_orders_table`
@@ -97,8 +97,7 @@ The storefront (Shop + Welcome) showed **hardcoded static data** instead of real
   - `GET /checkout` → `CheckoutController@show`
   - `POST /checkout` → `CheckoutController@store`
   - `GET /orders/{order}` → `OrderController@show`
-- [ ] Run `php artisan wayfinder:generate`
-  - Attempted on 2026-03-11, but the command failed with `Permission denied` writing `resources/js/actions/Laravel/index.ts`
+- [x] Run `php artisan wayfinder:generate`
 
 ### 2.4 Frontend pages
 - [x] Create `resources/js/types/order.ts`
@@ -109,6 +108,9 @@ The storefront (Shop + Welcome) showed **hardcoded static data** instead of real
   - Coupon code input
   - Submit via `router.post('/checkout', formData)`
   - Uses `StorefrontLayout`
+- [x] Enhance checkout shipping details with Malaysia-specific dependent dropdowns
+  - State uses a Malaysia dropdown
+  - City options are filtered by the selected state
 - [x] Create `resources/js/pages/OrderConfirmation.vue`
   - Order number, status badge, line items table, totals
   - Shipping address display
@@ -116,6 +118,10 @@ The storefront (Shop + Welcome) showed **hardcoded static data** instead of real
   - Uses `StorefrontLayout`
 - [x] Modify `resources/js/pages/Cart.vue`
   - Wire "Proceed to checkout" button → `router.get('/checkout')` (or `Link :href`)
+- [x] Fix Phase 2 verification regressions discovered after implementation
+  - Resolved missing Vite page-manifest lookup for `OrderConfirmation.vue`
+  - Fixed checkout form typing for the `cart` validation error surface
+  - Fixed auth/settings form helper usage after Wayfinder regeneration
 
 ---
 
@@ -150,17 +156,14 @@ The storefront (Shop + Welcome) showed **hardcoded static data** instead of real
 ### Phase 1 ✅ (pending migration run + manual test)
 
 ### Phase 2
-1. Run `php artisan migrate` for orders + order_items tables
-2. Add items to cart via `/shop`, visit `/cart`
-3. Click "Proceed to checkout" → redirected to `/checkout` (must be logged in)
-4. Fill shipping form, submit → order created, cart cleared
-5. Order confirmation page shows correct order details
-6. Quality gates remain pending because:
-   - `php artisan test tests/Feature/Commerce/CheckoutFlowTest.php` passed
-   - `vendor/bin/pint` passed for the Phase 2 backend files
-   - `npx prettier --check` passed for touched frontend files, but the shell wrapper still timed out after printing success
-   - `npm run types:check` reports repo-wide failures under `vendor/laravel/wayfinder/resources/*.blade.ts`, outside the checkout slice
-   - broader `phpstan`, `eslint`, and full-suite verification runs remain unresolved due shell stalls in the shared terminal session
+1. `php artisan test tests/Feature/Commerce/CheckoutFlowTest.php` passed
+2. `php artisan test` passed
+3. `npm run lint` passed
+4. `npm run types:check` passed
+5. `vendor/bin/pint --test` passed
+6. `vendor/bin/phpstan analyse --memory-limit=512M` passed
+7. `php artisan wayfinder:generate` succeeded
+8. Manual browser smoke test is still recommended for final UX confirmation, but the code and automated verification for Phase 2 are complete
 
 ### Phase 3
 1. In admin Products, upload an image file → stored in `storage/app/public/products/`

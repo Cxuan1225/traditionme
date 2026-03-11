@@ -48,7 +48,9 @@ class ProfileController extends Controller
 
         /** @var array<string, mixed> $validated */
         $validated = $request->validated();
-        $user->fill(Arr::except($validated, ['avatar', 'remove_avatar']));
+        /** @var array<string, mixed> $profileAttributes */
+        $profileAttributes = Arr::except($validated, ['avatar', 'remove_avatar']);
+        $user->fill($profileAttributes);
 
         if ($request->boolean('remove_avatar') && $user->avatar_path !== null) {
             Storage::disk('public')->delete($user->avatar_path);
@@ -60,7 +62,11 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->avatar_path);
             }
 
-            $user->avatar_path = $request->file('avatar')?->store('avatars', 'public');
+            $avatarPath = $request->file('avatar')?->store('avatars', 'public');
+
+            if (is_string($avatarPath)) {
+                $user->avatar_path = $avatarPath;
+            }
         }
 
         if ($user->isDirty('email')) {

@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         $isAdmin = AdminViewMode::isAdmin($user);
+        $status = $request->session()->get('status');
 
         return [
             ...parent::share($request),
@@ -54,7 +55,7 @@ class HandleInertiaRequests extends Middleware
                 'adminViewMode' => $isAdmin ? AdminViewMode::current($request) : AdminViewMode::STOREFRONT,
             ],
             'flash' => [
-                'status' => fn (): ?string => $request->session()->get('status'),
+                'status' => fn (): ?string => is_string($status) ? $status : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

@@ -15,11 +15,11 @@ class ViewModeController extends Controller
 {
     public function update(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'mode' => ['required', Rule::enum(AdminViewModeEnum::class)],
         ]);
 
-        AdminViewMode::set($request, (string) $validated['mode']);
+        AdminViewMode::set($request, $request->string('mode')->toString());
 
         return back();
     }

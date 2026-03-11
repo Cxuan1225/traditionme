@@ -9,7 +9,6 @@ use App\DTOs\Commerce\ShopFiltersData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ShopProductResource;
 use App\Models\Product;
-use App\Support\WelcomeCatalog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;

@@ -17,6 +17,19 @@ class GetWelcomeDataAction
     public function __invoke(): WelcomePageData
     {
         $dbProducts = Product::where('is_active', true)->latest()->take(4)->get();
+        /** @var list<WelcomeProductData> $products */
+        $products = array_values($dbProducts->map(
+            static fn (Product $product): WelcomeProductData => new WelcomeProductData(
+                name: $product->name,
+                slug: $product->slug,
+                category: $product->category,
+                priceInSen: $product->price_in_sen,
+                originalPriceInSen: $product->original_price_in_sen ?? $product->price_in_sen,
+                badge: $product->badge ?? '',
+                gradient: $product->gradient ?? '',
+                imageUrl: $product->image_url,
+            ),
+        )->all());
 
         return new WelcomePageData(
             categories: array_map(
@@ -26,18 +39,7 @@ class GetWelcomeDataAction
                 ),
                 WelcomeCatalog::categories(),
             ),
-            products: $dbProducts->map(
-                static fn (Product $product): WelcomeProductData => new WelcomeProductData(
-                    name: $product->name,
-                    slug: $product->slug,
-                    category: $product->category,
-                    priceInSen: $product->price_in_sen,
-                    originalPriceInSen: $product->original_price_in_sen ?? $product->price_in_sen,
-                    badge: $product->badge ?? '',
-                    gradient: $product->gradient ?? '',
-                    imageUrl: $product->image_url,
-                ),
-            )->all(),
+            products: $products,
             occasions: array_map(
                 static fn (array $occasion): WelcomeOccasionData => new WelcomeOccasionData(
                     name: $occasion['name'],

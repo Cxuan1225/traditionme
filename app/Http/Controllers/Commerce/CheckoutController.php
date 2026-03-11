@@ -10,6 +10,7 @@ use App\DTOs\Commerce\PlaceOrderData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Commerce\CheckoutRequest;
 use App\Http\Resources\CartLineResource;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,15 +29,22 @@ class CheckoutController extends Controller
                 ->with('status', 'Add items to your cart before checkout.');
         }
 
-        $subtotalInSen = (int) collect($lines)->sum(
-            fn (array $line): int => $line['product']->price_in_sen * $line['quantity'],
+        $subtotalInSen = array_reduce(
+            $lines,
+            static fn (int $sum, array $line): int => $sum + ($line['product']->price_in_sen * $line['quantity']),
+            0,
         );
         $shippingInSen = $subtotalInSen >= 20_000 ? 0 : 1_200;
+        $itemCount = array_reduce(
+            $lines,
+            static fn (int $sum, array $line): int => $sum + $line['quantity'],
+            0,
+        );
 
         return Inertia::render('Checkout', [
             'lines' => CartLineResource::collection($lines)->resolve($request),
             'summary' => [
-                'itemCount' => (int) collect($lines)->sum('quantity'),
+                'itemCount' => $itemCount,
                 'subtotalInSen' => $subtotalInSen,
                 'discountInSen' => 0,
                 'shippingInSen' => $shippingInSen,
@@ -49,10 +57,16 @@ class CheckoutController extends Controller
         CheckoutRequest $request,
         PlaceOrderAction $action,
     ): RedirectResponse {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            abort(401);
+        }
+
         try {
             $order = $action(
                 $request->session(),
-                $request->user() ?? abort(401),
+                $user,
                 PlaceOrderData::fromRequest($request),
             );
         } catch (RuntimeException) {

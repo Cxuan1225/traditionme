@@ -102,6 +102,12 @@ const couponHint = computed<string>(() => {
         : 'Unknown coupon. The order will continue without a discount.';
 });
 
+const cartError = computed<string>(() => {
+    const errors = form.errors as Record<string, string | undefined>;
+
+    return errors.cart ?? '';
+});
+
 const submit = (): void => {
     form.transform((data) => ({
         ...data,
@@ -548,7 +554,7 @@ watch(
                     </article>
 
                     <article
-                        v-if="form.errors.cart"
+                        v-if="cartError"
                         class="tm-panel border border-red-200 bg-red-50/80 p-5 dark:border-red-500/40 dark:bg-red-950/30"
                     >
                         <div class="flex items-start gap-3">
@@ -562,7 +568,7 @@ watch(
                                 <p
                                     class="tm-body-sm mt-2 text-red-700/90 dark:text-red-100/80"
                                 >
-                                    {{ form.errors.cart }}
+                                    {{ cartError }}
                                 </p>
                             </div>
                         </div>

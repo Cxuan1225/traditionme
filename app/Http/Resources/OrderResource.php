@@ -15,7 +15,8 @@ class OrderResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $itemCount = (int) $this->items->sum('quantity');
+        /** @var int $itemCount */
+        $itemCount = $this->items->sum('quantity');
 
         return [
             'id' => $this->id,
@@ -24,7 +25,7 @@ class OrderResource extends JsonResource
             'statusLabel' => ucfirst($this->status),
             'couponCode' => $this->coupon_code,
             'notes' => $this->notes,
-            'placedAt' => $this->created_at?->toIso8601String(),
+            'placedAt' => $this->created_at->toIso8601String(),
             'summary' => [
                 'subtotalInSen' => $this->subtotal_in_sen,
                 'discountInSen' => $this->discount_in_sen,

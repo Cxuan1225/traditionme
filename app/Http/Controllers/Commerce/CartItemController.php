@@ -34,7 +34,7 @@ class CartItemController extends Controller
         Product $product,
         UpdateCartItemAction $action,
     ): RedirectResponse {
-        $quantity = (int) $request->input('quantity', 1);
+        $quantity = $request->integer('quantity', 1);
 
         $action($request->session(), $product, $quantity);
 

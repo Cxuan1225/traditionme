@@ -16,7 +16,7 @@ final class AdminViewMode
 
     private const string SESSION_KEY = 'admin_view_mode';
 
-    public static function isAdmin(User|null $user): bool
+    public static function isAdmin(?User $user): bool
     {
         return $user?->hasRole('admin') ?? false;
     }
@@ -29,9 +29,17 @@ final class AdminViewMode
             return self::STOREFRONT;
         }
 
-        $mode = (string) $request->session()->get(self::SESSION_KEY, self::ADMIN);
+        $mode = $request->session()->get(self::SESSION_KEY, self::ADMIN);
 
-        return AdminViewModeEnum::tryFrom($mode)?->value ?? self::ADMIN;
+        if (! is_string($mode)) {
+            return self::ADMIN;
+        }
+
+        $resolvedMode = AdminViewModeEnum::tryFrom($mode);
+
+        return $resolvedMode instanceof AdminViewModeEnum
+            ? $resolvedMode->value
+            : self::ADMIN;
     }
 
     public static function isAdminMode(Request $request): bool
