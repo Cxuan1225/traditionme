@@ -19,7 +19,7 @@ class AddCartItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_slug' => ['required', 'string', 'max:255'],
+            'product_slug' => ['required', 'string', 'max:255', 'exists:products,slug'],
         ];
     }
 }

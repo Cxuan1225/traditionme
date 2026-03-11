@@ -19,7 +19,8 @@ class WelcomeProductResource extends JsonResource
      *     price: string,
      *     originalPrice: string,
      *     badge: string,
-     *     gradient: string
+     *     gradient: string,
+     *     imageUrl: string|null
      * }
      */
     public function toArray(Request $request): array
@@ -35,6 +36,7 @@ class WelcomeProductResource extends JsonResource
             'originalPrice' => $this->formatRinggit($product->originalPriceInSen),
             'badge' => $product->badge,
             'gradient' => $product->gradient,
+            'imageUrl' => $product->imageUrl,
         ];
     }
 

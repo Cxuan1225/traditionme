@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import {
     CheckCircle2,
     ShieldCheck,
@@ -9,50 +9,21 @@ import {
 import { computed, ref } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toRinggit } from '@/composables/useCurrency';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
+import cartItems from '@/routes/cart/items';
+import checkout from '@/routes/checkout';
 import shop from '@/routes/shop';
+import type { CartLine } from '@/types/order';
 
-type CartLine = {
-    id: number;
-    slug: string;
-    name: string;
-    category: string;
-    size: string;
-    unitPriceInSen: number;
-    quantity: number;
-    imageUrl: string;
-    tone: string;
-};
-
-const toRinggit = (valueInSen: number): string =>
-    `RM ${(valueInSen / 100).toFixed(2)}`;
-
-const cartLines = ref<CartLine[]>([
+const props = withDefaults(
+    defineProps<{
+        lines: CartLine[];
+    }>(),
     {
-        id: 1,
-        slug: 'seri-heritage-kurung',
-        name: 'Seri Heritage Kurung',
-        category: 'Baju Kurung',
-        size: 'M',
-        unitPriceInSen: 28900,
-        quantity: 1,
-        imageUrl:
-            'https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-rose-100 via-amber-50 to-orange-100',
+        lines: () => [],
     },
-    {
-        id: 2,
-        slug: 'modern-cheongsam-luna',
-        name: 'Modern Cheongsam Luna',
-        category: 'Cheongsam',
-        size: 'S',
-        unitPriceInSen: 25900,
-        quantity: 1,
-        imageUrl:
-            'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-fuchsia-100 via-rose-50 to-orange-100',
-    },
-]);
+);
 
 const couponInput = ref<string>('');
 const couponMessage = ref<string>('');
@@ -60,11 +31,11 @@ const appliedCoupon = ref<string | null>(null);
 const couponState = ref<'warning' | 'success' | 'danger'>('warning');
 
 const itemCount = computed<number>(() =>
-    cartLines.value.reduce((sum, line) => sum + line.quantity, 0),
+    props.lines.reduce((sum, line) => sum + line.quantity, 0),
 );
 
 const subtotalInSen = computed<number>(() =>
-    cartLines.value.reduce(
+    props.lines.reduce(
         (sum, line) => sum + line.unitPriceInSen * line.quantity,
         0,
     ),
@@ -79,7 +50,7 @@ const discountInSen = computed<number>(() => {
 });
 
 const shippingInSen = computed<number>(() => {
-    if (cartLines.value.length === 0) {
+    if (props.lines.length === 0) {
         return 0;
     }
 
@@ -90,24 +61,18 @@ const totalInSen = computed<number>(
     () => subtotalInSen.value - discountInSen.value + shippingInSen.value,
 );
 
-const increaseQty = (lineId: number): void => {
-    cartLines.value = cartLines.value.map((line) =>
-        line.id === lineId ? { ...line, quantity: line.quantity + 1 } : line,
+const updateQuantity = (line: CartLine, quantity: number): void => {
+    router.patch(
+        cartItems.update({ product: line.slug }),
+        { quantity },
+        { preserveScroll: true },
     );
 };
 
-const decreaseQty = (lineId: number): void => {
-    cartLines.value = cartLines.value
-        .map((line) =>
-            line.id === lineId
-                ? { ...line, quantity: Math.max(1, line.quantity - 1) }
-                : line,
-        )
-        .filter((line) => line.quantity > 0);
-};
-
-const removeLine = (lineId: number): void => {
-    cartLines.value = cartLines.value.filter((line) => line.id !== lineId);
+const removeLine = (line: CartLine): void => {
+    router.delete(cartItems.destroy({ product: line.slug }), {
+        preserveScroll: true,
+    });
 };
 
 const applyCoupon = (): void => {
@@ -143,8 +108,7 @@ const applyCoupon = (): void => {
                 </h1>
                 <p class="tm-body mt-3 max-w-2xl">
                     Adjust quantity, apply promotions, and confirm your order
-                    summary. Shipping updates and payment flow can plug into
-                    this structure directly.
+                    summary.
                 </p>
                 <div class="mt-6 grid gap-3 sm:grid-cols-3">
                     <div class="tm-stat">
@@ -173,7 +137,7 @@ const applyCoupon = (): void => {
             <div class="grid gap-5 xl:grid-cols-[1fr_360px]">
                 <section class="space-y-4">
                     <article
-                        v-if="cartLines.length === 0"
+                        v-if="lines.length === 0"
                         class="tm-section text-center"
                         aria-live="polite"
                     >
@@ -198,15 +162,19 @@ const applyCoupon = (): void => {
                         </div>
                         <div class="space-y-3">
                             <div
-                                v-for="line in cartLines"
+                                v-for="line in lines"
                                 :key="line.id"
                                 class="tm-list-item grid gap-3 sm:grid-cols-[86px_1fr_auto]"
                             >
                                 <div
-                                    class="tm-product-media h-[86px]"
-                                    :class="line.tone"
+                                    class="tm-product-media h-21.5 bg-linear-to-br"
+                                    :class="
+                                        line.gradient ??
+                                        'from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700'
+                                    "
                                 >
                                     <img
+                                        v-if="line.imageUrl"
                                         :src="line.imageUrl"
                                         :alt="line.name"
                                         class="h-full w-full object-cover"
@@ -218,10 +186,9 @@ const applyCoupon = (): void => {
                                         {{ line.name }}
                                     </p>
                                     <p class="tm-body-sm mt-1">
-                                        {{ line.category }} · Size
-                                        {{ line.size }}
+                                        {{ line.category }}
                                     </p>
-                                    <p class="tm-title text-primary mt-2">
+                                    <p class="tm-title mt-2 text-primary">
                                         {{ toRinggit(line.unitPriceInSen) }}
                                     </p>
                                 </div>
@@ -231,7 +198,12 @@ const applyCoupon = (): void => {
                                             type="button"
                                             class="rounded-full px-2 py-1 text-sm font-bold"
                                             :aria-label="`Decrease quantity for ${line.name}`"
-                                            @click="decreaseQty(line.id)"
+                                            @click="
+                                                updateQuantity(
+                                                    line,
+                                                    line.quantity - 1,
+                                                )
+                                            "
                                         >
                                             -
                                         </button>
@@ -244,7 +216,12 @@ const applyCoupon = (): void => {
                                             type="button"
                                             class="rounded-full px-2 py-1 text-sm font-bold"
                                             :aria-label="`Increase quantity for ${line.name}`"
-                                            @click="increaseQty(line.id)"
+                                            @click="
+                                                updateQuantity(
+                                                    line,
+                                                    line.quantity + 1,
+                                                )
+                                            "
                                         >
                                             +
                                         </button>
@@ -253,7 +230,7 @@ const applyCoupon = (): void => {
                                         type="button"
                                         class="text-xs font-semibold text-red-600 transition hover:text-red-500"
                                         :aria-label="`Remove ${line.name} from cart`"
-                                        @click="removeLine(line.id)"
+                                        @click="removeLine(line)"
                                     >
                                         Remove
                                     </button>
@@ -264,7 +241,7 @@ const applyCoupon = (): void => {
 
                     <article class="tm-panel p-5">
                         <div class="mb-3 flex items-center gap-2">
-                            <TicketPercent class="text-primary size-4" />
+                            <TicketPercent class="size-4 text-primary" />
                             <p class="tm-subtitle">Promo code</p>
                         </div>
                         <div class="flex flex-col gap-2 sm:flex-row">
@@ -323,7 +300,7 @@ const applyCoupon = (): void => {
                                     }}
                                 </span>
                             </div>
-                            <div class="border-border border-t pt-3">
+                            <div class="border-t border-border pt-3">
                                 <div
                                     class="tm-summary-row text-base font-black"
                                 >
@@ -335,12 +312,14 @@ const applyCoupon = (): void => {
                             </div>
                         </div>
 
-                        <Button
-                            class="mt-5 w-full"
-                            :disabled="cartLines.length === 0"
-                        >
-                            Proceed to checkout
-                        </Button>
+                        <Link :href="checkout.show()" class="mt-5 block">
+                            <Button
+                                class="w-full"
+                                :disabled="lines.length === 0"
+                            >
+                                Proceed to checkout
+                            </Button>
+                        </Link>
                         <Link :href="shop.index()" class="mt-2 block">
                             <Button variant="outline" class="w-full"
                                 >Continue shopping</Button
@@ -352,15 +331,15 @@ const applyCoupon = (): void => {
                         <p class="tm-subtitle">Why shop with Tradition Me</p>
                         <div class="mt-3 space-y-2">
                             <p class="tm-body-sm flex items-center gap-2">
-                                <ShieldCheck class="text-primary size-4" />
+                                <ShieldCheck class="size-4 text-primary" />
                                 Secure payment processing
                             </p>
                             <p class="tm-body-sm flex items-center gap-2">
-                                <Truck class="text-primary size-4" />
+                                <Truck class="size-4 text-primary" />
                                 Fast nationwide delivery
                             </p>
                             <p class="tm-body-sm flex items-center gap-2">
-                                <CheckCircle2 class="text-primary size-4" />
+                                <CheckCircle2 class="size-4 text-primary" />
                                 Easy size exchange support
                             </p>
                         </div>

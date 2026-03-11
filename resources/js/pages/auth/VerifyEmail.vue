@@ -28,7 +28,8 @@ defineProps<{
         </div>
 
         <Form
-            v-bind="send.form()"
+            :action="send().url"
+            :method="send().method"
             class="tm-shell space-y-6 p-5 text-center"
             v-slot="{ processing }"
         >

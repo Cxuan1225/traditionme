@@ -9,12 +9,15 @@ use App\DTOs\Home\WelcomeOccasionData;
 use App\DTOs\Home\WelcomePageData;
 use App\DTOs\Home\WelcomeProductData;
 use App\DTOs\Home\WelcomeReviewData;
+use App\Models\Product;
 use App\Support\WelcomeCatalog;
 
 class GetWelcomeDataAction
 {
     public function __invoke(): WelcomePageData
     {
+        $dbProducts = Product::where('is_active', true)->latest()->take(4)->get();
+
         return new WelcomePageData(
             categories: array_map(
                 static fn (array $category): WelcomeCategoryData => new WelcomeCategoryData(
@@ -23,18 +26,18 @@ class GetWelcomeDataAction
                 ),
                 WelcomeCatalog::categories(),
             ),
-            products: array_map(
-                static fn (array $product): WelcomeProductData => new WelcomeProductData(
-                    name: $product['name'],
-                    slug: $product['slug'],
-                    category: $product['category'],
-                    priceInSen: $product['priceInSen'],
-                    originalPriceInSen: $product['originalPriceInSen'],
-                    badge: $product['badge'],
-                    gradient: $product['gradient'],
+            products: $dbProducts->map(
+                static fn (Product $product): WelcomeProductData => new WelcomeProductData(
+                    name: $product->name,
+                    slug: $product->slug,
+                    category: $product->category,
+                    priceInSen: $product->price_in_sen,
+                    originalPriceInSen: $product->original_price_in_sen ?? $product->price_in_sen,
+                    badge: $product->badge ?? '',
+                    gradient: $product->gradient ?? '',
+                    imageUrl: $product->image_url,
                 ),
-                WelcomeCatalog::products(),
-            ),
+            )->all(),
             occasions: array_map(
                 static fn (array $occasion): WelcomeOccasionData => new WelcomeOccasionData(
                     name: $occasion['name'],
@@ -52,7 +55,7 @@ class GetWelcomeDataAction
                 ),
                 WelcomeCatalog::reviews(),
             ),
-            totalProducts: WelcomeCatalog::totalProducts(),
+            totalProducts: Product::where('is_active', true)->count(),
         );
     }
 }

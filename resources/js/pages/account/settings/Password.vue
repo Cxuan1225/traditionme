@@ -39,7 +39,8 @@ import SettingsLayout from '@/layouts/settings/AccountSettingsLayout.vue';
 
                 <div class="grid gap-5 xl:grid-cols-[1.25fr_0.75fr]">
                     <Form
-                        v-bind="PasswordController.update.form()"
+                        :action="PasswordController.update().url"
+                        :method="PasswordController.update().method"
                         :options="{
                             preserveScroll: true,
                         }"

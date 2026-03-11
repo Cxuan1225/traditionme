@@ -14,5 +14,6 @@ readonly class WelcomeProductData
         public int $originalPriceInSen,
         public string $badge,
         public string $gradient,
+        public ?string $imageUrl,
     ) {}
 }

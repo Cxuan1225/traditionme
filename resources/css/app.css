@@ -90,6 +90,20 @@
     }
 }
 
+@utility tm-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+}
+
+@utility tm-shell {
+    @apply relative overflow-hidden rounded-[2rem] border border-border/80 bg-card/92 shadow-[0_22px_60px_-42px_rgba(32,18,6,0.7)] backdrop-blur;
+    animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility tm-card {
+    @apply rounded-2xl border border-border bg-background/70 shadow-sm backdrop-blur;
+}
+
 :root {
     --background: hsl(38 45% 97%);
     --foreground: hsl(28 17% 17%);
@@ -207,8 +221,7 @@
     }
     h1,
     h2,
-    h3,
-    .tm-display {
+    h3 {
         font-family: var(--font-display);
         letter-spacing: -0.02em;
     }
@@ -260,31 +273,31 @@
 
 @layer components {
     .tm-title-xl {
-        @apply tm-display text-4xl font-black leading-tight sm:text-5xl;
+        @apply tm-display text-4xl leading-tight font-black sm:text-5xl;
     }
 
     .tm-title-lg {
-        @apply tm-display text-3xl font-black leading-tight;
+        @apply tm-display text-3xl leading-tight font-black;
     }
 
     .tm-title {
-        @apply tm-display text-2xl font-black leading-tight;
+        @apply tm-display text-2xl leading-tight font-black;
     }
 
     .tm-subtitle {
-        @apply text-foreground text-lg font-semibold leading-snug;
+        @apply text-lg leading-snug font-semibold text-foreground;
     }
 
     .tm-body {
-        @apply text-foreground/85 text-sm leading-relaxed;
+        @apply text-sm leading-relaxed text-foreground/85;
     }
 
     .tm-body-sm {
-        @apply text-muted-foreground text-xs leading-relaxed;
+        @apply text-xs leading-relaxed text-muted-foreground;
     }
 
     .tm-muted {
-        @apply text-muted-foreground text-sm;
+        @apply text-sm text-muted-foreground;
     }
 
     .tm-section {
@@ -292,15 +305,11 @@
     }
 
     .tm-panel {
-        @apply border-border bg-card/90 rounded-3xl border shadow-sm;
-    }
-
-    .tm-card {
-        @apply border-border bg-background/70 rounded-2xl border shadow-sm backdrop-blur;
+        @apply rounded-3xl border border-border bg-card/90 shadow-sm;
     }
 
     .tm-list-item {
-        @apply border-border bg-background/65 rounded-2xl border p-3 transition;
+        @apply rounded-2xl border border-border bg-background/65 p-3 transition;
     }
 
     .tm-list-item:hover {
@@ -308,7 +317,7 @@
     }
 
     .tm-stat {
-        @apply border-border bg-background/70 rounded-xl border px-4 py-3;
+        @apply rounded-xl border border-border bg-background/70 px-4 py-3;
     }
 
     .tm-stat-warning {
@@ -316,11 +325,11 @@
     }
 
     .tm-chip {
-        @apply border-border bg-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide;
+        @apply inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2.5 py-1 text-[11px] font-semibold tracking-wide uppercase;
     }
 
     .tm-chip-strong {
-        @apply border-primary/45 bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide;
+        @apply inline-flex items-center gap-1 rounded-full border border-primary/45 bg-primary/10 px-2.5 py-1 text-[11px] font-bold tracking-wide text-primary uppercase;
     }
 
     .tm-form-field {
@@ -328,23 +337,23 @@
     }
 
     .tm-form-hint {
-        @apply text-muted-foreground text-xs leading-relaxed;
+        @apply text-xs leading-relaxed text-muted-foreground;
     }
 
     .tm-label {
-        @apply text-foreground text-sm font-semibold;
+        @apply text-sm font-semibold text-foreground;
     }
 
     .tm-input-surface {
-        @apply border-border bg-card h-11 rounded-xl;
+        @apply h-11 rounded-xl border-border bg-card;
     }
 
     .tm-select-surface {
-        @apply border-border bg-card text-foreground h-11 rounded-xl border px-3 text-sm;
+        @apply h-11 rounded-xl border border-border bg-card px-3 text-sm text-foreground;
     }
 
     .tm-admin-toolbar {
-        @apply border-border/85 bg-card/95 sticky top-4 z-20 rounded-2xl border p-3 shadow-sm backdrop-blur;
+        @apply sticky top-4 z-20 rounded-2xl border border-border/85 bg-card/95 p-3 shadow-sm backdrop-blur;
     }
 
     .tm-admin-toolbar:focus-within {
@@ -361,11 +370,11 @@
     }
 
     .tm-filter-chip {
-        @apply border-border bg-background text-foreground inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition;
+        @apply inline-flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition;
     }
 
     .tm-filter-chip span {
-        @apply text-muted-foreground font-bold;
+        @apply font-bold text-muted-foreground;
     }
 
     .tm-filter-chip:hover {
@@ -382,11 +391,11 @@
     }
 
     .tm-density-switch {
-        @apply border-border bg-background inline-flex items-center rounded-full border p-1;
+        @apply inline-flex items-center rounded-full border border-border bg-background p-1;
     }
 
     .tm-density-button {
-        @apply text-muted-foreground rounded-full px-3 py-1 text-xs font-semibold transition;
+        @apply rounded-full px-3 py-1 text-xs font-semibold text-muted-foreground transition;
     }
 
     .tm-density-button-active {
@@ -394,11 +403,11 @@
     }
 
     .tm-empty-state {
-        @apply text-muted-foreground border-border rounded-xl border border-dashed p-4 text-center text-sm;
+        @apply rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground;
     }
 
     .tm-sticky-actions {
-        @apply border-border bg-card/96 sticky bottom-0 z-10 flex flex-wrap items-center gap-2 border-t px-6 py-4 backdrop-blur;
+        @apply sticky bottom-0 z-10 flex flex-wrap items-center gap-2 border-t border-border bg-card/96 px-6 py-4 backdrop-blur;
     }
 
     .tm-sticky-actions:focus-within {
@@ -407,7 +416,7 @@
     }
 
     .tm-table-wrap {
-        @apply border-border bg-card/85 overflow-x-auto rounded-2xl border;
+        @apply overflow-x-auto rounded-2xl border border-border bg-card/85;
     }
 
     .tm-table {
@@ -431,11 +440,11 @@
     }
 
     .tm-th {
-        @apply border-border bg-secondary/55 text-muted-foreground border-b px-5 py-3 text-xs font-bold uppercase tracking-[0.14em];
+        @apply border-b border-border bg-secondary/55 px-5 py-3 text-xs font-bold tracking-[0.14em] text-muted-foreground uppercase;
     }
 
     .tm-td {
-        @apply border-border/70 text-foreground border-b px-5 py-3 align-middle text-sm;
+        @apply border-b border-border/70 px-5 py-3 align-middle text-sm text-foreground;
     }
 
     .tm-tr {
@@ -473,7 +482,7 @@
     }
 
     .tm-table-checkbox {
-        @apply border-border bg-background h-4 w-4 rounded border;
+        @apply h-4 w-4 rounded border border-border bg-background;
     }
 
     .tm-state-note {
@@ -492,26 +501,21 @@
         @apply border-red-300 bg-red-50 text-red-800 dark:border-red-700/60 dark:bg-red-900/20 dark:text-red-300;
     }
 
-    .tm-shell {
-        @apply border-border/80 bg-card/92 relative overflow-hidden rounded-[2rem] border shadow-[0_22px_60px_-42px_rgba(32,18,6,0.7)] backdrop-blur;
-        animation: tm-fade-up 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
     .dark .tm-shell {
         box-shadow: 0 26px 72px -48px rgba(0, 0, 0, 0.88);
     }
 
     .tm-shell::before {
         content: '';
-        @apply pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-amber-400/20 blur-3xl;
+        @apply pointer-events-none absolute -top-24 -right-20 h-56 w-56 rounded-full bg-amber-400/20 blur-3xl;
     }
 
     .tm-kicker {
-        @apply text-[11px] font-bold uppercase tracking-[0.24em];
+        @apply text-[11px] font-bold tracking-[0.24em] uppercase;
     }
 
     .tm-subtle-card {
-        @apply border-border/90 bg-background/70 rounded-2xl border shadow-sm backdrop-blur transition duration-300;
+        @apply rounded-2xl border border-border/90 bg-background/70 shadow-sm backdrop-blur transition duration-300;
     }
 
     .tm-subtle-card:hover {
@@ -540,23 +544,23 @@
     }
 
     .tm-product-card {
-        @apply tm-card relative overflow-hidden p-4;
+        @apply relative overflow-hidden tm-card p-4;
     }
 
     .tm-product-media {
-        @apply border-border/70 relative h-40 rounded-2xl border bg-gradient-to-br;
+        @apply relative h-40 rounded-2xl border border-border/70 bg-gradient-to-br;
     }
 
     .tm-media-thumb {
-        @apply border-border relative h-14 w-12 overflow-hidden rounded-lg border bg-gradient-to-br;
+        @apply relative h-14 w-12 overflow-hidden rounded-lg border border-border bg-gradient-to-br;
     }
 
     .tm-media-fallback {
-        @apply text-foreground/80 flex h-full items-center justify-center text-[10px] font-semibold uppercase tracking-wide;
+        @apply flex h-full items-center justify-center text-[10px] font-semibold tracking-wide text-foreground/80 uppercase;
     }
 
     .tm-warning-chip {
-        @apply inline-flex items-center rounded-full border border-amber-300/80 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-900 dark:border-amber-700/70 dark:bg-amber-950/30 dark:text-amber-300;
+        @apply inline-flex items-center rounded-full border border-amber-300/80 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-amber-900 uppercase dark:border-amber-700/70 dark:bg-amber-950/30 dark:text-amber-300;
     }
 
     .tm-media-preview-panel {
@@ -564,11 +568,11 @@
     }
 
     .tm-media-preview {
-        @apply border-border relative h-40 overflow-hidden rounded-2xl border bg-gradient-to-br;
+        @apply relative h-40 overflow-hidden rounded-2xl border border-border bg-gradient-to-br;
     }
 
     .tm-filter-pill {
-        @apply border-border bg-background text-foreground/80 inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold tracking-wide transition;
+        @apply inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold tracking-wide text-foreground/80 transition;
     }
 
     .tm-filter-pill:hover {
@@ -581,11 +585,11 @@
     }
 
     .tm-permission-group {
-        @apply border-border/70 rounded-xl border p-2;
+        @apply rounded-xl border border-border/70 p-2;
     }
 
     .tm-mini-chip {
-        @apply border-border bg-background text-foreground rounded-full border px-2 py-0.5 text-[11px] font-semibold transition;
+        @apply rounded-full border border-border bg-background px-2 py-0.5 text-[11px] font-semibold text-foreground transition;
     }
 
     .tm-mini-chip:hover {
@@ -601,11 +605,11 @@
     }
 
     .tm-summary-row {
-        @apply text-foreground flex items-center justify-between text-sm;
+        @apply flex items-center justify-between text-sm text-foreground;
     }
 
     .tm-qty-control {
-        @apply border-border bg-background inline-flex items-center rounded-full border p-1;
+        @apply inline-flex items-center rounded-full border border-border bg-background p-1;
     }
 
     .tm-fade-up {

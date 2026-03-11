@@ -29,7 +29,8 @@ final class WelcomeCatalog
      *     priceInSen: int,
      *     originalPriceInSen: int,
      *     badge: string,
-     *     gradient: string
+     *     gradient: string,
+     *     imageUrl: string
      * }>
      */
     public static function products(): array
@@ -43,6 +44,7 @@ final class WelcomeCatalog
                 'originalPriceInSen' => 35900,
                 'badge' => 'Best Seller',
                 'gradient' => 'from-rose-100 via-orange-50 to-amber-100',
+                'imageUrl' => 'https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80',
             ],
             [
                 'name' => 'Cekak Musang Premium',
@@ -52,6 +54,7 @@ final class WelcomeCatalog
                 'originalPriceInSen' => 29900,
                 'badge' => 'Limited',
                 'gradient' => 'from-emerald-100 via-teal-50 to-cyan-100',
+                'imageUrl' => 'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=900&q=80',
             ],
             [
                 'name' => 'Nyonya Kebaya Bloom',
@@ -61,6 +64,7 @@ final class WelcomeCatalog
                 'originalPriceInSen' => 31900,
                 'badge' => 'New',
                 'gradient' => 'from-fuchsia-100 via-pink-50 to-rose-100',
+                'imageUrl' => 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80',
             ],
             [
                 'name' => 'Kids Raya Twin Set',
@@ -70,6 +74,7 @@ final class WelcomeCatalog
                 'originalPriceInSen' => 18900,
                 'badge' => 'Hot',
                 'gradient' => 'from-sky-100 via-blue-50 to-indigo-100',
+                'imageUrl' => 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80',
             ],
         ];
     }

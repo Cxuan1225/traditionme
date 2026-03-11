@@ -19,6 +19,7 @@ class UpdateProductAction
             'original_price_in_sen' => $data->originalPriceInSen,
             'badge' => $data->badge,
             'gradient' => $data->gradient,
+            'image_url' => $data->imageUrl,
             'is_active' => $data->isActive,
         ]);
 

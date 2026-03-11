@@ -75,7 +75,8 @@ onUnmounted(() => {
                         </Button>
                         <Form
                             v-else
-                            v-bind="enable.form()"
+                            :action="enable().url"
+                            :method="enable().method"
                             @success="showSetupModal = true"
                             #default="{ processing }"
                         >
@@ -102,7 +103,11 @@ onUnmounted(() => {
                     <TwoFactorRecoveryCodes />
 
                     <div class="relative inline">
-                        <Form v-bind="disable.form()" #default="{ processing }">
+                        <Form
+                            :action="disable().url"
+                            :method="disable().method"
+                            #default="{ processing }"
+                        >
                             <Button
                                 variant="destructive"
                                 type="submit"

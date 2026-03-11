@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Actions\Commerce;
 
 use App\DTOs\Commerce\AddCartItemData;
-use App\Support\WelcomeCatalog;
+use App\Models\Product;
 use Illuminate\Contracts\Session\Session;
 
 class AddCartItemAction
 {
     public function __invoke(Session $session, AddCartItemData $data): bool
     {
-        if (! in_array($data->productSlug, WelcomeCatalog::productSlugs(), true)) {
+        if (! Product::where('slug', $data->productSlug)->where('is_active', true)->exists()) {
             return false;
         }
 

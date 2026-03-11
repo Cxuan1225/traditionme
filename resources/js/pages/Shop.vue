@@ -1,246 +1,92 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { Search, SlidersHorizontal, Sparkles, Tag } from 'lucide-vue-next';
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toRinggit } from '@/composables/useCurrency';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
 import { home } from '@/routes';
 import cart from '@/routes/cart';
+import cartItems from '@/routes/cart/items';
+import shop from '@/routes/shop';
+import type {
+    PaginatedResponse,
+    ShopFilters,
+    ShopProduct,
+} from '@/types/shop';
 
-type CatalogProduct = {
-    id: number;
-    slug: string;
-    name: string;
-    category: string;
-    occasion: string;
-    badge: string;
-    rating: number;
-    priceInSen: number;
-    originalPriceInSen: number | null;
-    imageUrl: string;
-    tone: string;
-    stock: 'ready' | 'low' | 'preorder';
-};
-
-const catalog: CatalogProduct[] = [
-    {
-        id: 1,
-        slug: 'seri-heritage-kurung',
-        name: 'Seri Heritage Kurung',
-        category: 'Baju Kurung',
-        occasion: 'Hari Raya',
-        badge: 'Best Seller',
-        rating: 4.9,
-        priceInSen: 28900,
-        originalPriceInSen: 34900,
-        imageUrl:
-            'https://images.unsplash.com/photo-1551232864-3f0890e580d9?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-rose-100 via-amber-50 to-orange-100',
-        stock: 'ready',
-    },
-    {
-        id: 2,
-        slug: 'peranakan-kebaya-classic',
-        name: 'Peranakan Kebaya Classic',
-        category: 'Kebaya',
-        occasion: 'Wedding',
-        badge: 'Limited',
-        rating: 4.8,
-        priceInSen: 31900,
-        originalPriceInSen: null,
-        imageUrl:
-            'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-red-100 via-pink-50 to-amber-100',
-        stock: 'low',
-    },
-    {
-        id: 3,
-        slug: 'modern-cheongsam-luna',
-        name: 'Modern Cheongsam Luna',
-        category: 'Cheongsam',
-        occasion: 'Dinner',
-        badge: 'New',
-        rating: 4.7,
-        priceInSen: 25900,
-        originalPriceInSen: 29900,
-        imageUrl:
-            'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-fuchsia-100 via-rose-50 to-orange-100',
-        stock: 'ready',
-    },
-    {
-        id: 4,
-        slug: 'saree-noor-royal',
-        name: 'Saree Noor Royal',
-        category: 'Saree',
-        occasion: 'Deepavali',
-        badge: 'Premium',
-        rating: 4.9,
-        priceInSen: 39900,
-        originalPriceInSen: 45900,
-        imageUrl:
-            'https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-violet-100 via-indigo-50 to-purple-100',
-        stock: 'preorder',
-    },
-    {
-        id: 5,
-        slug: 'men-baju-melayu-arya',
-        name: 'Men Baju Melayu Arya',
-        category: 'Menswear',
-        occasion: 'Hari Raya',
-        badge: 'Top Rated',
-        rating: 4.8,
-        priceInSen: 22900,
-        originalPriceInSen: null,
-        imageUrl:
-            'https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-emerald-100 via-teal-50 to-cyan-100',
-        stock: 'ready',
-    },
-    {
-        id: 6,
-        slug: 'songket-couple-signature',
-        name: 'Songket Couple Signature',
-        category: 'Couple Set',
-        occasion: 'Engagement',
-        badge: 'Bundle',
-        rating: 5,
-        priceInSen: 55900,
-        originalPriceInSen: 63900,
-        imageUrl:
-            'https://images.unsplash.com/photo-1543087903-1ac2ec7aa8ac?auto=format&fit=crop&w=900&q=80',
-        tone: 'from-amber-100 via-yellow-50 to-orange-100',
-        stock: 'low',
-    },
-];
-
-const toRinggit = (valueInSen: number): string =>
-    `RM ${(valueInSen / 100).toFixed(2)}`;
-
-const stockLabelMap: Record<CatalogProduct['stock'], string> = {
-    ready: 'Ready to ship',
-    low: 'Low stock',
-    preorder: 'Pre-order',
-};
-
-withDefaults(
+const props = withDefaults(
     defineProps<{
-        category?: string;
-        occasion?: string;
+        products: PaginatedResponse<ShopProduct>;
+        filters: ShopFilters;
+        categories: string[];
     }>(),
     {
-        category: '',
-        occasion: '',
+        categories: () => [],
     },
 );
 
-const query = ref<string>('');
-const selectedCategory = ref<string>('all');
-const selectedOccasion = ref<string>('all');
-const selectedSort = ref<string>('featured');
-const readyToShipOnly = ref<boolean>(false);
-const loadingPreview = ref<boolean>(false);
-let loadingTimer: ReturnType<typeof setTimeout> | null = null;
+const query = ref<string>(props.filters.search);
+const selectedCategory = ref<string>(props.filters.category || 'all');
+const selectedSort = ref<string>(props.filters.sort);
 
-const categoryOptions = computed<string[]>(() => [
-    'all',
-    ...new Set(catalog.map((item) => item.category)),
-]);
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-const occasionOptions = computed<string[]>(() => [
-    'all',
-    ...new Set(catalog.map((item) => item.occasion)),
-]);
-
-const filteredProducts = computed<CatalogProduct[]>(() =>
-    catalog.filter((item) => {
-        const matchesSearch =
-            query.value.trim() === '' ||
-            item.name.toLowerCase().includes(query.value.toLowerCase()) ||
-            item.category.toLowerCase().includes(query.value.toLowerCase()) ||
-            item.occasion.toLowerCase().includes(query.value.toLowerCase());
-        const matchesCategory =
-            selectedCategory.value === 'all' ||
-            item.category === selectedCategory.value;
-        const matchesOccasion =
-            selectedOccasion.value === 'all' ||
-            item.occasion === selectedOccasion.value;
-        const matchesReadyFilter =
-            !readyToShipOnly.value || item.stock === 'ready';
-
-        return (
-            matchesSearch &&
-            matchesCategory &&
-            matchesOccasion &&
-            matchesReadyFilter
+const applyFilters = (): void => {
+    if (debounceTimer !== null) {
+        clearTimeout(debounceTimer);
+    }
+    debounceTimer = setTimeout(() => {
+        router.get(
+            shop.index(),
+            {
+                category:
+                    selectedCategory.value !== 'all'
+                        ? selectedCategory.value
+                        : undefined,
+                search: query.value || undefined,
+                sort:
+                    selectedSort.value !== 'featured'
+                        ? selectedSort.value
+                        : undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
         );
-    }),
-);
-
-const sortedProducts = computed<CatalogProduct[]>(() => {
-    const products = [...filteredProducts.value];
-
-    switch (selectedSort.value) {
-        case 'price-asc':
-            return products.sort((a, b) => a.priceInSen - b.priceInSen);
-        case 'price-desc':
-            return products.sort((a, b) => b.priceInSen - a.priceInSen);
-        case 'rating':
-            return products.sort((a, b) => b.rating - a.rating);
-        case 'newest':
-            return products.sort((a, b) => b.id - a.id);
-        default:
-            return products;
-    }
-});
-
-const activeFilters = computed<string[]>(() => {
-    const filters: string[] = [];
-    if (selectedCategory.value !== 'all') {
-        filters.push(selectedCategory.value);
-    }
-    if (selectedOccasion.value !== 'all') {
-        filters.push(selectedOccasion.value);
-    }
-    if (readyToShipOnly.value) {
-        filters.push('Ready to ship only');
-    }
-    if (query.value.trim() !== '') {
-        filters.push(`Search: ${query.value.trim()}`);
-    }
-
-    return filters;
-});
+    }, 300);
+};
 
 const clearFilters = (): void => {
     query.value = '';
     selectedCategory.value = 'all';
-    selectedOccasion.value = 'all';
     selectedSort.value = 'featured';
-    readyToShipOnly.value = false;
+    router.get(shop.index(), {}, { preserveState: true, preserveScroll: true });
 };
 
-watch(
-    [query, selectedCategory, selectedOccasion, selectedSort, readyToShipOnly],
-    () => {
-        if (loadingTimer !== null) {
-            clearTimeout(loadingTimer);
-        }
-        loadingPreview.value = true;
-        loadingTimer = setTimeout(() => {
-            loadingPreview.value = false;
-        }, 280);
-    },
-);
+const addToCart = (productSlug: string): void => {
+    router.post(
+        cartItems.store(),
+        { product_slug: productSlug },
+        { preserveScroll: true },
+    );
+};
 
-onBeforeUnmount(() => {
-    if (loadingTimer !== null) {
-        clearTimeout(loadingTimer);
+const activeFilters = (): string[] => {
+    const filters: string[] = [];
+    if (selectedCategory.value !== 'all') {
+        filters.push(selectedCategory.value);
     }
-});
+    if (query.value.trim() !== '') {
+        filters.push(`Search: ${query.value.trim()}`);
+    }
+    return filters;
+};
+
+watch([query, selectedCategory, selectedSort], applyFilters);
 </script>
 
 <template>
@@ -254,28 +100,28 @@ onBeforeUnmount(() => {
                     Find your signature heritage look.
                 </h1>
                 <p class="tm-body mt-3 max-w-3xl">
-                    Browse curated traditional and modern pieces by category,
-                    occasion, and style mood. This discovery experience is wired
-                    to current routes and ready for backend catalog integration.
+                    Browse curated traditional and modern pieces by category and
+                    style mood.
                 </p>
                 <div class="mt-6 grid gap-3 sm:grid-cols-3">
                     <div class="tm-stat">
                         <p class="tm-kicker text-muted-foreground">
-                            Collections
+                            Categories
                         </p>
                         <p class="tm-title mt-2">
-                            {{ categoryOptions.length - 1 }}
-                        </p>
-                    </div>
-                    <div class="tm-stat">
-                        <p class="tm-kicker text-muted-foreground">Occasions</p>
-                        <p class="tm-title mt-2">
-                            {{ occasionOptions.length - 1 }}
+                            {{ categories.length }}
                         </p>
                     </div>
                     <div class="tm-stat">
                         <p class="tm-kicker text-muted-foreground">Products</p>
-                        <p class="tm-title mt-2">{{ sortedProducts.length }}</p>
+                        <p class="tm-title mt-2">{{ products.total }}</p>
+                    </div>
+                    <div class="tm-stat">
+                        <p class="tm-kicker text-muted-foreground">Page</p>
+                        <p class="tm-title mt-2">
+                            {{ products.current_page }} /
+                            {{ products.last_page }}
+                        </p>
                     </div>
                 </div>
             </article>
@@ -309,46 +155,30 @@ onBeforeUnmount(() => {
                             <p class="tm-label">Category</p>
                             <div class="flex flex-wrap gap-2">
                                 <button
-                                    v-for="option in categoryOptions"
-                                    :key="option"
                                     type="button"
                                     class="tm-filter-pill"
                                     :class="{
                                         'tm-filter-pill-active':
-                                            selectedCategory === option,
+                                            selectedCategory === 'all',
                                     }"
-                                    :aria-pressed="selectedCategory === option"
-                                    @click="selectedCategory = option"
+                                    :aria-pressed="selectedCategory === 'all'"
+                                    @click="selectedCategory = 'all'"
                                 >
-                                    {{
-                                        option === 'all'
-                                            ? 'All Categories'
-                                            : option
-                                    }}
+                                    All Categories
                                 </button>
-                            </div>
-                        </div>
-
-                        <div class="tm-form-field">
-                            <p class="tm-label">Occasion</p>
-                            <div class="flex flex-wrap gap-2">
                                 <button
-                                    v-for="option in occasionOptions"
-                                    :key="option"
+                                    v-for="cat in categories"
+                                    :key="cat"
                                     type="button"
                                     class="tm-filter-pill"
                                     :class="{
                                         'tm-filter-pill-active':
-                                            selectedOccasion === option,
+                                            selectedCategory === cat,
                                     }"
-                                    :aria-pressed="selectedOccasion === option"
-                                    @click="selectedOccasion = option"
+                                    :aria-pressed="selectedCategory === cat"
+                                    @click="selectedCategory = cat"
                                 >
-                                    {{
-                                        option === 'all'
-                                            ? 'All Occasions'
-                                            : option
-                                    }}
+                                    {{ cat }}
                                 </button>
                             </div>
                         </div>
@@ -364,7 +194,6 @@ onBeforeUnmount(() => {
                             >
                                 <option value="featured">Featured</option>
                                 <option value="newest">Newest</option>
-                                <option value="rating">Top rated</option>
                                 <option value="price-asc">
                                     Price: Low to high
                                 </option>
@@ -373,17 +202,6 @@ onBeforeUnmount(() => {
                                 </option>
                             </select>
                         </div>
-
-                        <label
-                            class="text-foreground flex items-center gap-2 text-sm font-medium"
-                        >
-                            <input
-                                v-model="readyToShipOnly"
-                                type="checkbox"
-                                class="border-border size-4 rounded"
-                            />
-                            Ready to ship only
-                        </label>
                     </div>
 
                     <Button
@@ -405,8 +223,8 @@ onBeforeUnmount(() => {
                             <div aria-live="polite">
                                 <p class="tm-subtitle">Product discovery</p>
                                 <p class="tm-body-sm mt-1">
-                                    {{ sortedProducts.length }} item(s) matched
-                                    your current selection.
+                                    {{ products.total }} item(s) matched your
+                                    current selection.
                                 </p>
                             </div>
                             <div class="flex items-center gap-2">
@@ -420,11 +238,11 @@ onBeforeUnmount(() => {
                             </div>
                         </div>
                         <div
-                            v-if="activeFilters.length > 0"
+                            v-if="activeFilters().length > 0"
                             class="mt-3 flex flex-wrap gap-2"
                         >
                             <span
-                                v-for="filter in activeFilters"
+                                v-for="filter in activeFilters()"
                                 :key="filter"
                                 class="tm-chip"
                             >
@@ -440,45 +258,16 @@ onBeforeUnmount(() => {
                         </div>
                     </article>
 
-                    <div
-                        v-if="loadingPreview"
-                        class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
-                        role="status"
-                        aria-live="polite"
-                    >
-                        <article
-                            v-for="index in 6"
-                            :key="`skeleton-${index}`"
-                            class="tm-product-card animate-pulse"
-                        >
-                            <div
-                                class="tm-product-media from-zinc-200 via-zinc-100 to-zinc-200 dark:from-zinc-800 dark:via-zinc-700 dark:to-zinc-800"
-                            />
-                            <div class="mt-4 space-y-2">
-                                <div
-                                    class="h-4 w-3/5 rounded bg-zinc-200 dark:bg-zinc-700"
-                                />
-                                <div
-                                    class="h-3 w-2/5 rounded bg-zinc-200 dark:bg-zinc-700"
-                                />
-                                <div
-                                    class="h-8 rounded-xl bg-zinc-200 dark:bg-zinc-700"
-                                />
-                            </div>
-                        </article>
-                        <span class="sr-only">Loading catalog results</span>
-                    </div>
-
                     <article
-                        v-else-if="sortedProducts.length === 0"
+                        v-if="products.data.length === 0"
                         class="tm-section text-center"
                         aria-live="polite"
                     >
                         <Sparkles class="text-primary mx-auto size-9" />
                         <h2 class="tm-title mt-3">No products found</h2>
                         <p class="tm-body mt-2">
-                            Try adjusting category, occasion, or search keywords
-                            to discover available styles.
+                            Try adjusting category or search keywords to
+                            discover available styles.
                         </p>
                         <div class="mt-5 flex flex-wrap justify-center gap-2">
                             <Button variant="outline" @click="clearFilters"
@@ -495,22 +284,27 @@ onBeforeUnmount(() => {
                         class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
                     >
                         <article
-                            v-for="product in sortedProducts"
+                            v-for="product in products.data"
                             :key="product.id"
                             class="tm-product-card"
                         >
                             <div
+                                v-if="product.badge"
                                 class="mb-3 flex items-center justify-between gap-2"
                             >
                                 <span class="tm-chip-strong">{{
                                     product.badge
                                 }}</span>
-                                <span class="tm-body-sm"
-                                    >★ {{ product.rating.toFixed(1) }}</span
-                                >
                             </div>
-                            <div class="tm-product-media" :class="product.tone">
+                            <div
+                                class="tm-product-media bg-linear-to-br"
+                                :class="
+                                    product.gradient ??
+                                    'from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700'
+                                "
+                            >
                                 <img
+                                    v-if="product.imageUrl"
                                     :src="product.imageUrl"
                                     :alt="product.name"
                                     class="h-full w-full object-cover"
@@ -524,36 +318,61 @@ onBeforeUnmount(() => {
                                 <span class="tm-chip">{{
                                     product.category
                                 }}</span>
-                                <span class="tm-chip">{{
-                                    product.occasion
-                                }}</span>
                             </div>
                             <div class="mt-4 flex items-end gap-2">
                                 <p class="tm-title text-primary">
                                     {{ toRinggit(product.priceInSen) }}
                                 </p>
                                 <p
-                                    v-if="product.originalPriceInSen !== null"
+                                    v-if="
+                                        product.originalPriceInSen !== null &&
+                                        product.originalPriceInSen !==
+                                            product.priceInSen
+                                    "
                                     class="tm-body-sm line-through"
                                 >
-                                    {{ toRinggit(product.originalPriceInSen) }}
+                                    {{
+                                        toRinggit(product.originalPriceInSen)
+                                    }}
                                 </p>
                             </div>
-                            <p class="tm-body-sm mt-1">
-                                {{ stockLabelMap[product.stock] }}
-                            </p>
                             <Button
                                 class="mt-4 w-full"
                                 :aria-label="`Add ${product.name} to cart`"
+                                @click="addToCart(product.slug)"
                             >
-                                {{
-                                    product.stock === 'preorder'
-                                        ? 'Pre-order now'
-                                        : 'Add to cart'
-                                }}
+                                Add to cart
                             </Button>
                         </article>
                     </div>
+
+                    <nav
+                        v-if="products.last_page > 1"
+                        class="flex flex-wrap items-center justify-center gap-1"
+                        aria-label="Pagination"
+                    >
+                        <template
+                            v-for="link in products.links"
+                            :key="link.label"
+                        >
+                            <Link
+                                v-if="link.url"
+                                :href="link.url"
+                                class="tm-filter-pill"
+                                :class="{
+                                    'tm-filter-pill-active': link.active,
+                                }"
+                                preserve-state
+                                preserve-scroll
+                                v-html="link.label"
+                            />
+                            <span
+                                v-else
+                                class="tm-filter-pill opacity-40"
+                                v-html="link.label"
+                            />
+                        </template>
+                    </nav>
                 </section>
             </div>
         </section>

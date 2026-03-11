@@ -21,7 +21,8 @@ class WelcomePageResource extends JsonResource
      *         price: string,
      *         originalPrice: string,
      *         badge: string,
-     *         gradient: string
+     *         gradient: string,
+     *         imageUrl: string|null
      *     }>,
      *     occasions: array<int, array{name: string, slug: string, description: string, badge: string}>,
      *     reviews: array<int, array{name: string, location: string, comment: string}>,

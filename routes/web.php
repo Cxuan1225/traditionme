@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Admin\ViewModeController;
 use App\Http\Controllers\Commerce\CartController;
 use App\Http\Controllers\Commerce\CartItemController;
+use App\Http\Controllers\Commerce\CheckoutController;
 use App\Http\Controllers\Commerce\CollectionController;
+use App\Http\Controllers\Commerce\OrderController;
 use App\Http\Controllers\Commerce\ShopController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\ViewModeController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Marketing\NewsletterSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,10 +19,15 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/collections/{slug}', [CollectionController::class, 'show'])->name('collections.show');
 Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
 Route::post('/cart/items', [CartItemController::class, 'store'])->name('cart.items.store');
+Route::patch('/cart/items/{product:slug}', [CartItemController::class, 'update'])->name('cart.items.update');
+Route::delete('/cart/items/{product:slug}', [CartItemController::class, 'destroy'])->name('cart.items.destroy');
 Route::post('/newsletter/subscriptions', [NewsletterSubscriptionController::class, 'store'])->name('newsletter.subscriptions.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('admin/view-mode', [ViewModeController::class, 'update'])
         ->middleware('role:admin')
         ->name('admin.view-mode.update');
