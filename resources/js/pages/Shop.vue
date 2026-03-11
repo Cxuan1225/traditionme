@@ -364,13 +364,15 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                                 }"
                                 preserve-state
                                 preserve-scroll
-                                v-html="link.label"
-                            />
+                            >
+                                <span v-html="link.label" />
+                            </Link>
                             <span
                                 v-else
                                 class="tm-filter-pill opacity-40"
-                                v-html="link.label"
-                            />
+                            >
+                                <span v-html="link.label" />
+                            </span>
                         </template>
                     </nav>
                 </section>

@@ -66,7 +66,6 @@ onMounted(async () => {
                     v-if="isRecoveryCodesVisible && recoveryCodesList.length"
                     :action="regenerateRecoveryCodes().url"
                     :method="regenerateRecoveryCodes().method"
-                    method="post"
                     :options="{ preserveScroll: true }"
                     @success="fetchRecoveryCodes"
                     #default="{ processing }"
