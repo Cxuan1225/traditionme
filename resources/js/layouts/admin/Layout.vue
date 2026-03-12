@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import {
+    ClipboardList,
     Gauge,
     LockKeyhole,
     Palette,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-vue-next';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { dashboard, home, logout } from '@/routes';
+import { index as ordersIndex } from '@/routes/admin/orders';
 import { edit as editAppearance } from '@/routes/appearance';
 import { index as productsIndex } from '@/routes/products';
 import { edit as editProfile } from '@/routes/profile';
@@ -39,6 +41,11 @@ const primaryNav: NavEntry[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: Gauge,
+    },
+    {
+        title: 'Orders',
+        href: ordersIndex(),
+        icon: ClipboardList,
     },
     {
         title: 'Products',

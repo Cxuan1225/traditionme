@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $name
  * @property string $slug
  * @property string $category
+ * @property string|null $description
  * @property int $price_in_sen
  * @property int|null $original_price_in_sen
  * @property string|null $badge
@@ -29,6 +30,7 @@ class Product extends Model
         'name',
         'slug',
         'category',
+        'description',
         'price_in_sen',
         'original_price_in_sen',
         'badge',

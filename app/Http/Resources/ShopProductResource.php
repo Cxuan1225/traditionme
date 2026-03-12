@@ -20,6 +20,7 @@ class ShopProductResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'category' => $this->category,
+            'description' => $this->description,
             'priceInSen' => $this->price_in_sen,
             'originalPriceInSen' => $this->original_price_in_sen,
             'badge' => $this->badge,

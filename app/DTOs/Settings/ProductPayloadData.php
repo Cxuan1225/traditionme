@@ -15,6 +15,7 @@ readonly class ProductPayloadData
         public string $name,
         public string $slug,
         public string $category,
+        public ?string $description,
         public int $priceInSen,
         public ?int $originalPriceInSen,
         public ?string $badge,
@@ -54,6 +55,7 @@ readonly class ProductPayloadData
         $name = $validated['name'] ?? null;
         $slug = $validated['slug'] ?? null;
         $category = $validated['category'] ?? null;
+        $description = $validated['description'] ?? null;
         $priceInSen = $validated['price_in_sen'] ?? null;
         $originalPriceInSen = $validated['original_price_in_sen'] ?? null;
         $badge = $validated['badge'] ?? null;
@@ -69,6 +71,7 @@ readonly class ProductPayloadData
             name: $name,
             slug: $slug,
             category: $category,
+            description: self::normalizeOptionalString($description),
             priceInSen: $priceInSen,
             originalPriceInSen: is_int($originalPriceInSen) ? $originalPriceInSen : null,
             badge: is_string($badge) ? $badge : null,
@@ -78,5 +81,16 @@ readonly class ProductPayloadData
             imageFile: $imageFile instanceof UploadedFile ? $imageFile : null,
             isActive: $isActive,
         );
+    }
+
+    private static function normalizeOptionalString(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalizedValue = trim($value);
+
+        return $normalizedValue !== '' ? $normalizedValue : null;
     }
 }

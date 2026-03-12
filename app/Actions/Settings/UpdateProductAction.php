@@ -26,6 +26,7 @@ class UpdateProductAction
             'name' => $data->name,
             'slug' => $data->slug,
             'category' => $data->category,
+            'description' => $data->description,
             'price_in_sen' => $data->priceInSen,
             'original_price_in_sen' => $data->originalPriceInSen,
             'badge' => $data->badge,

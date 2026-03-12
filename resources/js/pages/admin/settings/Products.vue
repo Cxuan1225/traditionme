@@ -33,6 +33,7 @@ type ProductResource = {
     name: string;
     slug: string;
     category: string;
+    description: string | null;
     price_in_sen: number;
     original_price_in_sen: number | null;
     badge: string | null;
@@ -93,6 +94,7 @@ const form = ref<{
     name: string;
     slug: string;
     category: string;
+    description: string;
     price_in_sen: string;
     original_price_in_sen: string;
     badge: string;
@@ -103,6 +105,7 @@ const form = ref<{
     name: '',
     slug: '',
     category: '',
+    description: '',
     price_in_sen: '',
     original_price_in_sen: '',
     badge: '',
@@ -218,6 +221,18 @@ const draftMediaState = computed<'missing' | 'invalid' | 'valid'>(() => {
 const tableDensityClass = computed<string>(() =>
     density.value === 'compact' ? 'tm-table-compact' : 'tm-table-comfortable',
 );
+
+const summarizeDescription = (value: string | null): string => {
+    if (value === null || value.trim() === '') {
+        return 'No description yet.';
+    }
+
+    const normalized = value.replace(/\s+/g, ' ').trim();
+
+    return normalized.length > 120
+        ? `${normalized.slice(0, 117)}...`
+        : normalized;
+};
 
 const revokeSelectedImagePreview = (): void => {
     if (selectedImagePreviewUrl.value !== null) {
@@ -398,6 +413,7 @@ const resetForm = (): void => {
         name: '',
         slug: '',
         category: '',
+        description: '',
         price_in_sen: '',
         original_price_in_sen: '',
         badge: '',
@@ -421,6 +437,7 @@ const startEdit = (product: ProductResource): void => {
         name: product.name,
         slug: product.slug,
         category: product.category,
+        description: product.description ?? '',
         price_in_sen: product.price_in_sen.toString(),
         original_price_in_sen: product.original_price_in_sen
             ? product.original_price_in_sen.toString()
@@ -441,6 +458,7 @@ const duplicateIntoDraft = (product: ProductResource): void => {
         name: `${product.name} copy`,
         slug: `${product.slug}-copy`,
         category: product.category,
+        description: product.description ?? '',
         price_in_sen: product.price_in_sen.toString(),
         original_price_in_sen: product.original_price_in_sen
             ? product.original_price_in_sen.toString()
@@ -469,6 +487,10 @@ const submitForm = async (): Promise<void> => {
     try {
         const payload = {
             ...form.value,
+            description:
+                form.value.description.trim() === ''
+                    ? null
+                    : form.value.description.trim(),
             price_in_sen: Number.parseInt(form.value.price_in_sen, 10),
             original_price_in_sen:
                 form.value.original_price_in_sen.trim() === ''
@@ -488,6 +510,7 @@ const submitForm = async (): Promise<void> => {
                       data.set('name', form.value.name);
                       data.set('slug', form.value.slug);
                       data.set('category', form.value.category);
+                      data.set('description', form.value.description.trim());
                       data.set('price_in_sen', payload.price_in_sen.toString());
                       data.set(
                           'original_price_in_sen',
@@ -568,6 +591,7 @@ const toggleProductActive = async (product: ProductResource): Promise<void> => {
                     name: product.name,
                     slug: product.slug,
                     category: product.category,
+                    description: product.description,
                     price_in_sen: product.price_in_sen,
                     original_price_in_sen: product.original_price_in_sen,
                     badge: product.badge ?? '',
@@ -986,6 +1010,9 @@ onMounted(async () => {
                                             Category
                                         </th>
                                         <th scope="col" class="tm-th">
+                                            Description
+                                        </th>
+                                        <th scope="col" class="tm-th">
                                             Price (sen)
                                         </th>
                                         <th
@@ -1095,6 +1122,17 @@ onMounted(async () => {
                                         </td>
                                         <td class="tm-td">
                                             {{ product.category }}
+                                        </td>
+                                        <td class="tm-td max-w-xs">
+                                            <p
+                                                class="text-sm text-muted-foreground"
+                                            >
+                                                {{
+                                                    summarizeDescription(
+                                                        product.description,
+                                                    )
+                                                }}
+                                            </p>
                                         </td>
                                         <td class="tm-td">
                                             {{ product.price_in_sen }}
@@ -1246,6 +1284,17 @@ onMounted(async () => {
                                         id="category"
                                         v-model="form.category"
                                         class="tm-input-surface"
+                                    />
+                                </div>
+                                <div class="tm-form-field">
+                                    <Label for="description" class="tm-label"
+                                        >Description</Label
+                                    >
+                                    <textarea
+                                        id="description"
+                                        v-model="form.description"
+                                        class="tm-input-surface min-h-32 resize-y"
+                                        placeholder="Add product story, fabric details, sizing notes, or merchandising copy."
                                     />
                                 </div>
                             </div>

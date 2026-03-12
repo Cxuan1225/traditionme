@@ -24,6 +24,7 @@ class ProductStoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:180'],
             'slug' => ['required', 'string', 'max:200', 'alpha_dash', Rule::unique('products', 'slug')],
             'category' => ['required', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:5000'],
             'price_in_sen' => ['required', 'integer', 'min:1', 'max:99999999'],
             'original_price_in_sen' => ['nullable', 'integer', 'min:1', 'max:99999999'],
             'badge' => ['nullable', 'string', 'max:80'],

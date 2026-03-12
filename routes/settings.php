@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Settings\AppearanceController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProductController;
@@ -28,6 +29,18 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('settings/products/{product}', [ProductController::class, 'destroy'])
         ->middleware('permission:products.delete')
         ->name('products.destroy');
+
+    Route::get('settings/orders', [AdminOrderController::class, 'index'])
+        ->middleware('permission:orders.view')
+        ->name('admin.orders.index');
+
+    Route::get('settings/orders/{order}', [AdminOrderController::class, 'show'])
+        ->middleware('permission:orders.view')
+        ->name('admin.orders.show');
+
+    Route::patch('settings/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
+        ->middleware('permission:orders.update_status')
+        ->name('admin.orders.update-status');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
