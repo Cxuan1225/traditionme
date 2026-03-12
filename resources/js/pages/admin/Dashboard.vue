@@ -68,7 +68,7 @@ const permissionCount = computed(() => permissions.value.length);
                 <p class="tm-kicker text-primary dark:text-amber-300">
                     Admin dashboard
                 </p>
-                <h2 class="tm-display mt-2 text-3xl font-black text-foreground">
+                <h2 class="mt-2 tm-display text-3xl font-black text-foreground">
                     Welcome, {{ userName }}
                 </h2>
                 <p class="mt-2 max-w-2xl text-sm text-muted-foreground">

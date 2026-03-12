@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -84,6 +84,10 @@ const products = ref<ProductResource[]>(props.initialProducts);
 const editingId = ref<number | null>(null);
 const isEditorOpen = ref<boolean>(false);
 const previewImageError = ref<boolean>(false);
+const selectedImageFile = ref<File | null>(null);
+const selectedImagePreviewUrl = ref<string | null>(null);
+const imageInputKey = ref<number>(0);
+const isImageDragActive = ref<boolean>(false);
 
 const form = ref<{
     name: string;
@@ -185,27 +189,85 @@ const selectedProducts = computed<ProductResource[]>(() =>
 );
 
 const draftImageUrl = computed<string>(() => form.value.image_url.trim());
-const draftPreviewUrl = computed<string | null>(() => {
+const draftRemotePreviewUrl = computed<string | null>(() => {
     if (draftImageUrl.value === '') {
         return null;
     }
 
-    return /^https?:\/\/\S+/i.test(draftImageUrl.value)
+    return /^https?:\/\/\S+/i.test(draftImageUrl.value) ||
+        draftImageUrl.value.startsWith('/')
         ? draftImageUrl.value
         : null;
 });
+const draftPreviewUrl = computed<string | null>(
+    () => selectedImagePreviewUrl.value ?? draftRemotePreviewUrl.value,
+);
 
 const draftMediaState = computed<'missing' | 'invalid' | 'valid'>(() => {
+    if (selectedImagePreviewUrl.value !== null) {
+        return 'valid';
+    }
+
     if (draftImageUrl.value === '') {
         return 'missing';
     }
 
-    return draftPreviewUrl.value === null ? 'invalid' : 'valid';
+    return draftRemotePreviewUrl.value === null ? 'invalid' : 'valid';
 });
 
 const tableDensityClass = computed<string>(() =>
     density.value === 'compact' ? 'tm-table-compact' : 'tm-table-comfortable',
 );
+
+const revokeSelectedImagePreview = (): void => {
+    if (selectedImagePreviewUrl.value !== null) {
+        URL.revokeObjectURL(selectedImagePreviewUrl.value);
+        selectedImagePreviewUrl.value = null;
+    }
+};
+
+const clearSelectedImageFile = (): void => {
+    selectedImageFile.value = null;
+    isImageDragActive.value = false;
+    imageInputKey.value += 1;
+    revokeSelectedImagePreview();
+};
+
+const setSelectedImageFile = (file: File | null): void => {
+    previewImageError.value = false;
+    isImageDragActive.value = false;
+    revokeSelectedImagePreview();
+    selectedImageFile.value = file;
+
+    if (file === null) {
+        return;
+    }
+
+    selectedImagePreviewUrl.value = URL.createObjectURL(file);
+};
+
+const handleImageSelection = (event: Event): void => {
+    const input = event.target as HTMLInputElement;
+    const [file] = input.files ?? [];
+
+    if (!file || !file.type.startsWith('image/')) {
+        clearSelectedImageFile();
+        return;
+    }
+
+    setSelectedImageFile(file);
+};
+
+const handleImageDrop = (event: DragEvent): void => {
+    const [file] = Array.from(event.dataTransfer?.files ?? []);
+
+    if (!file || !file.type.startsWith('image/')) {
+        clearSelectedImageFile();
+        return;
+    }
+
+    setSelectedImageFile(file);
+};
 
 const readCookie = (name: string): string | null => {
     const encodedName = `${encodeURIComponent(name)}=`;
@@ -223,20 +285,30 @@ const requestJson = async <T,>(
     endpoint: string,
     options: {
         method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-        body?: Record<string, unknown>;
+        body?: FormData | Record<string, unknown>;
     } = {},
 ): Promise<T> => {
     const token = readCookie('XSRF-TOKEN');
+    let requestBody: BodyInit | undefined;
+
+    if (options.body instanceof FormData) {
+        requestBody = options.body;
+    } else if (options.body !== undefined) {
+        requestBody = JSON.stringify(options.body);
+    }
+
     const response = await fetch(endpoint, {
         method: options.method ?? 'GET',
         credentials: 'same-origin',
         headers: {
             Accept: 'application/json',
-            'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest',
             ...(token ? { 'X-XSRF-TOKEN': token } : {}),
+            ...(options.body instanceof FormData
+                ? {}
+                : { 'Content-Type': 'application/json' }),
         },
-        body: options.body ? JSON.stringify(options.body) : undefined,
+        body: requestBody,
     });
 
     const payload = (await response.json().catch(() => ({}))) as {
@@ -321,6 +393,7 @@ const loadProducts = async (): Promise<void> => {
 const resetForm = (): void => {
     editingId.value = null;
     previewImageError.value = false;
+    clearSelectedImageFile();
     form.value = {
         name: '',
         slug: '',
@@ -342,6 +415,7 @@ const openCreateEditor = (): void => {
 const startEdit = (product: ProductResource): void => {
     editingId.value = product.id;
     previewImageError.value = false;
+    clearSelectedImageFile();
     isEditorOpen.value = true;
     form.value = {
         name: product.name,
@@ -361,6 +435,7 @@ const startEdit = (product: ProductResource): void => {
 const duplicateIntoDraft = (product: ProductResource): void => {
     editingId.value = null;
     previewImageError.value = false;
+    clearSelectedImageFile();
     isEditorOpen.value = true;
     form.value = {
         name: `${product.name} copy`,
@@ -405,12 +480,41 @@ const submitForm = async (): Promise<void> => {
                     : form.value.image_url.trim(),
         };
 
+        const multipartPayload =
+            selectedImageFile.value === null
+                ? null
+                : (() => {
+                      const data = new FormData();
+                      data.set('name', form.value.name);
+                      data.set('slug', form.value.slug);
+                      data.set('category', form.value.category);
+                      data.set('price_in_sen', payload.price_in_sen.toString());
+                      data.set(
+                          'original_price_in_sen',
+                          form.value.original_price_in_sen.trim(),
+                      );
+                      data.set('badge', form.value.badge);
+                      data.set('gradient', form.value.gradient);
+                      data.set('image_url', form.value.image_url.trim());
+                      data.set('image', selectedImageFile.value);
+                      data.set('is_active', payload.is_active ? '1' : '0');
+
+                      return data;
+                  })();
+
         if (isEditing && editingId.value !== null) {
             const response = await requestJson(
                 productsRoutes.update.url({ product: editingId.value }),
                 {
-                    method: 'PUT',
-                    body: payload,
+                    method: multipartPayload ? 'POST' : 'PUT',
+                    body:
+                        multipartPayload === null
+                            ? payload
+                            : (() => {
+                                  multipartPayload.set('_method', 'PUT');
+
+                                  return multipartPayload;
+                              })(),
                 },
             );
 
@@ -425,7 +529,7 @@ const submitForm = async (): Promise<void> => {
         } else {
             const response = await requestJson(productsRoutes.store.url(), {
                 method: 'POST',
-                body: payload,
+                body: multipartPayload ?? payload,
             });
 
             const created = parseProduct(response);
@@ -572,6 +676,10 @@ watch(
     },
 );
 
+onBeforeUnmount(() => {
+    revokeSelectedImagePreview();
+});
+
 onMounted(async () => {
     if (products.value.length === 0) {
         await loadProducts();
@@ -590,17 +698,17 @@ onMounted(async () => {
                 >
                     <div>
                         <p class="tm-kicker text-primary">Catalog workspace</p>
-                        <h2 class="tm-display mt-2 text-3xl font-black">
+                        <h2 class="mt-2 tm-display text-3xl font-black">
                             Media-first product catalog
                         </h2>
-                        <p class="text-muted-foreground mt-2 max-w-2xl text-sm">
+                        <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
                             Filter faster, review product imagery quality, and
                             update catalog metadata without leaving this view.
                         </p>
                     </div>
                     <div class="grid gap-2 sm:grid-cols-3">
                         <div class="tm-stat">
-                            <p class="text-muted-foreground text-xs">
+                            <p class="text-xs text-muted-foreground">
                                 Total products
                             </p>
                             <p class="text-2xl font-black">
@@ -608,11 +716,11 @@ onMounted(async () => {
                             </p>
                         </div>
                         <div class="tm-stat">
-                            <p class="text-muted-foreground text-xs">Active</p>
+                            <p class="text-xs text-muted-foreground">Active</p>
                             <p class="text-2xl font-black">{{ activeCount }}</p>
                         </div>
                         <div class="tm-stat tm-stat-warning">
-                            <p class="text-muted-foreground text-xs">
+                            <p class="text-xs text-muted-foreground">
                                 Missing photo
                             </p>
                             <p class="text-2xl font-black">
@@ -640,10 +748,10 @@ onMounted(async () => {
                     aria-label="Catalog actions toolbar"
                 >
                     <div>
-                        <p class="text-foreground text-sm font-semibold">
+                        <p class="text-sm font-semibold text-foreground">
                             Catalog workflow tools
                         </p>
-                        <p class="text-muted-foreground text-xs">
+                        <p class="text-xs text-muted-foreground">
                             Search by name, control density, and focus on
                             missing media or inactive inventory.
                         </p>
@@ -814,7 +922,7 @@ onMounted(async () => {
 
                         <p
                             v-else-if="!abilities.canViewProducts"
-                            class="text-muted-foreground text-sm"
+                            class="text-sm text-muted-foreground"
                         >
                             You do not have access to view products.
                         </p>
@@ -945,7 +1053,7 @@ onMounted(async () => {
                                                         {{ product.name }}
                                                     </p>
                                                     <p
-                                                        class="text-muted-foreground text-xs"
+                                                        class="text-xs text-muted-foreground"
                                                     >
                                                         {{ product.slug }}
                                                     </p>
@@ -1191,17 +1299,109 @@ onMounted(async () => {
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Media and publish</p>
                             <p class="tm-form-hint">
-                                Supply <code>image_url</code> for photo-first
-                                cards. Gradient classes are fallback for missing
-                                media.
+                                Upload a catalog image for local storage, or
+                                keep using <code>image_url</code> for remote
+                                media. Gradient classes remain the fallback for
+                                missing images.
                             </p>
                             <div
                                 class="mt-3 grid gap-3 xl:grid-cols-[1.1fr_0.9fr]"
                             >
                                 <div class="space-y-3">
                                     <div class="tm-form-field">
+                                        <Label class="tm-label"
+                                            >Product image upload</Label
+                                        >
+                                        <label
+                                            class="flex cursor-pointer flex-col gap-3 rounded-[1.75rem] border border-dashed border-[color:rgba(140,74,44,0.24)] bg-[linear-gradient(145deg,rgba(255,250,245,0.96),rgba(255,244,234,0.82))] p-4 transition hover:border-[color:rgba(140,74,44,0.42)]"
+                                            :class="{
+                                                'border-[color:rgba(140,74,44,0.5)] bg-[linear-gradient(145deg,rgba(255,244,234,0.96),rgba(255,236,220,0.88))]':
+                                                    isImageDragActive,
+                                            }"
+                                            @dragenter.prevent="
+                                                isImageDragActive = true
+                                            "
+                                            @dragover.prevent="
+                                                isImageDragActive = true
+                                            "
+                                            @dragleave.prevent="
+                                                isImageDragActive = false
+                                            "
+                                            @drop.prevent="handleImageDrop"
+                                        >
+                                            <input
+                                                :key="imageInputKey"
+                                                type="file"
+                                                accept="image/*"
+                                                class="sr-only"
+                                                @change="handleImageSelection"
+                                            />
+                                            <div
+                                                class="flex items-start justify-between gap-3"
+                                            >
+                                                <div class="space-y-1">
+                                                    <p
+                                                        class="text-sm font-semibold text-zinc-900"
+                                                    >
+                                                        Drop an image here or
+                                                        browse from device
+                                                    </p>
+                                                    <p
+                                                        class="text-xs leading-5 text-zinc-600"
+                                                    >
+                                                        JPG, PNG, or WebP up to
+                                                        4 MB. New uploads take
+                                                        priority over the remote
+                                                        URL field.
+                                                    </p>
+                                                </div>
+                                                <span
+                                                    class="rounded-full border border-[color:rgba(140,74,44,0.2)] bg-white/90 px-3 py-1 text-xs font-semibold text-zinc-700"
+                                                >
+                                                    Browse
+                                                </span>
+                                            </div>
+                                            <div
+                                                v-if="selectedImageFile"
+                                                class="flex items-center justify-between gap-3 rounded-2xl bg-white/80 px-3 py-2"
+                                            >
+                                                <div class="min-w-0">
+                                                    <p
+                                                        class="truncate text-sm font-medium text-zinc-900"
+                                                    >
+                                                        {{
+                                                            selectedImageFile.name
+                                                        }}
+                                                    </p>
+                                                    <p
+                                                        class="text-xs text-zinc-500"
+                                                    >
+                                                        {{
+                                                            (
+                                                                selectedImageFile.size /
+                                                                1024 /
+                                                                1024
+                                                            ).toFixed(2)
+                                                        }}
+                                                        MB selected
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    variant="outline"
+                                                    @click.prevent="
+                                                        clearSelectedImageFile()
+                                                    "
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="tm-form-field">
                                         <Label for="image-url" class="tm-label"
-                                            >Product photo URL</Label
+                                            >Remote photo URL</Label
                                         >
                                         <Input
                                             id="image-url"
@@ -1269,7 +1469,8 @@ onMounted(async () => {
                                     >
                                         Missing photo warning: this product will
                                         render with gradient fallback in
-                                        listings.
+                                        listings until an upload or URL is
+                                        supplied.
                                     </p>
                                     <p
                                         v-else-if="
@@ -1285,8 +1486,11 @@ onMounted(async () => {
                                         v-else
                                         class="tm-state-note tm-state-note-success"
                                     >
-                                        Photo preview loaded. Product cards will
-                                        prioritize this media.
+                                        {{
+                                            selectedImageFile
+                                                ? 'New upload preview ready. Saving will replace the current catalog image.'
+                                                : 'Photo preview loaded. Product cards will prioritize this media.'
+                                        }}
                                     </p>
                                 </div>
                             </div>

@@ -475,10 +475,10 @@ onMounted(async () => {
         <div class="space-y-4 p-4">
             <section class="tm-shell p-6">
                 <p class="tm-kicker text-primary">Security Administration</p>
-                <h2 class="tm-display text-foreground mt-2 text-3xl font-black">
+                <h2 class="mt-2 tm-display text-3xl font-black text-foreground">
                     Role and permission control
                 </h2>
-                <p class="text-muted-foreground mt-2 max-w-2xl text-sm">
+                <p class="mt-2 max-w-2xl text-sm text-muted-foreground">
                     Manage role bundles, permission synchronization, and user
                     assignments.
                 </p>
@@ -501,10 +501,10 @@ onMounted(async () => {
                     aria-label="Role actions toolbar"
                 >
                     <div>
-                        <p class="text-foreground text-sm font-semibold">
+                        <p class="text-sm font-semibold text-foreground">
                             Roles and access controls
                         </p>
-                        <p class="text-muted-foreground text-xs">
+                        <p class="text-xs text-muted-foreground">
                             Manage role bundles with a simpler, direct
                             permission workflow.
                         </p>
@@ -530,7 +530,7 @@ onMounted(async () => {
                     <div
                         class="mt-2 flex flex-col gap-2 text-sm lg:flex-row lg:items-center lg:justify-between"
                     >
-                        <p class="text-foreground font-semibold">
+                        <p class="font-semibold text-foreground">
                             {{
                                 selectedRole
                                     ? `${selectedRole.name} (${selectedRole.guard_name})`
@@ -572,7 +572,7 @@ onMounted(async () => {
 
                         <p
                             v-else-if="!abilities.canViewRoles"
-                            class="text-muted-foreground text-sm"
+                            class="text-sm text-muted-foreground"
                         >
                             You do not have access to view roles.
                         </p>
@@ -711,7 +711,7 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Initial permissions</Label>
                             <div
-                                class="tm-card max-h-72 space-y-3 overflow-y-auto p-3"
+                                class="max-h-72 space-y-3 overflow-y-auto tm-card p-3"
                             >
                                 <p
                                     v-if="permissionGroups.length === 0"
@@ -811,7 +811,7 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Permissions by domain</Label>
                             <div
-                                class="tm-card max-h-80 space-y-3 overflow-y-auto p-3"
+                                class="max-h-80 space-y-3 overflow-y-auto tm-card p-3"
                             >
                                 <p
                                     v-if="permissionGroups.length === 0"
@@ -913,7 +913,7 @@ onMounted(async () => {
                         <div class="space-y-2">
                             <Label>Roles</Label>
                             <div
-                                class="tm-card max-h-56 space-y-2 overflow-y-auto p-3"
+                                class="max-h-56 space-y-2 overflow-y-auto tm-card p-3"
                             >
                                 <p
                                     v-if="availableRoleNames.length === 0"
@@ -958,11 +958,11 @@ onMounted(async () => {
                             class="tm-state-note tm-state-note-success"
                         >
                             Updated user:
-                            <span class="text-foreground font-medium">
+                            <span class="font-medium text-foreground">
                                 {{ assignedUser.name }}
                             </span>
                             ({{ assignedUser.email }}) with
-                            <span class="text-foreground font-medium">
+                            <span class="font-medium text-foreground">
                                 {{ assignedUser.roles.length }}
                             </span>
                             role(s).

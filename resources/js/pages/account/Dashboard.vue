@@ -21,10 +21,10 @@ const userName = computed(() => page.props.auth?.user?.name ?? 'there');
             >
                 <p class="tm-kicker text-primary">Welcome back</p>
                 <h1
-                    class="tm-display mt-3 text-4xl leading-tight font-black text-foreground sm:text-5xl"
+                    class="mt-3 tm-display text-4xl leading-tight font-black text-foreground sm:text-5xl"
                 >
                     Hi {{ userName }}, continue your
-                    <span class="tm-display block text-primary"
+                    <span class="block tm-display text-primary"
                         >Tradition Me</span
                     >
                     journey.

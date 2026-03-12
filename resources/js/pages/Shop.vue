@@ -11,11 +11,7 @@ import { home } from '@/routes';
 import cart from '@/routes/cart';
 import cartItems from '@/routes/cart/items';
 import shop from '@/routes/shop';
-import type {
-    PaginatedResponse,
-    ShopFilters,
-    ShopProduct,
-} from '@/types/shop';
+import type { PaginatedResponse, ShopFilters, ShopProduct } from '@/types/shop';
 
 const props = withDefaults(
     defineProps<{
@@ -129,7 +125,7 @@ watch([query, selectedCategory, selectedSort], applyFilters);
             <div class="grid gap-5 xl:grid-cols-[280px_1fr]">
                 <aside class="tm-panel h-fit p-5 xl:sticky xl:top-24">
                     <div class="mb-4 flex items-center gap-2">
-                        <SlidersHorizontal class="text-primary size-4" />
+                        <SlidersHorizontal class="size-4 text-primary" />
                         <p class="tm-subtitle">Filter & Sort</p>
                     </div>
 
@@ -140,7 +136,7 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                             >
                             <div class="relative">
                                 <Search
-                                    class="text-muted-foreground pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
+                                    class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
                                 />
                                 <Input
                                     id="shop-search"
@@ -263,7 +259,7 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                         class="tm-section text-center"
                         aria-live="polite"
                     >
-                        <Sparkles class="text-primary mx-auto size-9" />
+                        <Sparkles class="mx-auto size-9 text-primary" />
                         <h2 class="tm-title mt-3">No products found</h2>
                         <p class="tm-body mt-2">
                             Try adjusting category or search keywords to
@@ -331,9 +327,7 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                                     "
                                     class="tm-body-sm line-through"
                                 >
-                                    {{
-                                        toRinggit(product.originalPriceInSen)
-                                    }}
+                                    {{ toRinggit(product.originalPriceInSen) }}
                                 </p>
                             </div>
                             <Button
@@ -367,10 +361,7 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                             >
                                 <span v-html="link.label" />
                             </Link>
-                            <span
-                                v-else
-                                class="tm-filter-pill opacity-40"
-                            >
+                            <span v-else class="tm-filter-pill opacity-40">
                                 <span v-html="link.label" />
                             </span>
                         </template>

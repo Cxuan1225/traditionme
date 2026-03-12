@@ -6,6 +6,7 @@ namespace App\DTOs\Settings;
 
 use App\Http\Requests\Settings\ProductStoreRequest;
 use App\Http\Requests\Settings\ProductUpdateRequest;
+use Illuminate\Http\UploadedFile;
 use UnexpectedValueException;
 
 readonly class ProductPayloadData
@@ -19,24 +20,37 @@ readonly class ProductPayloadData
         public ?string $badge,
         public ?string $gradient,
         public ?string $imageUrl,
+        public bool $hasImageUrlInput,
+        public ?UploadedFile $imageFile,
         public bool $isActive,
     ) {}
 
     public static function fromStoreRequest(ProductStoreRequest $request): self
     {
-        return self::fromValidated($request->validated());
+        return self::fromValidated(
+            $request->validated(),
+            $request->exists('image_url'),
+            $request->file('image'),
+        );
     }
 
     public static function fromUpdateRequest(ProductUpdateRequest $request): self
     {
-        return self::fromValidated($request->validated());
+        return self::fromValidated(
+            $request->validated(),
+            $request->exists('image_url'),
+            $request->file('image'),
+        );
     }
 
     /**
      * @param  array<string, mixed>  $validated
      */
-    private static function fromValidated(array $validated): self
-    {
+    private static function fromValidated(
+        array $validated,
+        bool $hasImageUrlInput,
+        mixed $imageFile,
+    ): self {
         $name = $validated['name'] ?? null;
         $slug = $validated['slug'] ?? null;
         $category = $validated['category'] ?? null;
@@ -60,6 +74,8 @@ readonly class ProductPayloadData
             badge: is_string($badge) ? $badge : null,
             gradient: is_string($gradient) ? $gradient : null,
             imageUrl: is_string($imageUrl) ? $imageUrl : null,
+            hasImageUrlInput: $hasImageUrlInput,
+            imageFile: $imageFile instanceof UploadedFile ? $imageFile : null,
             isActive: $isActive,
         );
     }
