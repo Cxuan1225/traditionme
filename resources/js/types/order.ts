@@ -53,6 +53,9 @@ export interface Order {
     couponCode: string | null;
     notes: string | null;
     placedAt: string | null;
+    paidAt: string | null;
+    shippedAt: string | null;
+    deliveredAt: string | null;
     summary: OrderSummary;
     shipping: OrderShipping;
     items: OrderItem[];

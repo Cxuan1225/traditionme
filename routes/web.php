@@ -27,6 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/account/orders', [OrderController::class, 'index'])->name('account.orders.index');
+    Route::get('/account/orders/{order}', [OrderController::class, 'accountShow'])->name('account.orders.show');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('admin/view-mode', [ViewModeController::class, 'update'])
         ->middleware('role:admin')

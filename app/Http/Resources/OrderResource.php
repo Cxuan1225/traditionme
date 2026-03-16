@@ -26,6 +26,9 @@ class OrderResource extends JsonResource
             'couponCode' => $this->coupon_code,
             'notes' => $this->notes,
             'placedAt' => $this->created_at->toIso8601String(),
+            'paidAt' => $this->paid_at?->toIso8601String(),
+            'shippedAt' => $this->shipped_at?->toIso8601String(),
+            'deliveredAt' => $this->delivered_at?->toIso8601String(),
             'summary' => [
                 'subtotalInSen' => $this->subtotal_in_sen,
                 'discountInSen' => $this->discount_in_sen,

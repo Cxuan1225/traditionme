@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { ChevronDown, LogOut, Settings, ShoppingBag } from 'lucide-vue-next';
+import {
+    ChevronDown,
+    LogOut,
+    Package,
+    Settings,
+    ShoppingBag,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -12,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getInitials } from '@/composables/useInitials';
 import { home, login, logout, register } from '@/routes';
+import accountOrders from '@/routes/account/orders';
 import cart from '@/routes/cart';
 import { edit as editProfile } from '@/routes/profile';
 import shop from '@/routes/shop';
@@ -127,6 +134,15 @@ const isAuthenticated = computed(() => Boolean(user.value));
                                     >
                                         <Settings class="mr-2 size-4" />
                                         Settings
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem as-child>
+                                    <Link
+                                        :href="accountOrders.index()"
+                                        class="flex w-full items-center"
+                                    >
+                                        <Package class="mr-2 size-4" />
+                                        My Orders
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
