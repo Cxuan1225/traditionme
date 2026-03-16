@@ -21,7 +21,7 @@ class CreateProductAction
         return Product::query()->create([
             'name' => $data->name,
             'slug' => $data->slug,
-            'category' => $data->category,
+            'category' => $data->category->value,
             'description' => $data->description,
             'price_in_sen' => $data->priceInSen,
             'original_price_in_sen' => $data->originalPriceInSen,

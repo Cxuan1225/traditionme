@@ -23,6 +23,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { toRinggit } from '@/composables/useCurrency';
+import {
+    getProductCategoryLabel,
+    productCategoryOptions,
+} from '@/constants/productCategories';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { index as productsIndexRoute } from '@/routes/products';
 import productsRoutes from '@/routes/products';
@@ -118,23 +123,18 @@ const abilities = computed<Required<Capabilities>>(() => ({
     canDeleteProducts: props.capabilities.canDeleteProducts ?? true,
 }));
 
-const categoryOptions = computed<string[]>(() =>
-    Array.from(
-        new Set(
-            products.value
-                .map((product) => product.category.trim())
-                .filter((category) => category !== ''),
-        ),
-    ).sort((left, right) => left.localeCompare(right)),
-);
-
 const visibleProducts = computed<ProductResource[]>(() => {
     const query = searchQuery.value.trim().toLowerCase();
 
     return products.value.filter((product) => {
         const searchMatch =
             query === '' ||
-            [product.name, product.slug, product.category]
+            [
+                product.name,
+                product.slug,
+                product.category,
+                getProductCategoryLabel(product.category),
+            ]
                 .join(' ')
                 .toLowerCase()
                 .includes(query);
@@ -218,6 +218,37 @@ const draftMediaState = computed<'missing' | 'invalid' | 'valid'>(() => {
 const tableDensityClass = computed<string>(() =>
     density.value === 'compact' ? 'tm-table-compact' : 'tm-table-comfortable',
 );
+
+const formatRinggitInput = (valueInSen: number | null): string =>
+    valueInSen === null ? '' : (valueInSen / 100).toFixed(2);
+
+const parseRinggitInput = (
+    value: string,
+    fieldLabel: string,
+    allowEmpty: boolean,
+): number | null => {
+    const normalized = value.trim().replaceAll(',', '');
+
+    if (normalized === '') {
+        if (allowEmpty) {
+            return null;
+        }
+
+        throw new Error(`${fieldLabel} is required.`);
+    }
+
+    if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) {
+        throw new Error(`${fieldLabel} must use RM format like 1.00.`);
+    }
+
+    const amountInSen = Math.round(Number.parseFloat(normalized) * 100);
+
+    if (!Number.isInteger(amountInSen) || amountInSen < 1) {
+        throw new Error(`${fieldLabel} must be at least RM 0.01.`);
+    }
+
+    return amountInSen;
+};
 
 const revokeSelectedImagePreview = (): void => {
     if (selectedImagePreviewUrl.value !== null) {
@@ -421,9 +452,9 @@ const startEdit = (product: ProductResource): void => {
         name: product.name,
         slug: product.slug,
         category: product.category,
-        price_in_sen: product.price_in_sen.toString(),
+        price_in_sen: formatRinggitInput(product.price_in_sen),
         original_price_in_sen: product.original_price_in_sen
-            ? product.original_price_in_sen.toString()
+            ? formatRinggitInput(product.original_price_in_sen)
             : '',
         badge: product.badge ?? '',
         gradient: product.gradient ?? '',
@@ -441,9 +472,9 @@ const duplicateIntoDraft = (product: ProductResource): void => {
         name: `${product.name} copy`,
         slug: `${product.slug}-copy`,
         category: product.category,
-        price_in_sen: product.price_in_sen.toString(),
+        price_in_sen: formatRinggitInput(product.price_in_sen),
         original_price_in_sen: product.original_price_in_sen
-            ? product.original_price_in_sen.toString()
+            ? formatRinggitInput(product.original_price_in_sen)
             : '',
         badge: product.badge ?? '',
         gradient: product.gradient ?? '',
@@ -467,13 +498,26 @@ const submitForm = async (): Promise<void> => {
     pageSuccess.value = null;
 
     try {
+        const priceInSen = parseRinggitInput(
+            form.value.price_in_sen,
+            'Price',
+            false,
+        );
+        const originalPriceInSen = parseRinggitInput(
+            form.value.original_price_in_sen,
+            'Original price',
+            true,
+        );
+
+        if (priceInSen === null) {
+            throw new Error('Price is required.');
+        }
+
         const payload = {
             ...form.value,
-            price_in_sen: Number.parseInt(form.value.price_in_sen, 10),
-            original_price_in_sen:
-                form.value.original_price_in_sen.trim() === ''
-                    ? null
-                    : Number.parseInt(form.value.original_price_in_sen, 10),
+            category: form.value.category.trim().toLowerCase(),
+            price_in_sen: priceInSen,
+            original_price_in_sen: originalPriceInSen,
             image_url:
                 form.value.image_url.trim() === ''
                     ? null
@@ -487,11 +531,11 @@ const submitForm = async (): Promise<void> => {
                       const data = new FormData();
                       data.set('name', form.value.name);
                       data.set('slug', form.value.slug);
-                      data.set('category', form.value.category);
+                      data.set('category', payload.category);
                       data.set('price_in_sen', payload.price_in_sen.toString());
                       data.set(
                           'original_price_in_sen',
-                          form.value.original_price_in_sen.trim(),
+                          payload.original_price_in_sen?.toString() ?? '',
                       );
                       data.set('badge', form.value.badge);
                       data.set('gradient', form.value.gradient);
@@ -842,11 +886,11 @@ onMounted(async () => {
                         >
                             <option value="all">All categories</option>
                             <option
-                                v-for="category in categoryOptions"
-                                :key="category"
-                                :value="category"
+                                v-for="category in productCategoryOptions"
+                                :key="category.value"
+                                :value="category.value"
                             >
-                                {{ category }}
+                                {{ category.label }}
                             </option>
                         </select>
                         <div
@@ -1094,10 +1138,16 @@ onMounted(async () => {
                                             </Badge>
                                         </td>
                                         <td class="tm-td">
-                                            {{ product.category }}
+                                            {{
+                                                getProductCategoryLabel(
+                                                    product.category,
+                                                )
+                                            }}
                                         </td>
                                         <td class="tm-td">
-                                            {{ product.price_in_sen }}
+                                            {{
+                                                toRinggit(product.price_in_sen)
+                                            }}
                                         </td>
                                         <td class="tm-td text-right">
                                             <div
@@ -1242,44 +1292,58 @@ onMounted(async () => {
                                     <Label for="category" class="tm-label"
                                         >Category</Label
                                     >
-                                    <Input
+                                    <select
                                         id="category"
                                         v-model="form.category"
-                                        class="tm-input-surface"
-                                    />
+                                        class="tm-select-surface"
+                                    >
+                                        <option value="">
+                                            Select product category
+                                        </option>
+                                        <option
+                                            v-for="category in productCategoryOptions"
+                                            :key="category.value"
+                                            :value="category.value"
+                                        >
+                                            {{ category.label }}
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
                         </section>
                         <section class="tm-card p-4">
                             <p class="tm-subtitle">Commercial details</p>
                             <p class="tm-form-hint">
-                                Keep monetary values in sen and optional badge
-                                labels for merchandising highlights.
+                                Enter ringgit values in RM format like
+                                <code>1.00</code> and add optional badge labels
+                                for merchandising highlights.
                             </p>
                             <div class="mt-3 space-y-3">
                                 <div class="grid grid-cols-2 gap-3">
                                     <div class="tm-form-field">
                                         <Label for="price" class="tm-label"
-                                            >Price (sen)</Label
+                                            >Price (RM)</Label
                                         >
                                         <Input
                                             id="price"
                                             v-model="form.price_in_sen"
                                             class="tm-input-surface"
-                                            inputmode="numeric"
+                                            inputmode="decimal"
+                                            placeholder="1.00"
                                         />
                                     </div>
                                     <div class="tm-form-field">
                                         <Label
                                             for="original-price"
                                             class="tm-label"
-                                            >Original price (sen)</Label
+                                            >Original price (RM)</Label
                                         >
                                         <Input
                                             id="original-price"
                                             v-model="form.original_price_in_sen"
                                             class="tm-input-surface"
-                                            inputmode="numeric"
+                                            inputmode="decimal"
+                                            placeholder="1.00"
                                         />
                                     </div>
                                 </div>

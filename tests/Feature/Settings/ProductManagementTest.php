@@ -40,7 +40,7 @@ test('admin can create update and delete product', function (): void {
     $createResponse = $this->actingAs($admin)->post(route('products.store'), [
         'name' => 'Songket Classic',
         'slug' => 'songket-classic',
-        'category' => 'Women',
+        'category' => 'malay',
         'price_in_sen' => 19900,
         'original_price_in_sen' => 24900,
         'badge' => 'New',
@@ -56,7 +56,7 @@ test('admin can create update and delete product', function (): void {
     $updateResponse = $this->actingAs($admin)->put(route('products.update', $product), [
         'name' => 'Songket Classic Updated',
         'slug' => 'songket-classic-updated',
-        'category' => 'Women',
+        'category' => 'other',
         'price_in_sen' => 20900,
         'original_price_in_sen' => 25900,
         'badge' => 'Best Seller',
@@ -83,13 +83,13 @@ test('admin can create product with uploaded image', function (): void {
     $createResponse = $this->actingAs($admin)->post(route('products.store'), [
         'name' => 'Batik Deluxe',
         'slug' => 'batik-deluxe',
-        'category' => 'Women',
-        'price_in_sen' => 25900,
-        'original_price_in_sen' => 29900,
+        'category' => 'malay',
+        'price_in_sen' => '25900',
+        'original_price_in_sen' => '29900',
         'badge' => 'Fresh',
         'gradient' => 'from-emerald-100 via-teal-50 to-cyan-100',
         'image' => UploadedFile::fake()->image('batik-deluxe.jpg'),
-        'is_active' => true,
+        'is_active' => '1',
     ]);
 
     $createResponse->assertCreated();
@@ -110,7 +110,7 @@ test('admin replacing an uploaded image removes the old managed file', function 
     $createResponse = $this->actingAs($admin)->post(route('products.store'), [
         'name' => 'Tenun Luxe',
         'slug' => 'tenun-luxe',
-        'category' => 'Women',
+        'category' => 'indian',
         'price_in_sen' => 31900,
         'original_price_in_sen' => 35900,
         'badge' => 'Editor Pick',
@@ -130,13 +130,13 @@ test('admin replacing an uploaded image removes the old managed file', function 
         '_method' => 'PUT',
         'name' => 'Tenun Luxe',
         'slug' => 'tenun-luxe',
-        'category' => 'Women',
-        'price_in_sen' => 32900,
-        'original_price_in_sen' => 36900,
+        'category' => 'chinese',
+        'price_in_sen' => '32900',
+        'original_price_in_sen' => '36900',
         'badge' => 'Editor Pick',
         'gradient' => 'from-fuchsia-100 via-rose-50 to-orange-100',
         'image' => UploadedFile::fake()->image('tenun-luxe-new.jpg'),
-        'is_active' => true,
+        'is_active' => '1',
     ]);
 
     $updateResponse->assertOk();
@@ -148,4 +148,20 @@ test('admin replacing an uploaded image removes the old managed file', function 
     expect($newImagePath)->not->toBe($oldImagePath);
     Storage::disk('public')->assertMissing($oldImagePath);
     Storage::disk('public')->assertExists($newImagePath);
+});
+
+test('product category must use supported enum values', function (): void {
+    $this->seed(SecurityRbacSeeder::class);
+
+    $admin = User::factory()->create();
+    $admin->assignRole(Role::findByName('admin', 'web'));
+
+    $this->actingAs($admin)->post(route('products.store'), [
+        'name' => 'Heritage Capsule',
+        'slug' => 'heritage-capsule',
+        'category' => 'women',
+        'price_in_sen' => 15900,
+        'original_price_in_sen' => 19900,
+        'is_active' => true,
+    ])->assertSessionHasErrors('category');
 });

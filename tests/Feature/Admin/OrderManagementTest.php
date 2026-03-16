@@ -149,7 +149,7 @@ function createAdminOrderFixture(User $customer, string $status): Order
     $product = Product::query()->create([
         'name' => 'Heritage Kurung',
         'slug' => 'heritage-kurung-'.$customer->id.'-'.$status,
-        'category' => 'Women',
+        'category' => 'malay',
         'description' => 'Woven for ceremonial occasions.',
         'price_in_sen' => 18900,
         'original_price_in_sen' => 21900,

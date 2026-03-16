@@ -67,7 +67,7 @@ function createCustomerOrderFixture(User $user, string $status): Order
     $product = Product::query()->create([
         'name' => 'Artisan Kebaya '.$user->id.'-'.$status,
         'slug' => 'artisan-kebaya-'.$user->id.'-'.$status,
-        'category' => 'Women',
+        'category' => 'chinese',
         'description' => 'Tailored for celebratory evenings.',
         'price_in_sen' => 20900,
         'original_price_in_sen' => 23900,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs\Settings;
 
+use App\Enums\ProductCategory;
 use App\Http\Requests\Settings\ProductStoreRequest;
 use App\Http\Requests\Settings\ProductUpdateRequest;
 use Illuminate\Http\UploadedFile;
@@ -14,7 +15,7 @@ readonly class ProductPayloadData
     public function __construct(
         public string $name,
         public string $slug,
-        public string $category,
+        public ProductCategory $category,
         public ?string $description,
         public int $priceInSen,
         public ?int $originalPriceInSen,
@@ -62,15 +63,16 @@ readonly class ProductPayloadData
         $gradient = $validated['gradient'] ?? null;
         $imageUrl = $validated['image_url'] ?? null;
         $isActive = $validated['is_active'] ?? null;
+        $normalizedCategory = is_string($category) ? ProductCategory::tryFrom($category) : null;
 
-        if (! is_string($name) || ! is_string($slug) || ! is_string($category) || ! is_int($priceInSen) || ! is_bool($isActive)) {
+        if (! is_string($name) || ! is_string($slug) || $normalizedCategory === null || ! is_int($priceInSen) || ! is_bool($isActive)) {
             throw new UnexpectedValueException('Validated product payload is invalid.');
         }
 
         return new self(
             name: $name,
             slug: $slug,
-            category: $category,
+            category: $normalizedCategory,
             description: self::normalizeOptionalString($description),
             priceInSen: $priceInSen,
             originalPriceInSen: is_int($originalPriceInSen) ? $originalPriceInSen : null,

@@ -24,7 +24,7 @@ test('authenticated user can place an order and cart is cleared', function (): v
     $product = Product::query()->create([
         'name' => 'Batik Heritage',
         'slug' => 'batik-heritage',
-        'category' => 'Women',
+        'category' => 'malay',
         'price_in_sen' => 15000,
         'original_price_in_sen' => 18000,
         'badge' => 'Featured',
@@ -82,7 +82,7 @@ test('user cannot view another users order confirmation', function (): void {
     $product = Product::query()->create([
         'name' => 'Songket Legacy',
         'slug' => 'songket-legacy',
-        'category' => 'Men',
+        'category' => 'other',
         'price_in_sen' => 12000,
         'original_price_in_sen' => null,
         'badge' => null,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Settings;
 
+use App\Enums\ProductCategory;
+use App\Http\Requests\Settings\Concerns\NormalizesProductInput;
 use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -11,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class ProductUpdateRequest extends FormRequest
 {
+    use NormalizesProductInput;
+
     public function authorize(): bool
     {
         return true;
@@ -27,7 +31,7 @@ class ProductUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:180'],
             'slug' => ['required', 'string', 'max:200', 'alpha_dash', Rule::unique('products', 'slug')->ignore($productId)],
-            'category' => ['required', 'string', 'max:120'],
+            'category' => ['required', Rule::enum(ProductCategory::class)],
             'description' => ['nullable', 'string', 'max:5000'],
             'price_in_sen' => ['required', 'integer', 'min:1', 'max:99999999'],
             'original_price_in_sen' => ['nullable', 'integer', 'min:1', 'max:99999999'],
