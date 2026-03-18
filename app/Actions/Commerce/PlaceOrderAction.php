@@ -8,6 +8,7 @@ use App\DTOs\Commerce\PlaceOrderData;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Notifications\OrderPlacedNotification;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -106,6 +107,10 @@ readonly class PlaceOrderAction
 
         $session->forget('cart.items');
 
-        return $order->load(['items.product']);
+        $order->load(['items.product']);
+
+        $user->notify(new OrderPlacedNotification($order));
+
+        return $order;
     }
 }

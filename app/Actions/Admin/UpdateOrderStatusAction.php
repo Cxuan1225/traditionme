@@ -6,6 +6,7 @@ namespace App\Actions\Admin;
 
 use App\DTOs\Admin\UpdateOrderStatusData;
 use App\Models\Order;
+use App\Notifications\OrderStatusChangedNotification;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
@@ -54,7 +55,11 @@ class UpdateOrderStatusAction
             ($this->restoreStockAction)($order);
         }
 
-        return $order->refresh()->load(['user', 'items.product']);
+        $order->refresh()->load(['user', 'items.product']);
+
+        $order->user->notify(new OrderStatusChangedNotification($order, $data->status));
+
+        return $order;
     }
 
     private function ensureTransitionIsAllowed(string $currentStatus, string $nextStatus): void
