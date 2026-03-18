@@ -18,6 +18,10 @@ class UpdateCartItemAction
         if ($quantity <= 0) {
             unset($cart[$product->slug]);
         } else {
+            if (! $product->hasStockFor($quantity)) {
+                $quantity = $product->track_stock ? $product->stock_quantity : $quantity;
+            }
+
             $cart[$product->slug] = $quantity;
         }
 

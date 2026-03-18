@@ -11,6 +11,10 @@ use Illuminate\Validation\ValidationException;
 
 class UpdateOrderStatusAction
 {
+    public function __construct(
+        private readonly RestoreStockAction $restoreStockAction,
+    ) {}
+
     /**
      * @var array<string, list<string>>
      */
@@ -45,6 +49,10 @@ class UpdateOrderStatusAction
 
         $order->fill($changes);
         $order->save();
+
+        if ($data->status === 'cancelled') {
+            ($this->restoreStockAction)($order);
+        }
 
         return $order->refresh()->load(['user', 'items.product']);
     }

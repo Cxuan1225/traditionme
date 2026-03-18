@@ -7,6 +7,8 @@ export interface CartLine {
     quantity: number;
     imageUrl: string | null;
     gradient: string | null;
+    inStock: boolean;
+    stockQuantity: number | null;
 }
 
 export type CheckoutCartLine = CartLine;

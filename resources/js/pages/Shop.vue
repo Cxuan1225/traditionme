@@ -293,7 +293,7 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                                 }}</span>
                             </div>
                             <div
-                                class="tm-product-media bg-linear-to-br"
+                                class="tm-product-media relative bg-linear-to-br"
                                 :class="
                                     product.gradient ??
                                     'from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-700'
@@ -306,6 +306,16 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                                     class="h-full w-full object-cover"
                                     loading="lazy"
                                 />
+                                <div
+                                    v-if="!product.inStock"
+                                    class="absolute inset-0 flex items-center justify-center bg-black/50"
+                                >
+                                    <span
+                                        class="rounded-full bg-white px-3 py-1 text-xs font-bold tracking-wide text-red-600"
+                                    >
+                                        Out of Stock
+                                    </span>
+                                </div>
                             </div>
                             <h3 class="tm-title mt-4 text-xl">
                                 {{ product.name }}
@@ -333,9 +343,14 @@ watch([query, selectedCategory, selectedSort], applyFilters);
                             <Button
                                 class="mt-4 w-full"
                                 :aria-label="`Add ${product.name} to cart`"
+                                :disabled="!product.inStock"
                                 @click="addToCart(product.slug)"
                             >
-                                Add to cart
+                                {{
+                                    product.inStock
+                                        ? 'Add to cart'
+                                        : 'Out of stock'
+                                }}
                             </Button>
                         </article>
                     </div>

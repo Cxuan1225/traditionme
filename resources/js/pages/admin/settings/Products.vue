@@ -45,6 +45,8 @@ type ProductResource = {
     gradient: string | null;
     image_url: string | null;
     is_active: boolean;
+    stock_quantity: number;
+    track_stock: boolean;
 };
 
 type Capabilities = {
@@ -106,6 +108,8 @@ const form = ref<{
     gradient: string;
     image_url: string;
     is_active: boolean;
+    stock_quantity: string;
+    track_stock: boolean;
 }>({
     name: '',
     slug: '',
@@ -117,6 +121,8 @@ const form = ref<{
     gradient: '',
     image_url: '',
     is_active: true,
+    stock_quantity: '0',
+    track_stock: false,
 });
 
 const abilities = computed<Required<Capabilities>>(() => ({
@@ -451,6 +457,8 @@ const resetForm = (): void => {
         gradient: '',
         image_url: '',
         is_active: true,
+        stock_quantity: '0',
+        track_stock: false,
     };
 };
 
@@ -477,6 +485,8 @@ const startEdit = (product: ProductResource): void => {
         gradient: product.gradient ?? '',
         image_url: product.image_url ?? '',
         is_active: product.is_active,
+        stock_quantity: product.stock_quantity.toString(),
+        track_stock: product.track_stock,
     };
 };
 
@@ -498,6 +508,8 @@ const duplicateIntoDraft = (product: ProductResource): void => {
         gradient: product.gradient ?? '',
         image_url: product.image_url ?? '',
         is_active: false,
+        stock_quantity: product.stock_quantity.toString(),
+        track_stock: product.track_stock,
     };
     pageSuccess.value = 'Draft copied to editor.';
 };
@@ -544,6 +556,8 @@ const submitForm = async (): Promise<void> => {
                 form.value.image_url.trim() === ''
                     ? null
                     : form.value.image_url.trim(),
+            stock_quantity: parseInt(form.value.stock_quantity, 10) || 0,
+            track_stock: form.value.track_stock,
         };
 
         const multipartPayload =
@@ -565,6 +579,11 @@ const submitForm = async (): Promise<void> => {
                       data.set('image_url', form.value.image_url.trim());
                       data.set('image', selectedImageFile.value);
                       data.set('is_active', payload.is_active ? '1' : '0');
+                      data.set(
+                          'stock_quantity',
+                          payload.stock_quantity.toString(),
+                      );
+                      data.set('track_stock', payload.track_stock ? '1' : '0');
 
                       return data;
                   })();
@@ -642,6 +661,8 @@ const toggleProductActive = async (product: ProductResource): Promise<void> => {
                     gradient: product.gradient ?? '',
                     image_url: product.image_url,
                     is_active: !product.is_active,
+                    stock_quantity: product.stock_quantity,
+                    track_stock: product.track_stock,
                 },
             },
         );
@@ -1056,6 +1077,7 @@ onMounted(async () => {
                                         <th scope="col" class="tm-th">
                                             Description
                                         </th>
+                                        <th scope="col" class="tm-th">Stock</th>
                                         <th scope="col" class="tm-th">
                                             Price (sen)
                                         </th>
@@ -1181,6 +1203,26 @@ onMounted(async () => {
                                                     )
                                                 }}
                                             </p>
+                                        </td>
+                                        <td class="tm-td">
+                                            <span
+                                                v-if="!product.track_stock"
+                                                class="text-muted-foreground"
+                                                title="Stock not tracked"
+                                            >
+                                                &mdash;
+                                            </span>
+                                            <span
+                                                v-else-if="
+                                                    product.stock_quantity > 0
+                                                "
+                                                class="text-green-600"
+                                            >
+                                                {{ product.stock_quantity }}
+                                            </span>
+                                            <span v-else class="text-red-600">
+                                                0
+                                            </span>
                                         </td>
                                         <td class="tm-td">
                                             {{
@@ -1532,6 +1574,34 @@ onMounted(async () => {
                                             v-model="form.gradient"
                                             class="tm-input-surface"
                                             placeholder="from-rose-100 via-orange-50 to-amber-100"
+                                        />
+                                    </div>
+                                    <Label
+                                        class="flex items-center gap-2 text-sm"
+                                    >
+                                        <input
+                                            v-model="form.track_stock"
+                                            type="checkbox"
+                                            class="h-4 w-4 rounded border-zinc-300"
+                                        />
+                                        Track stock
+                                    </Label>
+                                    <div
+                                        v-if="form.track_stock"
+                                        class="tm-form-field"
+                                    >
+                                        <Label
+                                            for="stock_quantity"
+                                            class="tm-label"
+                                            >Stock quantity</Label
+                                        >
+                                        <Input
+                                            id="stock_quantity"
+                                            v-model="form.stock_quantity"
+                                            type="number"
+                                            min="0"
+                                            class="tm-input-surface"
+                                            placeholder="0"
                                         />
                                     </div>
                                     <Label

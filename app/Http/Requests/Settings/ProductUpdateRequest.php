@@ -51,6 +51,8 @@ class ProductUpdateRequest extends FormRequest
             ],
             'image' => ['nullable', 'image', 'max:4096'],
             'is_active' => ['required', 'boolean'],
+            'stock_quantity' => ['nullable', 'integer', 'min:0'],
+            'track_stock' => ['nullable', 'boolean'],
         ];
     }
 }

@@ -68,6 +68,24 @@ readonly class PlaceOrderAction
                 'notes' => $data->notes,
             ]);
 
+            foreach ($lines as $line) {
+                /** @var Product $product */
+                $product = $line['product'];
+                $quantity = $line['quantity'];
+
+                if ($product->track_stock) {
+                    $fresh = Product::query()->lockForUpdate()->find($product->id);
+
+                    if ($fresh === null || ! $fresh->hasStockFor($quantity)) {
+                        throw new RuntimeException(
+                            sprintf('Insufficient stock for "%s". Only %d available.', $product->name, $fresh?->stock_quantity ?? 0),
+                        );
+                    }
+
+                    $fresh->decrement('stock_quantity', $quantity);
+                }
+            }
+
             $order->items()->createMany(array_map(
                 /**
                  * @param  array{product: Product, quantity: int}  $line

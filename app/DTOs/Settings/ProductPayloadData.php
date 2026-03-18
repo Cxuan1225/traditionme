@@ -25,6 +25,8 @@ readonly class ProductPayloadData
         public bool $hasImageUrlInput,
         public ?UploadedFile $imageFile,
         public bool $isActive,
+        public int $stockQuantity,
+        public bool $trackStock,
     ) {}
 
     public static function fromStoreRequest(ProductStoreRequest $request): self
@@ -63,6 +65,8 @@ readonly class ProductPayloadData
         $gradient = $validated['gradient'] ?? null;
         $imageUrl = $validated['image_url'] ?? null;
         $isActive = $validated['is_active'] ?? null;
+        $stockQuantity = $validated['stock_quantity'] ?? 0;
+        $trackStock = $validated['track_stock'] ?? false;
         $normalizedCategory = is_string($category) ? ProductCategory::tryFrom($category) : null;
 
         if (! is_string($name) || ! is_string($slug) || $normalizedCategory === null || ! is_int($priceInSen) || ! is_bool($isActive)) {
@@ -82,6 +86,8 @@ readonly class ProductPayloadData
             hasImageUrlInput: $hasImageUrlInput,
             imageFile: $imageFile instanceof UploadedFile ? $imageFile : null,
             isActive: $isActive,
+            stockQuantity: is_int($stockQuantity) ? $stockQuantity : 0,
+            trackStock: (bool) $trackStock,
         );
     }
 

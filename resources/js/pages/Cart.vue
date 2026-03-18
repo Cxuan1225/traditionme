@@ -191,6 +191,21 @@ const applyCoupon = (): void => {
                                     <p class="tm-title mt-2 text-primary">
                                         {{ toRinggit(line.unitPriceInSen) }}
                                     </p>
+                                    <p
+                                        v-if="
+                                            line.stockQuantity !== null &&
+                                            line.quantity > line.stockQuantity
+                                        "
+                                        class="mt-1 text-xs font-semibold text-red-600"
+                                    >
+                                        Only {{ line.stockQuantity }} available
+                                    </p>
+                                    <p
+                                        v-else-if="!line.inStock"
+                                        class="mt-1 text-xs font-semibold text-red-600"
+                                    >
+                                        Out of stock
+                                    </p>
                                 </div>
                                 <div class="flex flex-col items-end gap-2">
                                     <div class="tm-qty-control">
@@ -216,6 +231,11 @@ const applyCoupon = (): void => {
                                             type="button"
                                             class="rounded-full px-2 py-1 text-sm font-bold"
                                             :aria-label="`Increase quantity for ${line.name}`"
+                                            :disabled="
+                                                line.stockQuantity !== null &&
+                                                line.quantity >=
+                                                    line.stockQuantity
+                                            "
                                             @click="
                                                 updateQuantity(
                                                     line,

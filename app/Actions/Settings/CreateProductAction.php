@@ -7,6 +7,7 @@ namespace App\Actions\Settings;
 use App\Actions\Settings\Concerns\ManagesProductImages;
 use App\DTOs\Settings\ProductPayloadData;
 use App\Models\Product;
+use Illuminate\Http\UploadedFile;
 
 class CreateProductAction
 {
@@ -14,7 +15,7 @@ class CreateProductAction
 
     public function __invoke(ProductPayloadData $data): Product
     {
-        $imageUrl = $data->imageFile instanceof \Illuminate\Http\UploadedFile
+        $imageUrl = $data->imageFile instanceof UploadedFile
             ? $this->storeUploadedImage($data->imageFile)
             : $data->imageUrl;
 
@@ -29,6 +30,8 @@ class CreateProductAction
             'gradient' => $data->gradient,
             'image_url' => $imageUrl,
             'is_active' => $data->isActive,
+            'stock_quantity' => $data->stockQuantity,
+            'track_stock' => $data->trackStock,
         ]);
     }
 }

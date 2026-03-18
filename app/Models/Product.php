@@ -20,10 +20,12 @@ use Illuminate\Support\Carbon;
  * @property string|null $gradient
  * @property string|null $image_url
  * @property bool $is_active
+ * @property int $stock_quantity
+ * @property bool $track_stock
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Fillable(['name', 'slug', 'category', 'description', 'price_in_sen', 'original_price_in_sen', 'badge', 'gradient', 'image_url', 'is_active'])]
+#[Fillable(['name', 'slug', 'category', 'description', 'price_in_sen', 'original_price_in_sen', 'badge', 'gradient', 'image_url', 'is_active', 'stock_quantity', 'track_stock'])]
 class Product extends Model
 {
     /**
@@ -33,6 +35,17 @@ class Product extends Model
     {
         return [
             'is_active' => 'bool',
+            'track_stock' => 'bool',
         ];
+    }
+
+    public function isInStock(): bool
+    {
+        return ! $this->track_stock || $this->stock_quantity > 0;
+    }
+
+    public function hasStockFor(int $quantity): bool
+    {
+        return ! $this->track_stock || $this->stock_quantity >= $quantity;
     }
 }

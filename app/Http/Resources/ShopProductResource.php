@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Product */
+/** @mixin Product */
 class ShopProductResource extends JsonResource
 {
     /**
@@ -26,6 +27,8 @@ class ShopProductResource extends JsonResource
             'badge' => $this->badge,
             'gradient' => $this->gradient,
             'imageUrl' => $this->image_url,
+            'inStock' => $this->isInStock(),
+            'stockQuantity' => $this->track_stock ? $this->stock_quantity : null,
         ];
     }
 }

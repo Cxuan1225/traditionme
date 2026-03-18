@@ -27,6 +27,8 @@ class CartLineResource extends JsonResource
             'quantity' => $line['quantity'],
             'imageUrl' => $line['product']->image_url,
             'gradient' => $line['product']->gradient,
+            'inStock' => $line['product']->isInStock(),
+            'stockQuantity' => $line['product']->track_stock ? $line['product']->stock_quantity : null,
         ];
     }
 }

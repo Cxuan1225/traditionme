@@ -8,6 +8,8 @@ export interface ShopProduct {
     badge: string | null;
     gradient: string | null;
     imageUrl: string | null;
+    inStock: boolean;
+    stockQuantity: number | null;
 }
 
 export interface PaginationLink {
