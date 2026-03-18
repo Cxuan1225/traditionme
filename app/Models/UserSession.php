@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -13,23 +16,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id
  * @property string|null $ip_address
  * @property string|null $user_agent
- * @property \Carbon\CarbonImmutable|\Illuminate\Support\Carbon|string|null $last_activity_at
- * @property \Carbon\CarbonImmutable|\Illuminate\Support\Carbon|string|null $revoked_at
+ * @property CarbonImmutable|Carbon|string|null $last_activity_at
+ * @property CarbonImmutable|Carbon|string|null $revoked_at
  */
+#[Fillable(['session_id', 'user_id', 'ip_address', 'user_agent', 'last_activity_at', 'revoked_at'])]
 class UserSession extends Model
 {
-    /**
-     * @var list<string>
-     */
-    protected $fillable = [
-        'session_id',
-        'user_id',
-        'ip_address',
-        'user_agent',
-        'last_activity_at',
-        'revoked_at',
-    ];
-
     /**
      * @var array<string, string>
      */

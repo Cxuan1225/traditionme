@@ -10,7 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Security\AssignUserRolesRequest;
 use App\Http\Resources\UserSecurityResource;
 use App\Models\User;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 
+#[Middleware('permission:users.assign_roles')]
 class UserRoleController extends Controller
 {
     public function update(

@@ -13,11 +13,17 @@ use App\Http\Requests\Settings\ProductStoreRequest;
 use App\Http\Requests\Settings\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Inertia\Inertia;
 use Inertia\Response;
 
+#[Middleware('permission:products.view', only: ['index'])]
+#[Middleware('permission:products.create', only: ['store'])]
+#[Middleware('permission:products.update', only: ['update'])]
+#[Middleware('permission:products.delete', only: ['destroy'])]
 class ProductController extends Controller
 {
     public function index(Request $request): Response|AnonymousResourceCollection
@@ -56,7 +62,7 @@ class ProductController extends Controller
         return new ProductResource($updatedProduct);
     }
 
-    public function destroy(Product $product, DeleteProductAction $action): \Illuminate\Http\JsonResponse
+    public function destroy(Product $product, DeleteProductAction $action): JsonResponse
     {
         $action($product);
 

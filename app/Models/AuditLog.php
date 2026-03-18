@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,25 +20,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $ip_address
  * @property string|null $user_agent
  * @property array<string, mixed>|null $metadata
- * @property \Carbon\CarbonImmutable|\Illuminate\Support\Carbon|string $occurred_at
+ * @property CarbonImmutable|Carbon|string $occurred_at
  */
+#[Fillable(['actor_id', 'event', 'subject_type', 'subject_id', 'ip_address', 'user_agent', 'metadata', 'occurred_at'])]
 class AuditLog extends Model
 {
     public $timestamps = false;
-
-    /**
-     * @var list<string>
-     */
-    protected $fillable = [
-        'actor_id',
-        'event',
-        'subject_type',
-        'subject_id',
-        'ip_address',
-        'user_agent',
-        'metadata',
-        'occurred_at',
-    ];
 
     /**
      * @var array<string, string>

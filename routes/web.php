@@ -30,9 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account/orders', [OrderController::class, 'index'])->name('account.orders.index');
     Route::get('/account/orders/{order}', [OrderController::class, 'accountShow'])->name('account.orders.show');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('admin/view-mode', [ViewModeController::class, 'update'])
-        ->middleware('role:admin')
-        ->name('admin.view-mode.update');
+    Route::post('admin/view-mode', [ViewModeController::class, 'update'])->name('admin.view-mode.update');
 });
 
 require __DIR__.'/settings.php';

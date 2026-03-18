@@ -15,9 +15,12 @@ use App\Models\Order as OrderModel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Inertia\Inertia;
 use Inertia\Response;
 
+#[Middleware('permission:orders.view', only: ['index', 'show'])]
+#[Middleware('permission:orders.update_status', only: ['updateStatus'])]
 class OrderController extends Controller
 {
     public function index(Request $request, GetOrdersAction $action): Response

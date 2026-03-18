@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,23 +17,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $unit_price_in_sen
  * @property int $quantity
  * @property int $subtotal_in_sen
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
+#[Fillable(['order_id', 'product_id', 'product_name', 'unit_price_in_sen', 'quantity', 'subtotal_in_sen'])]
 class OrderItem extends Model
 {
-    /**
-     * @var list<string>
-     */
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'product_name',
-        'unit_price_in_sen',
-        'quantity',
-        'subtotal_in_sen',
-    ];
-
     /**
      * @return BelongsTo<Order, $this>
      */

@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 test('sync role permissions is idempotent for duplicate calls', function (): void {
-    $this->withoutMiddleware(VerifyCsrfToken::class);
+    $this->withoutMiddleware(PreventRequestForgery::class);
 
     $actor = User::factory()->create([
         'email_verified_at' => now(),
@@ -35,7 +35,7 @@ test('sync role permissions is idempotent for duplicate calls', function (): voi
 });
 
 test('assign user roles uses sync behavior', function (): void {
-    $this->withoutMiddleware(VerifyCsrfToken::class);
+    $this->withoutMiddleware(PreventRequestForgery::class);
 
     $actor = User::factory()->create([
         'email_verified_at' => now(),

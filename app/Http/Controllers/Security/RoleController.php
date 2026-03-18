@@ -12,11 +12,14 @@ use App\Http\Resources\PermissionResource;
 use App\Http\Resources\RoleResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Inertia\Inertia;
 use Inertia\Response;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
+#[Middleware('role_or_permission:admin|roles.view', only: ['index'])]
+#[Middleware('permission:roles.create', only: ['store'])]
 class RoleController extends Controller
 {
     public function index(Request $request): Response|AnonymousResourceCollection

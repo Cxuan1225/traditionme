@@ -4,22 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $email
  * @property string $source
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
-class NewsletterSubscriber extends Model
-{
-    /**
-     * @var list<string>
-     */
-    protected $fillable = [
-        'email',
-        'source',
-    ];
-}
+#[Fillable(['email', 'source'])]
+class NewsletterSubscriber extends Model {}

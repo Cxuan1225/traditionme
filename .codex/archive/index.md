@@ -6,6 +6,11 @@ Completed tasks grouped by date, **newest first**.
 
 ---
 
+## 2026-03-16
+
+- [product-pricing-and-category-normalization.md](2026-03-16/product-pricing-and-category-normalization.md) — Switch product pricing to RM entry, constrain categories to enum values, and fix multipart product create failures
+- [phase-5-customer-order-history.md](2026-03-16/phase-5-customer-order-history.md) — Deliver customer account order history, detail timeline, and storefront navigation entry for phase 5
+
 ## 2026-03-12
 
 - [phase-4-admin-order-management-product-description.md](2026-03-12/phase-4-admin-order-management-product-description.md) — Add admin order management and product description support for phase 4

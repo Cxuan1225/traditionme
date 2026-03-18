@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -24,37 +26,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $shipping_phone
  * @property string|null $coupon_code
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $paid_at
- * @property \Illuminate\Support\Carbon|null $shipped_at
- * @property \Illuminate\Support\Carbon|null $delivered_at
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
+ * @property Carbon|null $paid_at
+ * @property Carbon|null $shipped_at
+ * @property Carbon|null $delivered_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
+#[Fillable(['user_id', 'status', 'subtotal_in_sen', 'discount_in_sen', 'shipping_in_sen', 'total_in_sen', 'shipping_name', 'shipping_address', 'shipping_city', 'shipping_state', 'shipping_postcode', 'shipping_phone', 'coupon_code', 'notes', 'paid_at', 'shipped_at', 'delivered_at'])]
 class Order extends Model
 {
-    /**
-     * @var list<string>
-     */
-    protected $fillable = [
-        'user_id',
-        'status',
-        'subtotal_in_sen',
-        'discount_in_sen',
-        'shipping_in_sen',
-        'total_in_sen',
-        'shipping_name',
-        'shipping_address',
-        'shipping_city',
-        'shipping_state',
-        'shipping_postcode',
-        'shipping_phone',
-        'coupon_code',
-        'notes',
-        'paid_at',
-        'shipped_at',
-        'delivered_at',
-    ];
-
     /**
      * @return array<string, string>
      */

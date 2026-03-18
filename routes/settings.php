@@ -14,33 +14,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::get('settings/products', [ProductController::class, 'index'])
-        ->middleware('permission:products.view')
-        ->name('products.index');
+    Route::get('settings/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('settings/products', [ProductController::class, 'store'])->name('products.store');
+    Route::put('settings/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('settings/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-    Route::post('settings/products', [ProductController::class, 'store'])
-        ->middleware('permission:products.create')
-        ->name('products.store');
-
-    Route::put('settings/products/{product}', [ProductController::class, 'update'])
-        ->middleware('permission:products.update')
-        ->name('products.update');
-
-    Route::delete('settings/products/{product}', [ProductController::class, 'destroy'])
-        ->middleware('permission:products.delete')
-        ->name('products.destroy');
-
-    Route::get('settings/orders', [AdminOrderController::class, 'index'])
-        ->middleware('permission:orders.view')
-        ->name('admin.orders.index');
-
-    Route::get('settings/orders/{order}', [AdminOrderController::class, 'show'])
-        ->middleware('permission:orders.view')
-        ->name('admin.orders.show');
-
-    Route::patch('settings/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])
-        ->middleware('permission:orders.update_status')
-        ->name('admin.orders.update-status');
+    Route::get('settings/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('settings/orders/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+    Route::patch('settings/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.update-status');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

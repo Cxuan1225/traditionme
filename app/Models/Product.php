@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,27 +20,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $gradient
  * @property string|null $image_url
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
+#[Fillable(['name', 'slug', 'category', 'description', 'price_in_sen', 'original_price_in_sen', 'badge', 'gradient', 'image_url', 'is_active'])]
 class Product extends Model
 {
-    /**
-     * @var list<string>
-     */
-    protected $fillable = [
-        'name',
-        'slug',
-        'category',
-        'description',
-        'price_in_sen',
-        'original_price_in_sen',
-        'badge',
-        'gradient',
-        'image_url',
-        'is_active',
-    ];
-
     /**
      * @return array<string, string>
      */

@@ -9,8 +9,10 @@ use App\Http\Controllers\Controller;
 use App\Support\AdminViewMode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Illuminate\Validation\Rule;
 
+#[Middleware('role:admin')]
 class ViewModeController extends Controller
 {
     public function update(Request $request): RedirectResponse

@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Spatie\Permission\Models\Permission;
 
 test('roles index is forbidden without permission', function (): void {
-    $this->withoutMiddleware(VerifyCsrfToken::class);
+    $this->withoutMiddleware(PreventRequestForgery::class);
 
     $user = User::factory()->create([
         'email_verified_at' => now(),
@@ -19,7 +19,7 @@ test('roles index is forbidden without permission', function (): void {
 });
 
 test('roles index is accessible with roles.view permission', function (): void {
-    $this->withoutMiddleware(VerifyCsrfToken::class);
+    $this->withoutMiddleware(PreventRequestForgery::class);
 
     $user = User::factory()->create([
         'email_verified_at' => now(),
