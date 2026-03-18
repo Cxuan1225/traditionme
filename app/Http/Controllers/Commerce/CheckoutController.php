@@ -76,7 +76,6 @@ class CheckoutController extends Controller
         }
 
         return redirect()
-            ->route('orders.show', $order)
-            ->with('status', 'Order placed successfully.');
+            ->route('orders.pay', $order);
     }
 }

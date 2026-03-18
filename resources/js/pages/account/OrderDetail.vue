@@ -1,18 +1,31 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { Clock3, PackageCheck, ReceiptText, Truck } from 'lucide-vue-next';
+import { Head, Link, router } from '@inertiajs/vue3';
+import {
+    Clock3,
+    CreditCard,
+    PackageCheck,
+    ReceiptText,
+    ShieldCheck,
+    Truck,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toRinggit } from '@/composables/useCurrency';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
 import { index as ordersIndex } from '@/routes/account/orders';
+import { pay as orderPay } from '@/routes/orders';
 import shop from '@/routes/shop';
 import type { Order } from '@/types/order';
 
 const props = defineProps<{
     order: Order;
 }>();
+
+function payNow(): void {
+    const route = orderPay(props.order.id);
+    router.post(route.url);
+}
 
 const placedAtLabel = computed<string>(() =>
     formatTimestamp(props.order.placedAt),
@@ -129,10 +142,27 @@ function formatTimestamp(value: string | null): string {
 
             <article
                 v-if="order.status === 'pending'"
-                class="rounded-3xl border border-amber-300/70 bg-amber-50/80 px-5 py-4 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/30 dark:text-amber-100"
+                class="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-amber-300/70 bg-amber-50/80 px-5 py-4 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-950/30 dark:text-amber-100"
             >
-                Payment is still pending. We’ll keep this order reserved and
-                update the timeline as soon as payment is confirmed.
+                <span>
+                    Payment is still pending. Complete payment to confirm your
+                    order.
+                </span>
+                <Button size="sm" @click="payNow">
+                    <CreditCard class="mr-2 size-3.5" />
+                    Pay now
+                </Button>
+            </article>
+
+            <article
+                v-else-if="order.paymentTransactionId"
+                class="flex items-center gap-3 rounded-3xl border border-emerald-200 bg-emerald-50/80 px-5 py-4 text-sm text-emerald-800 dark:border-emerald-500/40 dark:bg-emerald-950/30 dark:text-emerald-100"
+            >
+                <ShieldCheck class="size-4 shrink-0" />
+                <span>
+                    Payment confirmed via
+                    {{ order.paymentMethod ?? 'card' }}
+                </span>
             </article>
 
             <div class="grid gap-5 xl:grid-cols-[1.15fr_360px]">

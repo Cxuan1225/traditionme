@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Order */
+/** @mixin Order */
 class OrderResource extends JsonResource
 {
     /**
@@ -29,6 +30,8 @@ class OrderResource extends JsonResource
             'paidAt' => $this->paid_at?->toIso8601String(),
             'shippedAt' => $this->shipped_at?->toIso8601String(),
             'deliveredAt' => $this->delivered_at?->toIso8601String(),
+            'paymentMethod' => $this->payment_method,
+            'paymentTransactionId' => $this->payment_transaction_id,
             'summary' => [
                 'subtotalInSen' => $this->subtotal_in_sen,
                 'discountInSen' => $this->discount_in_sen,

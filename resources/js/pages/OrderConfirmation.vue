@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     CheckCircle2,
+    CreditCard,
     PackageCheck,
     ReceiptText,
+    ShieldCheck,
     Truck,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
@@ -11,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toRinggit } from '@/composables/useCurrency';
 import StorefrontLayout from '@/layouts/account/StorefrontLayout.vue';
+import { pay as orderPay } from '@/routes/orders';
 import shop from '@/routes/shop';
 import type { Order } from '@/types/order';
 
@@ -19,6 +22,11 @@ const props = defineProps<{
 }>();
 
 const page = usePage<{ flash?: { status?: string } }>();
+
+function payNow(): void {
+    const route = orderPay(props.order.id);
+    router.post(route.url);
+}
 
 const placedAtLabel = computed<string>(() => {
     if (props.order.placedAt === null) {
@@ -51,7 +59,7 @@ const placedAtLabel = computed<string>(() => {
                             Your order is in motion.
                         </h1>
                         <p class="tm-body mt-3">
-                            We’ve captured your shipping details and locked the
+                            We've captured your shipping details and locked the
                             current product snapshot for fulfillment.
                         </p>
                         <div class="mt-5 flex flex-wrap items-center gap-3">
@@ -258,9 +266,35 @@ const placedAtLabel = computed<string>(() => {
                             </p>
                         </div>
 
-                        <Link :href="shop.index()" class="mt-5 block">
-                            <Button class="w-full">Continue shopping</Button>
-                        </Link>
+                        <div class="mt-5 space-y-3">
+                            <Button
+                                v-if="order.status === 'pending'"
+                                class="w-full"
+                                @click="payNow"
+                            >
+                                <CreditCard class="mr-2 size-4" />
+                                Pay now
+                            </Button>
+                            <div
+                                v-else-if="order.status === 'paid'"
+                                class="flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-semibold text-emerald-800 dark:border-emerald-500/40 dark:bg-emerald-950/30 dark:text-emerald-100"
+                            >
+                                <ShieldCheck class="size-4" />
+                                Payment confirmed
+                            </div>
+                            <Link :href="shop.index()" class="block">
+                                <Button
+                                    :variant="
+                                        order.status === 'pending'
+                                            ? 'outline'
+                                            : 'default'
+                                    "
+                                    class="w-full"
+                                >
+                                    Continue shopping
+                                </Button>
+                            </Link>
+                        </div>
                     </article>
 
                     <article class="tm-panel p-5">
@@ -269,10 +303,17 @@ const placedAtLabel = computed<string>(() => {
                             <div>
                                 <p class="tm-subtitle">What happens next</p>
                                 <div class="mt-3 space-y-2">
-                                    <p class="tm-body-sm">
-                                        Your order remains in `pending` status
-                                        until payment and fulfillment are
-                                        processed.
+                                    <p
+                                        v-if="order.status === 'pending'"
+                                        class="tm-body-sm"
+                                    >
+                                        Complete payment above to confirm your
+                                        order. Your items are reserved while you
+                                        pay.
+                                    </p>
+                                    <p v-else class="tm-body-sm">
+                                        Your payment is confirmed. We're now
+                                        preparing your order for shipment.
                                     </p>
                                     <p class="tm-body-sm">
                                         Item names and pricing are stored as

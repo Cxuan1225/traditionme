@@ -58,6 +58,8 @@ export interface Order {
     paidAt: string | null;
     shippedAt: string | null;
     deliveredAt: string | null;
+    paymentMethod: string | null;
+    paymentTransactionId: string | null;
     summary: OrderSummary;
     shipping: OrderShipping;
     items: OrderItem[];

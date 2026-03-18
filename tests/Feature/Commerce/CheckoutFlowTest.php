@@ -52,8 +52,7 @@ test('authenticated user can place an order and cart is cleared', function (): v
 
     $order = Order::query()->with('items')->firstOrFail();
 
-    $response->assertRedirect(route('orders.show', $order));
-    $response->assertSessionHas('status', 'Order placed successfully.');
+    $response->assertRedirect(route('orders.pay', $order));
     $this->assertDatabaseHas('orders', [
         'id' => $order->id,
         'user_id' => $user->id,

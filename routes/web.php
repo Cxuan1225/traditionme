@@ -8,6 +8,7 @@ use App\Http\Controllers\Commerce\CartItemController;
 use App\Http\Controllers\Commerce\CheckoutController;
 use App\Http\Controllers\Commerce\CollectionController;
 use App\Http\Controllers\Commerce\OrderController;
+use App\Http\Controllers\Commerce\PaymentController;
 use App\Http\Controllers\Commerce\ShopController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -30,8 +31,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account/orders', [OrderController::class, 'index'])->name('account.orders.index');
     Route::get('/account/orders/{order}', [OrderController::class, 'accountShow'])->name('account.orders.show');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::match(['get', 'post'], '/orders/{order}/pay', [PaymentController::class, 'initiate'])->name('orders.pay');
+    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
     Route::post('admin/view-mode', [ViewModeController::class, 'update'])->name('admin.view-mode.update');
 });
+
+Route::post('/webhooks/payment', [PaymentController::class, 'webhook'])->name('webhooks.payment');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/security.php';

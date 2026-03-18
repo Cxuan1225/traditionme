@@ -26,13 +26,16 @@ use Illuminate\Support\Carbon;
  * @property string $shipping_phone
  * @property string|null $coupon_code
  * @property string|null $notes
+ * @property string|null $payment_method
+ * @property string|null $payment_session_id
+ * @property string|null $payment_transaction_id
  * @property Carbon|null $paid_at
  * @property Carbon|null $shipped_at
  * @property Carbon|null $delivered_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Fillable(['user_id', 'status', 'subtotal_in_sen', 'discount_in_sen', 'shipping_in_sen', 'total_in_sen', 'shipping_name', 'shipping_address', 'shipping_city', 'shipping_state', 'shipping_postcode', 'shipping_phone', 'coupon_code', 'notes', 'paid_at', 'shipped_at', 'delivered_at'])]
+#[Fillable(['user_id', 'status', 'subtotal_in_sen', 'discount_in_sen', 'shipping_in_sen', 'total_in_sen', 'shipping_name', 'shipping_address', 'shipping_city', 'shipping_state', 'shipping_postcode', 'shipping_phone', 'coupon_code', 'notes', 'payment_method', 'payment_session_id', 'payment_transaction_id', 'paid_at', 'shipped_at', 'delivered_at'])]
 class Order extends Model
 {
     /**
