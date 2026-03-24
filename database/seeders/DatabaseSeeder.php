@@ -17,7 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(SecurityRbacSeeder::class);
+        $this->call([
+            SecurityRbacSeeder::class,
+            ProductSeeder::class,
+        ]);
 
         $admin = User::query()->updateOrCreate([
             'email' => 'admin@gmail.com',
@@ -29,5 +32,7 @@ class DatabaseSeeder extends Seeder
 
         $adminRole = Role::findByName('admin', 'web');
         $admin->syncRoles([$adminRole]);
+
+        $this->call(OrderSeeder::class);
     }
 }

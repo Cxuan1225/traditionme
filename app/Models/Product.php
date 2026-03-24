@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -28,6 +30,9 @@ use Illuminate\Support\Carbon;
 #[Fillable(['name', 'slug', 'category', 'description', 'price_in_sen', 'original_price_in_sen', 'badge', 'gradient', 'image_url', 'is_active', 'stock_quantity', 'track_stock'])]
 class Product extends Model
 {
+    /** @use HasFactory<ProductFactory> */
+    use HasFactory;
+
     /**
      * @return array<string, string>
      */

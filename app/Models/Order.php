@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,6 +40,9 @@ use Illuminate\Support\Carbon;
 #[Fillable(['user_id', 'status', 'subtotal_in_sen', 'discount_in_sen', 'shipping_in_sen', 'total_in_sen', 'shipping_name', 'shipping_address', 'shipping_city', 'shipping_state', 'shipping_postcode', 'shipping_phone', 'coupon_code', 'notes', 'payment_method', 'payment_session_id', 'payment_transaction_id', 'paid_at', 'shipped_at', 'delivered_at'])]
 class Order extends Model
 {
+    /** @use HasFactory<OrderFactory> */
+    use HasFactory;
+
     /**
      * @return array<string, string>
      */
